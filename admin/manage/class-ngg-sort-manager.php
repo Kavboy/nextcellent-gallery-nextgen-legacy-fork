@@ -1,19 +1,19 @@
 <?php
 
 include_once( 'class-ngg-manager.php' );
-include_once( NGGALLERY_ABSPATH . '/admin/interface-ngg-displayable.php' );
+include_once( dirname(__DIR__) . '/interface-ncg-admin-page.php' );
 
 /**
  * Class NGG_Sort_Manager
  *
  * This class represents the page where a user can sort the gallery.
  */
-class NGG_Sort_Manager implements NGG_Displayable {
+class NGG_Sort_Manager implements NCG_Admin_Page {
 
 	/**
 	 * @todo We also use this in NGG_Manager. Should we make another superclass or a trait for one line?
 	 */
-	const BASE = 'admin.php?page=nggallery-manage';
+	const BASE = 'admin.php?page=nextcellent-manage';
 
 	private $id;
 
@@ -88,7 +88,7 @@ class NGG_Sort_Manager implements NGG_Displayable {
 						<?php wp_nonce_field( 'ngg-update-sort' ) ?>
 						<a href="<?php echo esc_url( $back_url ); ?>" class="button"><?php _e( 'Back to gallery',
 								'nggallery' ); ?></a>
-						<input class="button-primary action" type="submit" name="update_sort_order" onclick="saveImageOrder()" value="<?php _e( 'Update Sort Order',
+						<input class="button-primary action" type="submit" name="update_sort_order" value="<?php _e( 'Update Sort Order',
 							'nggallery' ) ?>">
 					</div>
 				</div>
@@ -206,5 +206,27 @@ class NGG_Sort_Manager implements NGG_Displayable {
 
 			nggGallery::show_message( __( 'Sort order changed', 'nggallery' ) );
 		}
+	}
+
+	public function register_styles() {
+		wp_enqueue_style( 'ngg-jqueryui' );
+		wp_enqueue_style( 'nggadmin' );
+	}
+
+	public function register_scripts() {
+		wp_enqueue_script( 'postbox' );
+		wp_enqueue_script( 'ngg-ajax' );
+		wp_enqueue_script( 'ngg-progressbar' );
+		wp_enqueue_script( 'jquery-ui-dialog' );
+		wp_enqueue_script( 'jquery-ui-sortable' );
+	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	function add_help( $screen ) {
+		//None yet.
 	}
 }

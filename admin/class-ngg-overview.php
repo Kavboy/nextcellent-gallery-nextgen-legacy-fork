@@ -1,12 +1,12 @@
 <?php
 
-include_once('interface-ngg-displayable.php');
+require_once(__DIR__ . '/interface-ncg-admin-page.php');
 
 /**
  * Class to display the overview.
  * @since 1.9.24
  */
-class NGG_Overview implements NGG_Displayable {
+class NGG_Overview implements NCG_Admin_Page {
 
 	public function __construct() {
 
@@ -37,6 +37,17 @@ class NGG_Overview implements NGG_Displayable {
 			), 'ngg_overview', 'normal', 'core' );
 		}
 		add_meta_box( 'dashboard_contributors', __( 'Contributors', 'nggallery' ), array( $this, 'contributors' ), 'ngg_overview', 'normal', 'core' );
+	}
+
+
+	function register_styles() {
+		wp_enqueue_style( 'nggadmin' );
+		wp_enqueue_style( 'thickbox' );
+	}
+
+	function register_scripts() {
+		add_thickbox();
+		wp_enqueue_script( 'postbox' );
 	}
 
 	/**
@@ -880,10 +891,62 @@ class NGG_Overview implements NGG_Displayable {
 	/* New contributors. */
 	private function new_contributors() {
 		return array(
-			'Vladimir Vasilenko'    => array( 'Russian translation', 'http://shumbely.com/' ),
-			'Niko Strijbol'         => array( 'Dutch translation', 'https://plus.google.com/u/0/+NikoStrijbol' ),
-			'Vesa Tiirikainen'      => array( 'Finnish translation', 'mailto:vesa@tiirikainen.fi' ),
-			'Thomas Blomberg Hansen'=> array( 'Danish translation' , 'mailto:thomasdk81@gmail.com')
+			'Vladimir Vasilenko'     => array( 'Russian translation', 'http://shumbely.com/' ),
+			'Niko Strijbol'          => array( 'Dutch translation', 'https://plus.google.com/u/0/+NikoStrijbol' ),
+			'Vesa Tiirikainen'       => array( 'Finnish translation', 'mailto:vesa@tiirikainen.fi' ),
+			'Thomas Blomberg Hansen' => array( 'Danish translation', 'mailto:thomasdk81@gmail.com' )
 		);
+	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	public function add_help( $screen ) {
+		//The tab content
+		$help = '<p>' . __( 'Welcome to your NextCellent Dashboard! This screen gives you all kinds of information about NextCellent at glance. You can get help for any screen by clicking the Help tab in the upper corner.' ) . '</p>';
+		//Add the tab
+		$screen->add_help_tab( array(
+			'id'      => $screen->id . '-welcome',
+			'title'   => 'Overview',
+			'content' => $help
+		) );
+
+		//The tab content
+		$help = '<p>' . __( 'The boxes on your overview screen are:', 'nggallery' ) . '</p>';
+		$help .= '<p><strong>' . __( 'At a Glance',
+				'nggallery' ) . '</strong> - ' . __( 'Shows some general information about your site, such as the number of pictures, albums and galleries.',
+				'nggallery' ) . '</p>';
+		$help .= '<p><strong>' . __( 'Latest News',
+				'nggallery' ) . '</strong> - ' . __( 'The latest NextCellent news.', 'nggallery' ) . '</p>';
+		if ( ! is_multisite() || is_super_admin() ) {
+			$help .= '<p><strong>' . __( 'Related plugins',
+					'nggallery' ) . '</strong> - ' . __( 'Shows plugins that extend NextCellent.',
+					'nggallery' ) . ' <strong>' . __( 'Pay attention',
+					'nggallery' ) . '</strong>: ' . __( 'third parties plugins that are compatible with NGG may not be 100% compatible with NextCellent Gallery!',
+					'nggallery' ) . '</p>';
+		}
+		$help .= '<p><strong>' . __( 'Help me help YOU!',
+				'nggallery' ) . '</strong> - ' . __( 'Shows general information about he plugin and some links.',
+				'nggallery' ) . '</p>';
+		if ( ! ( get_locale() == 'en_US' ) ) {
+			$help .= '<p><strong>' . __( 'Translation',
+					'nggallery' ) . '</strong> - ' . __( 'View information about the current translation.' ) . '</p>';
+		}
+		if ( ! is_multisite() || is_super_admin() ) {
+			$help .= '<p><strong>' . __( 'Server Settings',
+					'nggallery' ) . '</strong> - ' . __( 'Show all the server settings!.',
+					'nggallery' ) . '</p>';
+			$help .= '<p><strong>' . __( 'Plugin Check',
+					'nggallery' ) . '</strong> - ' . __( 'Check if there are known errors in your installation.',
+					'nggallery' ) . '</p>';
+		}
+		//Add the tab
+		$screen->add_help_tab( array(
+			'id'      => $screen->id . '-content',
+			'title'   => 'Content',
+			'content' => $help
+		) );
 	}
 }

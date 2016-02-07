@@ -321,4 +321,29 @@ class NGG_Style extends NGG_Post_Admin_Page {
 			<?php
 				} //end if ( !is_multisite() || is_super_admin() )
 	}
+
+	public function register_styles() {
+		//None.
+	}
+
+	public function register_scripts() {
+		wp_enqueue_script( 'codepress' );
+	}
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	 public function add_help($screen) {
+        $help = '<p>' . __( 'You can edit the css file to adjust how your gallery looks.',
+						'nggallery' ) . '</p>';
+		$help .= '<p>' . __( 'When you save an edited file, NextCellent automatically saves it as a copy in the folder ngg_styles. This protects your changes from upgrades.',
+				'nggallery' ) . '</p>';
+
+		$screen->add_help_tab( array(
+			'id'      => $screen->id . '-general',
+			'title'   => 'Style your gallery',
+			'content' => $help
+		) );
+	}
 }

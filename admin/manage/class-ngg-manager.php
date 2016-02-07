@@ -1,15 +1,15 @@
 <?php
 
-include_once( NGGALLERY_ABSPATH . '/admin/interface-ngg-displayable.php' );
+require_once( dirname(__DIR__) . '/interface-ncg-admin-page.php' );
 
 /**
  * Class NGG_Manager
  *
  * Contains common JavaScript and other code for the managing pages.
  */
-abstract class NGG_Manager implements NGG_Displayable {
+abstract class NGG_Manager implements NCG_Admin_Page {
 
-	const BASE = 'admin.php?page=nggallery-manage';
+	const BASE = 'admin.php?page=nextcellent-manage';
 
 	/**
 	 * Subclasses should override this method, but must call the parent function.
@@ -487,5 +487,25 @@ abstract class NGG_Manager implements NGG_Displayable {
 				}
 			}
 		}
+	}
+
+	public function register_styles() {
+		wp_enqueue_style( 'ngg-cropper' );
+		wp_enqueue_style( 'shutter' );
+		wp_enqueue_style( 'datepicker');
+		wp_enqueue_style( 'ngg-jqueryui' );
+		wp_enqueue_style( 'nggadmin' );
+	}
+
+	public function register_scripts() {
+		wp_enqueue_script( 'postbox' );
+		wp_enqueue_script( 'ngg-ajax' );
+		wp_enqueue_script( 'ngg-progressbar' );
+		wp_enqueue_script( 'jquery-ui-dialog' );
+		wp_enqueue_script( 'jquery-ui-sortable' );
+		wp_enqueue_script( 'jquery-ui-datepicker' );
+		wp_enqueue_script( 'ngg-autocomplete' );
+		wp_enqueue_script( 'ngg-cropper' );
+		wp_enqueue_script( 'shutter' );
 	}
 }

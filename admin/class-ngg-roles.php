@@ -143,4 +143,31 @@ class NGG_Roles extends NGG_Post_Admin_Page {
 			$add_capability ? $the_role->add_cap($capability) : $the_role->remove_cap($capability) ;
 		}
 	}
+
+	function register_styles() {
+		wp_enqueue_style( 'ngg-jqueryui' );
+		wp_enqueue_style( 'nggadmin' );
+	}
+
+	function register_scripts() {
+		//None.
+	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	public function add_help( $screen ) {
+		$help = '<p>' . __( 'You can assign the lowest user role that has access to a certain feature. Needless to say, all greater user roles will also have access to that feature.',
+				'nggallery' ) . '</p>';
+		$help .= '<p>' . __( 'NextCellent also works with various plugins that extend the default roles capabilities.',
+				'nggallery' ) . '</p>';
+
+		$screen->add_help_tab( array(
+			'id'      => $screen->id . '-general',
+			'title'   => 'Grant permissions',
+			'content' => $help
+		) );
+	}
 }

@@ -1,8 +1,8 @@
 <?php
 
-include_once( 'interface-ngg-displayable.php' );
+include_once( __DIR__ . '/interface-ncg-admin-page.php' );
 
-class NGG_Album_Manager implements NGG_Displayable {
+class NGG_Album_Manager implements NCG_Admin_Page {
 
 	/**
 	 * The selected album ID.
@@ -610,5 +610,33 @@ class NGG_Album_Manager implements NGG_Displayable {
 		}
 
 		return $used;
+	}
+
+	public function register_styles() {
+		wp_enqueue_style( 'ngg-jqueryui' );
+		wp_enqueue_style( 'nggadmin' );
+	}
+
+	public function register_scripts() {
+		wp_enqueue_script( 'jquery-ui-dialog' );
+		wp_enqueue_script( 'jquery-ui-sortable' );
+		wp_enqueue_script( 'ngg-autocomplete' );
+	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	public function add_help( $screen ) {
+		$help = '<p>' . __( 'Organize your galleries into albums.',
+				'nggallery' ) . '</p><p>' . __( 'First select an album from the dropdown and then drag the galleries you want to add or remove from the selected album.',
+				'nggallery' ) . '</p>';
+
+		$screen->add_help_tab( array(
+			'id'      => $screen->id . '-general',
+			'title'   => 'Organize everything',
+			'content' => $help
+		) );
 	}
 }

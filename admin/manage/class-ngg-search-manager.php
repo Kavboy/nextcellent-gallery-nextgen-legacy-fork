@@ -106,4 +106,13 @@ class NGG_Search_Manager extends NGG_Abstract_Image_Manager {
 
 		return false;
 	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	function add_help( $screen ) {
+		//None yet.
+	}
 }

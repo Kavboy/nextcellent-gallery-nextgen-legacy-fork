@@ -1,6 +1,6 @@
 <?php
-include_once( 'class-ngg-gallery-list-table.php' );
-include_once( 'class-ngg-manager.php' );
+include_once( __DIR__ . '/class-ngg-gallery-list-table.php' );
+include_once( __DIR__ . '/class-ngg-manager.php' );
 
 /**
  * Class NGG_Gallery_Manager
@@ -37,7 +37,7 @@ class NGG_Gallery_Manager extends NGG_Manager {
 			</h2>
 
 			<form method="get">
-				<input type="hidden" name="page" value="nggallery-manage">
+				<input type="hidden" name="page" value="nextcellent-manage">
 				<input type="hidden" name="mode" value="search">
 				<?php $table->search_box( 'Search images', 'nggallery' ); ?>
 			</form>
@@ -120,5 +120,22 @@ class NGG_Gallery_Manager extends NGG_Manager {
 		}
 
 		do_action( 'ngg_update_addgallery_page' );
+	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	public function add_help( $screen ) {
+		add_filter( 'manage_' . $screen->id . '_columns',
+			array( 'NGG_Gallery_List_Table', 'get_columns_static' ), 0 );
+		$args = array(
+			'label'   => __( 'Galleries', 'nggallery' ),
+			'default' => 25,
+			'option'  => 'ngg_galleries_per_page'
+		);
+
+		$screen->add_option( 'per_page', $args );
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 
-include_once("interface-ngg-displayable.php");
+require_once( __DIR__ . "/interface-ncg-admin-page.php");
 
 /**
  * Tag management page. Inspired from the Simple Tags plugin by Amaury Balmer.
@@ -8,7 +8,7 @@ include_once("interface-ngg-displayable.php");
  *
  * @todo Rewrite this into a decent class
  */
-class NGG_Tag_Manager implements NGG_Displayable {
+class NGG_Tag_Manager implements NCG_Admin_Page {
 
 	public function display() {
 		$action_status = array('message' => '', 'status' => 'ok');
@@ -294,5 +294,30 @@ class NGG_Tag_Manager implements NGG_Displayable {
 		</div>
 
 		<?php
+	}
+
+	public function register_styles() {
+		wp_enqueue_style( 'nggadmin' );
+	}
+
+	public function register_scripts() {
+		//None.
+	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	public function add_help( $screen ) {
+		$help = '<p>' . __( 'Organize your pictures with tags.',
+				'nggallery' ) . '</p><p>' . __( 'Rename, delete and edit tags. Use the rename function to merge tags.',
+				'nggallery' ) . '</p>';
+
+		$screen->add_help_tab( array(
+			'id'      => $screen->id . '-general',
+			'title'   => 'Organize pictures',
+			'content' => $help
+		) );
 	}
 }

@@ -1,13 +1,13 @@
 <?php
 
-include_once( 'interface-ngg-displayable.php' );
+include_once( 'interface-ncg-admin-page.php' );
 
 /**
  * Class NGG_Post_Admin_Page
  *
  * Represents a simple admin page.
  */
-abstract class NGG_Post_Admin_Page implements NGG_Displayable {
+abstract class NGG_Post_Admin_Page implements NCG_Admin_Page {
 
 	protected $page;
 

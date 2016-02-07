@@ -576,4 +576,66 @@ class NGG_Adder extends NGG_Post_Admin_Page {
 			}
 		}
 	}
+
+	public function register_styles() {
+		wp_enqueue_style( 'ngg-jqueryui' );
+		wp_enqueue_style( 'jqueryFileTree' );
+		wp_enqueue_style( 'nggtabs');
+		wp_enqueue_style( 'nggadmin' );
+		wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_style( 'ngg-jqueryui' );
+	}
+
+	public function register_scripts() {
+		wp_enqueue_script( 'jquery-ui-tabs' );
+		wp_enqueue_script( 'ngg-plupload-handler' );
+		wp_enqueue_script( 'ngg-ajax' );
+		wp_enqueue_script( 'ngg-progressbar' );
+		wp_enqueue_script( 'jquery-ui-dialog' );
+		wp_enqueue_script( 'jqueryFileTree' );
+
+	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	public function add_help( $screen ) {
+		/**
+		 * @global nggdb $nggdb
+		 */
+		global $nggdb;
+		$gallerylist = $nggdb->find_all_galleries( 'gid', 'DESC' ); //look for galleries
+
+		$help = '<p>' . __( 'On this page you can add galleries and pictures to those galleries.',
+				'nggallery' ) . '</p>';
+		if ( nggGallery::current_user_can( 'NextGEN Add new gallery' ) ) {
+			$help .= '<p><strong>' . __( 'New gallery',
+					'nggallery' ) . '</strong> - ' . __( 'Add new galleries to NextCellent.',
+					'nggallery' ) . '</p>';
+		}
+		if ( empty ( $gallerylist ) ) {
+			$help .= '<p><strong>' . __( 'You must add a gallery before adding images!',
+					'nggallery' ) . '</strong>';
+		} else {
+			$help .= '<p><strong>' . __( 'Images',
+					'nggallery' ) . '</strong> - ' . __( 'Add new images to a gallery.', 'nggallery' ) . '</p>';
+		}
+		if ( wpmu_enable_function( 'wpmuZipUpload' ) && nggGallery::current_user_can( 'NextGEN Upload a zip' ) && ! empty ( $gallerylist ) ) {
+			$help .= '<p><strong>' . __( 'ZIP file',
+					'nggallery' ) . '</strong> - ' . __( 'Add images from a ZIP file.', 'nggallery' ) . '</p>';
+		}
+		if ( wpmu_enable_function( 'wpmuImportFolder' ) && nggGallery::current_user_can( 'NextGEN Import image folder' ) ) {
+			$help .= '<p><strong>' . __( 'Import folder',
+					'nggallery' ) . '</strong> - ' . __( 'Import a folder from the server as a new gallery.',
+					'nggallery' ) . '</p>';
+		}
+
+		$screen->add_help_tab( array(
+			'id'      => $screen->id . '-general',
+			'title'   => 'Add things',
+			'content' => $help
+		) );
+	}
 }

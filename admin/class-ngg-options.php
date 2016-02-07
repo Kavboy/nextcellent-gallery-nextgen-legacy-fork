@@ -1050,4 +1050,52 @@ class NGG_Options extends NGG_Post_Admin_Page {
 		</script>
 		<?php
 	}
+
+	public function register_styles() {
+		wp_enqueue_style( 'nggtabs');
+		wp_enqueue_style( 'nggadmin' );
+		wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_style( 'ngg-jqueryui' );
+		wp_enqueue_style( 'jqueryFileTree');
+	}
+
+	public function register_scripts() {
+		wp_enqueue_script( 'jquery-ui-tabs' );
+		wp_enqueue_script( 'wp-color-picker' );
+		wp_enqueue_script( 'ngg-autocomplete' );
+	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	public function add_help( $screen ) {
+		$help = '<p>' . __( 'Edit all of NextCellent\'s options. The options are sorted in multiple categories.',
+				'nggallery' ) . '</p>';
+		$help .= '<p><strong>' . __( 'General',
+				'nggallery' ) . '</strong> - ' . __( 'General NextCellent options. Contains options for permalinks and related images.',
+				'nggallery' ) . '</p>';
+		$help .= '<p><strong>' . __( 'Images',
+				'nggallery' ) . '</strong> - ' . __( 'All image-related options. Also contains options for thumbnails.',
+				'nggallery' ) . '</p>';
+		$help .= '<p><strong>' . __( 'Gallery',
+				'nggallery' ) . '</strong> - ' . __( 'Everything about galleries. From sorting options to the number of images, it\'s all in here.',
+				'nggallery' ) . '</p>';
+		$help .= '<p><strong>' . __( 'Effects',
+				'nggallery' ) . '</strong> - ' . __( 'Make your gallery look beautiful.',
+				'nggallery' ) . '</p>';
+		$help .= '<p><strong>' . __( 'Watermark',
+				'nggallery' ) . '</strong> - ' . __( 'Who doesn\'t want theft-proof images?',
+				'nggallery' ) . '</p>';
+		$help .= '<p><strong>' . __( 'Slideshow',
+				'nggallery' ) . '</strong> - ' . __( 'Edit options for the slideshow.', 'nggallery' ) . '</p>';
+		$help .= '<p>' . __( 'Don\'t forget to press save!', 'nggallery' ) . '</p>';
+
+		$screen->add_help_tab( array(
+			'id'      => $screen->id . '-general',
+			'title'   => 'Edit options',
+			'content' => $help
+		) );
+	}
 }

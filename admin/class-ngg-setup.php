@@ -1,6 +1,6 @@
 <?php  
 
-include_once('class-ngg-post-admin-page.php');
+require_once(__DIR__ . '/class-ngg-post-admin-page.php');
 
 class NGG_Setup extends NGG_Post_Admin_Page {
 
@@ -103,5 +103,32 @@ class NGG_Setup extends NGG_Post_Admin_Page {
 
 			nggGallery::show_message(__('Uninstall successful! Now delete the plugin and enjoy your life!','nggallery'));
 		}
+	}
+
+	public function register_styles() {
+		//None.
+	}
+
+	public function register_scripts() {
+		//None.
+	}
+
+	/**
+	 * A possibility to add help to the screen.
+	 *
+	 * @param WP_Screen $screen The current screen.
+	 */
+	public function add_help( $screen ) {
+		$help = '<p>' . __( 'If \'someone\' messed with your settings (yeah, definitely not you), you can reset them here.',
+				'nggallery' ) . '</p>';
+		$help .= '<p><b>' . __( 'Attention!',
+				'nggallery' ) . '</b> ' . __( 'You should not use the Uninstall Plugin button, unless you know what you\'re doing! It should never be necessary to press it.',
+				'nggallery' ) . '</p>';
+
+		$screen->add_help_tab( array(
+			'id'      => $screen->id . '-general',
+			'title'   => 'Reset',
+			'content' => $help
+		) );
 	}
 }
