@@ -219,7 +219,7 @@ class NGG_Overview implements NGG_Displayable {
 							cache: false,
 							timeout: 10000,
 							success: function (msg) {
-								if (msg.version == '<?php echo $ngg->version; ?>')
+								if (msg.version == '<?php echo $ngg::VERSION; ?>')
 									nggPluginCheck.success(1);
 								else
 									nggPluginCheck.failed(1);

@@ -1,6 +1,10 @@
 <?php
 /**
  * Upgrade the NextCellent database.
+ *
+ * Note: since 1.9.31, the options no longer require an update.
+ * @see NCG_Options
+ *
  * @throws Exception If the database could not be found.
  */
 function ngg_upgrade() {

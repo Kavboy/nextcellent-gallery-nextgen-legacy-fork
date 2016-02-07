@@ -359,7 +359,7 @@ function ngg_ajax_tinymce() {
 
    	include_once( dirname( dirname(__FILE__) ) . '/admin/tinymce/window.php');
 
-    throw new E_Clean_Exit();
+    exit();
 }
 
 add_action( 'wp_ajax_ngg_rebuild_unique_slugs', 'ngg_ajax_rebuild_unique_slugs' );
