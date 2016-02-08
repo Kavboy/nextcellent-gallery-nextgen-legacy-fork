@@ -50,6 +50,9 @@ if (!class_exists('NCG')) {
 	    const MINIMUM_WP = '4.0';
 	    const MINIMUM_PHP = '5.3';
 
+	    //The base for our admin pages.
+	    const ADMIN_BASE = 'nextcellent';
+
 	    /**
 	     * @var NCG_Registry $registry The registry for dependencies.
 	     */
@@ -157,7 +160,7 @@ if (!class_exists('NCG')) {
 		    //Register the admin hooks.
 		    if(is_admin() && !defined( 'DOING_AJAX' )) {
 			    //The admin hooks are registered in the constructor of NGG_Admin_Launcher
-			    $this->registry->add('admin-launcher', new NGG_Admin_Launcher());
+			    $this->registry->add('admin-launcher', new NGG_Admin_Launcher(self::ADMIN_BASE));
 		    }
 	    }
 

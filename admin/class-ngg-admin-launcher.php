@@ -3,14 +3,19 @@
 /**
  * NGG_Admin_Launcher - Admin Section for NextGEN Gallery
  *
- * @since   1.0.0
+ * @since   1.9.30
  */
 class NGG_Admin_Launcher {
 
-	const BASE_SLUG = 'nextcellent';
+	/**
+	 * @var string $base_slug The base slug for admin pages.
+	 * @since 1.9.31
+	 */
+	private $base_slug;
 
 	/**
 	 * @var NCG_Admin_Page $page The page we want to display.
+	 * @since 1.9.31
 	 */
 	private $page;
 
@@ -19,8 +24,12 @@ class NGG_Admin_Launcher {
 	 *
 	 * See the link for the order in which the hooks are fired, as this is important.
 	 * @link https://codex.wordpress.org/Plugin_API/Action_Reference#Actions_Run_During_an_Admin_Page_Request
+	 *
+	 * @param string $slug The base slug for the admin pages URL.
 	 */
-	public function __construct() {
+	public function __construct($slug) {
+
+		$this->base_slug = $slug;
 
 		//Create the screen object.
 		add_action( 'current_screen', array($this, 'make_page'));
@@ -49,45 +58,45 @@ class NGG_Admin_Launcher {
 	 */
 	public function add_menu() {
 		add_menu_page( __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ),
-			'NextGEN Gallery overview', self::BASE_SLUG, array( $this, 'show_menu' ), 'dashicons-format-gallery' );
+			'NextGEN Gallery overview', $this->base_slug, array( $this, 'show_menu' ), 'dashicons-format-gallery' );
 
-		add_submenu_page( self::BASE_SLUG, __( 'Overview', 'nggallery' ), __( 'Overview', 'nggallery' ),
+		add_submenu_page( $this->base_slug, __( 'Overview', 'nggallery' ), __( 'Overview', 'nggallery' ),
 			'NextGEN Gallery overview',
-			self::BASE_SLUG, array( $this, 'show_menu' ) );
+			$this->base_slug, array( $this, 'show_menu' ) );
 
-		add_submenu_page( self::BASE_SLUG, __( 'Add Gallery / Images', 'nggallery' ),
+		add_submenu_page( $this->base_slug, __( 'Add Gallery / Images', 'nggallery' ),
 			__( 'Add Gallery / Images', 'nggallery' ), 'NextGEN Upload images', $this->sluggify( 'add-gallery' ),
 			array( $this, 'show_menu' ) );
 
-		add_submenu_page( self::BASE_SLUG, __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ),
+		add_submenu_page( $this->base_slug, __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ),
 			'NextGEN Manage gallery', $this->sluggify( 'manage' ),
 			array( $this, 'show_menu' ) );
 
-		add_submenu_page( self::BASE_SLUG, __( 'Albums', 'nggallery' ), __( 'Albums', 'nggallery' ), 'NextGEN Edit album',
+		add_submenu_page( $this->base_slug, __( 'Albums', 'nggallery' ), __( 'Albums', 'nggallery' ), 'NextGEN Edit album',
 			$this->sluggify( 'manage-album' ),
 			array( $this, 'show_menu' ) );
 
-		add_submenu_page( self::BASE_SLUG, __( 'Tags', 'nggallery' ), __( 'Tags', 'nggallery' ), 'NextGEN Manage tags',
+		add_submenu_page( $this->base_slug, __( 'Tags', 'nggallery' ), __( 'Tags', 'nggallery' ), 'NextGEN Manage tags',
 			$this->sluggify('tags'),
 			array( $this, 'show_menu' ) );
 
-		add_submenu_page( self::BASE_SLUG, __( 'Settings', 'nggallery' ), __( 'Settings', 'nggallery' ),
+		add_submenu_page( $this->base_slug, __( 'Settings', 'nggallery' ), __( 'Settings', 'nggallery' ),
 			'NextGEN Change options', $this->sluggify('options'),
 			array( $this, 'show_menu' ) );
 
 		if ( wpmu_enable_function( 'wpmuStyle' ) ) {
-			add_submenu_page( self::BASE_SLUG, __( 'Style', 'nggallery' ), __( 'Style', 'nggallery' ), 'NextGEN Change style',
+			add_submenu_page( $this->base_slug, __( 'Style', 'nggallery' ), __( 'Style', 'nggallery' ), 'NextGEN Change style',
 				$this->sluggify('style'),
 				array( $this, 'show_menu' ) );
 		}
 		if ( wpmu_enable_function( 'wpmuRoles' ) || is_super_admin() ) {
-			add_submenu_page( self::BASE_SLUG, __( 'Roles', 'nggallery' ), __( 'Roles', 'nggallery' ), 'activate_plugins',
+			add_submenu_page( $this->base_slug, __( 'Roles', 'nggallery' ), __( 'Roles', 'nggallery' ), 'activate_plugins',
 				$this->sluggify('roles'),
 				array( $this, 'show_menu' ) );
 		}
 
 		if ( ! is_multisite() || is_super_admin() ) {
-			add_submenu_page( self::BASE_SLUG, __( 'Reset / Uninstall', 'nggallery' ), __( 'Reset / Uninstall', 'nggallery' ),
+			add_submenu_page( $this->base_slug, __( 'Reset / Uninstall', 'nggallery' ), __( 'Reset / Uninstall', 'nggallery' ),
 				'activate_plugins', $this->sluggify('setup'),
 				array( $this, 'show_menu' ) );
 		}
@@ -101,7 +110,7 @@ class NGG_Admin_Launcher {
 	 * @return string A slug.
 	 */
 	private function sluggify($page) {
-		return self::BASE_SLUG . '-' . $page;
+		return $this->base_slug . '-' . $page;
 	}
 
 	/**
@@ -112,7 +121,7 @@ class NGG_Admin_Launcher {
 	 * @return string Unslugged name.
 	 */
 	private function unslug($page) {
-		return str_replace(self::BASE_SLUG . '-', '', $page);
+		return str_replace($this->base_slug . '-', '', $page);
 	}
 
 	/**
@@ -120,13 +129,13 @@ class NGG_Admin_Launcher {
 	 */
 	public function add_network_admin_menu() {
 		add_menu_page( __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ), 'nggallery-wpmu',
-			NGGFOLDER, array( $this, 'show_network_settings' ), 'dashicons-format-gallery' );
+			$this->base_slug, array( $this, 'show_network_settings' ), 'dashicons-format-gallery' );
 
-		add_submenu_page( NGGFOLDER, __( 'Network settings', 'nggallery' ), __( 'Network settings', 'nggallery' ),
+		add_submenu_page( $this->base_slug, __( 'Network settings', 'nggallery' ), __( 'Network settings', 'nggallery' ),
 			'nggallery-wpmu',
-			NGGFOLDER, array( $this, 'show_network_settings' ) );
+			$this->base_slug, array( $this, 'show_network_settings' ) );
 
-		add_submenu_page( NGGFOLDER, __( 'Reset / Uninstall', 'nggallery' ), __( 'Reset / Uninstall', 'nggallery' ),
+		add_submenu_page( $this->base_slug, __( 'Reset / Uninstall', 'nggallery' ), __( 'Reset / Uninstall', 'nggallery' ),
 			'activate_plugins',
 			'nggallery-setup', array( $this, 'show_menu' ) );
 	}
@@ -136,10 +145,12 @@ class NGG_Admin_Launcher {
 	 */
 	private function show_upgrade_page() {
 
+		global $ngg;
+
 		// check for upgrade and show upgrade screen
-		if ( get_option( 'ngg_db_version' ) != NGG_DBVERSION ) {
-			include_once( dirname( __FILE__ ) . '/functions.php' );
-			include_once( dirname( __FILE__ ) . '/upgrade.php' );
+		if ( get_option( 'ngg_db_version' ) != $ngg::DB_VERSION ) {
+			require_once( __DIR__ . '/functions.php' );
+			require_once( __DIR__ . '/upgrade.php' );
 			nggallery_upgrade_page();
 			exit;
 		}
@@ -150,8 +161,8 @@ class NGG_Admin_Launcher {
 	 */
 	public function show_network_settings() {
 		$this->show_upgrade_page();
-		include_once( dirname( __FILE__ ) . '/class-ngg-style.php' );
-		include_once( dirname( __FILE__ ) . '/wpmu.php' );
+		include_once( __DIR__ . '/class-ngg-style.php' );
+		include_once( __DIR__ . '/wpmu.php' );
 		nggallery_wpmu_setup();
 	}
 
@@ -200,7 +211,7 @@ class NGG_Admin_Launcher {
 				require_once( __DIR__ . '/class-ngg-roles.php' );
 				$this->page = new NGG_Roles();
 				break;
-			case "toplevel_page_" . self::BASE_SLUG:
+			case "toplevel_page_" . $this->base_slug:
 				require_once( __DIR__ . '/class-ngg-overview.php' );
 				$this->page = new NGG_Overview();
 				break;
@@ -231,7 +242,7 @@ class NGG_Admin_Launcher {
 	 * - sort mode of a gallery,
 	 * - search mode.
 	 *
-	 * @return NGG_Displayable The correct managing page or null if the page could not be found.
+	 * @return NCG_Admin_Page The correct managing page or null if the page could not be found.
 	 */
 	private function get_manager() {
 
