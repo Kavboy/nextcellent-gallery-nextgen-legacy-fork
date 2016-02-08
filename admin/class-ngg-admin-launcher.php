@@ -31,6 +31,9 @@ class NGG_Admin_Launcher {
 
 		$this->base_slug = $slug;
 
+		//Register the settings we need.
+		add_action( 'admin_init', array($this, 'register_settings'));
+
 		//Create the screen object.
 		add_action( 'current_screen', array($this, 'make_page'));
 
@@ -395,6 +398,19 @@ class NGG_Admin_Launcher {
 			'<p><a href="https://bitbucket.org/wpgetready/nextcellent" target="_blank">' . __( 'Source Code',
 				'nggallery' ) . '</a></p>'
 		);
+	}
+
+	public function register_settings() {
+		// First, we register a section. This is necessary since all future options must belong to one.
+		register_setting( 'ngg_options2', 'ngg_options2', function($arg) {
+			return $arg;
+		} );
+		add_settings_section('plugin_main', 'Main Settings', function() {
+			echo "Nice function here!";
+		}, 'plugin');
+		add_settings_field('plugin_text_string', 'Plugin Text Input', function() {
+			echo "<input id='plugin_text_string' name='plugin_options[text_string]' size='40' type='text' value='ok' />";
+		}, 'plugin', 'plugin_main');
 	}
 }
 
