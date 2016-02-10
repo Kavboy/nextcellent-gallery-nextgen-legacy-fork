@@ -1,12 +1,12 @@
 <?php
 
-include_once('class-ngg-post-admin-page.php');
+include_once( 'class-ncg-post-admin-page.php' );
 
 
 /**
  * The roles admin screen
  */
-class NGG_Roles extends NGG_Post_Admin_Page {
+class NCG_Roles extends NCG_Post_Admin_Page {
 
 	public function display() {
 		parent::display();
@@ -16,7 +16,7 @@ class NGG_Roles extends NGG_Post_Admin_Page {
 			<h2><?php _e('Roles / capabilities', 'nggallery') ;?></h2>
 			<p><?php _e('Select the lowest role which should be able to access the following capabilities. NextCellent Gallery supports the standard roles from WordPress.', 'nggallery') ?> <br />
 				<?php _e('For a more flexible user management you can use the', 'nggallery') ?> <a href="http://wordpress.org/extend/plugins/capsman/" target="_blank">Capability Manager</a>.</p>
-			<form name="addroles" id="addroles" method="POST" accept-charset="utf-8" >
+			<form name="addroles" id="addroles" method="POST" accept-charset="utf-8" action="<?php echo $this->get_full_url() ?>">
 				<?php wp_nonce_field('ngg_addroles') ?>
 				<table class="form-table">
 					<tr valign="top">
@@ -169,5 +169,20 @@ class NGG_Roles extends NGG_Post_Admin_Page {
 			'title'   => 'Grant permissions',
 			'content' => $help
 		) );
+	}
+
+	/**
+	 * Get the name of this page. This is the second part of the full name:
+	 *
+	 * admin.php?page=[SLUG]-[PAGE_NAME].
+	 *
+	 * An example is 'admin.php?page=nextcellent-manage-images'
+	 *
+	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
+	 *
+	 * @return string The name.
+	 */
+	public function get_name() {
+		return 'roles';
 	}
 }

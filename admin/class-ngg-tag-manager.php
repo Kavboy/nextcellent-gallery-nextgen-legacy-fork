@@ -1,6 +1,6 @@
 <?php
 
-require_once( __DIR__ . "/interface-ncg-admin-page.php");
+require_once( __DIR__ . "/class-ncg-admin-page.php" );
 
 /**
  * Tag management page. Inspired from the Simple Tags plugin by Amaury Balmer.
@@ -8,7 +8,7 @@ require_once( __DIR__ . "/interface-ncg-admin-page.php");
  *
  * @todo Rewrite this into a decent class
  */
-class NGG_Tag_Manager implements NCG_Admin_Page {
+class NGG_Tag_Manager extends NCG_Admin_Page {
 
 	public function display() {
 		$action_status = array('message' => '', 'status' => 'ok');
@@ -31,14 +31,12 @@ class NGG_Tag_Manager implements NCG_Admin_Page {
 			}
 		}
 
-		// Some useful variables
-		$admin_base_url = admin_url() . 'admin.php?page=nggallery-tags';
 		$nb_tags = 50; // Number of tags to show on a single page
 
 		// Manage URL
 		$sort_order = ( isset($_GET['tag_sortorder']) ) ? esc_attr( stripslashes($_GET['tag_sortorder']) ) : 'desc';
 		$search_url = ( isset($_GET['search']) ) ? '&amp;search=' . esc_attr ( stripslashes($_GET['search']) ) : '';
-		$action_url = $admin_base_url . '&amp;tag_sortorder=' . $sort_order. $search_url;
+		$action_url = $this->get_full_url() . '&amp;tag_sortorder=' . $sort_order. $search_url;
 
 		// Tags Filters
 		$order_array = array(
@@ -128,7 +126,7 @@ class NGG_Tag_Manager implements NCG_Admin_Page {
 								<?php
 								$output = array();
 								foreach( $order_array as $sort => $title ) {
-									$output[] = ($sort == $sort_order) ? '<span style="color: red;">'.$title.'</span>' : '<a href="'. $admin_base_url . '&amp;tag_sortorder=' . $sort . $search_url .'">'.$title.'</a>';
+									$output[] = ($sort == $sort_order) ? '<span style="color: red;">'.$title.'</span>' : '<a href="'. $this->get_full_url() . '&amp;tag_sortorder=' . $sort . $search_url .'">'.$title.'</a>';
 								}
 								echo implode('<br />', $output);
 								$output = array();
@@ -319,5 +317,20 @@ class NGG_Tag_Manager implements NCG_Admin_Page {
 			'title'   => 'Organize pictures',
 			'content' => $help
 		) );
+	}
+
+	/**
+	 * Get the name of this page. This is the second part of the full name:
+	 *
+	 * admin.php?page=[SLUG]-[PAGE_NAME].
+	 *
+	 * An example is 'admin.php?page=nextcellent-manage-images'
+	 *
+	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
+	 *
+	 * @return string The name.
+	 */
+	public function get_name() {
+		return 'tags';
 	}
 }

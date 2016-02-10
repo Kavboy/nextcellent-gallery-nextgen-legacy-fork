@@ -1,8 +1,8 @@
 <?php  
 
-include_once('class-ngg-post-admin-page.php');
+include_once('class-ncg-post-admin-page.php');
 
-class NGG_Style extends NGG_Post_Admin_Page {
+class NCG_Style extends NCG_Post_Admin_Page {
 	
 	/**
 	 * Find stylesheets.
@@ -85,7 +85,7 @@ class NGG_Style extends NGG_Post_Admin_Page {
 	 */
 	static function output_css_files_dropdown( $css_list, $act_css_file ) {
 		foreach ( $css_list as $file) {
-			$a_cssfile = NGG_Style::ngg_get_cssfiles_data($file);
+			$a_cssfile = NCG_Style::ngg_get_cssfiles_data($file);
 			$css_name = esc_attr( $a_cssfile['Name'] );
 			$css_folder = esc_attr( $a_cssfile['Folder'] );
 			if ( $css_name != '' ) {
@@ -221,12 +221,12 @@ class NGG_Style extends NGG_Post_Admin_Page {
 		
 		//load all files
 		if ( !isset($act_cssfile) ) {
-			$csslist = NGG_Style::ngg_get_cssfiles($dir);
+			$csslist = NCG_Style::ngg_get_cssfiles($dir);
 			$act_cssfile = $ngg->options['CSSfile'];
 		}
 		
 		//get the data from the file
-		$act_css_data = NGG_Style::ngg_get_cssfiles_data($act_cssfile);
+		$act_css_data = NCG_Style::ngg_get_cssfiles_data($act_cssfile);
 		$act_css_name = $act_css_data['Name'];
 		$act_css_description = $act_css_data['Description'];
 		$act_css_author = $act_css_data['Author'];

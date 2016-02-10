@@ -122,6 +122,14 @@ if (!class_exists('NCG')) {
 	    }
 
 	    /**
+	     * Reload the options.
+	     */
+	    public function reload_options() {
+		    /** @noinspection PhpInternalEntityUsedInspection */
+		    $this->registry->add('options', new NCG_Options());
+	    }
+
+	    /**
 	     * Register the hooks and actions.
 	     */
 	    private function register_hooks_actions() {

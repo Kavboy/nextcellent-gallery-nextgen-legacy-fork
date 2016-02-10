@@ -1,13 +1,13 @@
 <?php
 include_once( __DIR__ . '/class-ngg-gallery-list-table.php' );
-include_once( __DIR__ . '/class-ngg-manager.php' );
+include_once( __DIR__ . '/class-ncg-manager.php' );
 
 /**
- * Class NGG_Gallery_Manager
+ * Class NCG_Gallery_Manager
  *
  * Display the gallery managing page.
  */
-class NGG_Gallery_Manager extends NGG_Manager {
+class NCG_Gallery_Manager extends NCG_Manager {
 
 	/**
 	 * Display the page.
@@ -26,7 +26,7 @@ class NGG_Gallery_Manager extends NGG_Manager {
 		/**
 		 * Display the actual table.
 		 */
-		$table = new NGG_Gallery_List_Table( self::BASE );
+		$table = new NGG_Gallery_List_Table( $this->get_full_url() );
 		$table->prepare_items();
 		?>
 		<div class="wrap">

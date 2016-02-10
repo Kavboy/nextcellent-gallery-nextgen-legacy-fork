@@ -66,7 +66,7 @@ if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You 
 
 		//load all files
 		if ( !isset($act_cssfile) ) {
-			$csslist = NGG_Style::ngg_get_cssfiles($dir);
+			$csslist = NCG_Style::ngg_get_cssfiles($dir);
 			$act_cssfile = $ngg->options['CSSfile'];
 		}
 	
@@ -137,7 +137,7 @@ if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You 
 					<th><label for="wpmuCSSfile"><?php _e('Default style','nggallery'); ?></label></th>
 					<td>
 					<select name="wpmuCSSfile" id="wpmuCSSfile">
-						<?php NGG_Style::output_css_files_dropdown($csslist, $act_cssfile); ?>
+						<?php NCG_Style::output_css_files_dropdown($csslist, $act_cssfile); ?>
 					</select>
 					<p class="description">
 						<?php _e('Choose the default style for the galleries.','nggallery') ?>

@@ -1,15 +1,13 @@
 <?php
 
-require_once( dirname(__DIR__) . '/interface-ncg-admin-page.php' );
+require_once( dirname( __DIR__ ) . '/class-ncg-admin-page.php' );
 
 /**
- * Class NGG_Manager
+ * Class NCG_Manager
  *
  * Contains common JavaScript and other code for the managing pages.
  */
-abstract class NGG_Manager implements NCG_Admin_Page {
-
-	const BASE = 'admin.php?page=nextcellent-manage';
+abstract class NCG_Manager extends NCG_Admin_Page {
 
 	/**
 	 * Subclasses should override this method, but must call the parent function.
@@ -507,5 +505,9 @@ abstract class NGG_Manager implements NCG_Admin_Page {
 		wp_enqueue_script( 'ngg-autocomplete' );
 		wp_enqueue_script( 'ngg-cropper' );
 		wp_enqueue_script( 'shutter' );
+	}
+
+	public function get_name() {
+		return 'manage';
 	}
 }

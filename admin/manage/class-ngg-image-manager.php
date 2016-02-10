@@ -2,16 +2,20 @@
 include_once( 'class-ngg-abstract-image-manager.php' );
 
 /**
- * Class NGG_Gallery_Manager
+ * Class NCG_Gallery_Manager
  *
  * Display the gallery managing page.
  */
-class NGG_Image_Manager extends NGG_Abstract_Image_Manager {
+class NGG_Image_Manager extends NCG_Abstract_Image_Manager {
 
 	private $gallery;
 	private $id;
 
-	public function __construct() {
+	/**
+	 * {@inheritDoc}
+	 */
+	public function __construct($slug) {
+		parent::__construct($slug);
 		$this->id = (int) $_GET['gid'];
 	}
 
@@ -54,17 +58,17 @@ class NGG_Image_Manager extends NGG_Abstract_Image_Manager {
 		/**
 		 * Display the actual table.
 		 */
-		$table = new NGG_Image_List_Table( self::BASE );
+		$table = new NGG_Image_List_Table( $this->get_full_url() );
 		$table->prepare_items();
 		?>
 		<div class="wrap">
-			<form id="update_gallery" class="nggform" method="post" action="<?php echo self::BASE . '&mode=image&gid=' . $this->id . '&paged=' . $page; ?>" accept-charset="utf-8">
+			<form id="update_gallery" class="nggform" method="post" action="<?php echo $this->get_full_url() . '&mode=image&gid=' . $this->id . '&paged=' . $page; ?>" accept-charset="utf-8">
 				<?php wp_nonce_field( 'ngg-update-gallery', '_ngg_nonce_gallery' ); ?>
 				<input type="hidden" name="form" value="gallery">
 				<?php $this->print_gallery_overview( $table->items ) ?>
 			</form>
 			<!-- TODO Add a search inside a gallery form -->
-			<form id="update_images" class="nggform" method="post" action="<?php echo self::BASE . '&mode=image&gid=' . $this->id . '&paged=' . $page; ?>" accept-charset="utf-8">
+			<form id="update_images" class="nggform" method="post" action="<?php echo $this->get_full_url() . '&mode=image&gid=' . $this->id . '&paged=' . $page; ?>" accept-charset="utf-8">
 				<?php wp_nonce_field( 'ngg-update-images', '_ngg_nonce_images' ); ?>
 				<input type="hidden" id="page_type" name="page_type" value="image">
 				<?php $table->display(); ?>
@@ -112,7 +116,7 @@ class NGG_Image_Manager extends NGG_Abstract_Image_Manager {
 			 * Redirect to the sorting UI.
 			 */
 			jQuery("#sort_gallery").click(function() {
-				location.href = "<?php echo esc_js(self::BASE) . '&mode=sort&gid=' . $this->id ?>";
+				location.href = "<?php echo esc_js($this->get_full_url()) . '&mode=sort&gid=' . $this->id ?>";
 			});
 		</script>
 

@@ -1,23 +1,19 @@
 <?php
 
-include_once( 'class-ngg-manager.php' );
-include_once( dirname(__DIR__) . '/interface-ncg-admin-page.php' );
+include_once( 'class-ncg-manager.php' );
+include_once( dirname( __DIR__ ) . '/class-ncg-admin-page.php' );
 
 /**
  * Class NGG_Sort_Manager
  *
  * This class represents the page where a user can sort the gallery.
  */
-class NGG_Sort_Manager implements NCG_Admin_Page {
-
-	/**
-	 * @todo We also use this in NGG_Manager. Should we make another superclass or a trait for one line?
-	 */
-	const BASE = 'admin.php?page=nextcellent-manage';
+class NGG_Sort_Manager extends NCG_Admin_Page {
 
 	private $id;
 
-	public function __construct() {
+	public function __construct($slug) {
+		parent::__construct($slug);
 		$this->id = (int) $_GET['gid'];
 	}
 
@@ -32,7 +28,7 @@ class NGG_Sort_Manager implements NCG_Admin_Page {
 			//Disable sort button and provide feedback why is disabled
 			nggGallery::show_error( __( 'To enable manual Sort set Custom Order Sort. See Settings->Gallery Settings->Sort Options',
 				'nggallery' ) );
-			echo '<a href="' . self::BASE . '&mode=image&gid=' . $this->id . '">' . __( 'Go back',
+			echo '<a href="' . $this->get_full_url() . '&mode=image&gid=' . $this->id . '">' . __( 'Go back',
 					'nggallery' ) . '</a>';
 
 			return;
@@ -67,9 +63,9 @@ class NGG_Sort_Manager implements NCG_Admin_Page {
 		}
 
 		//This is the url without any presort variable
-		$clean_url = self::BASE . '&mode=sort&gid=' . $this->id;
+		$clean_url = $this->get_full_url() . '&mode=sort&gid=' . $this->id;
 		//If we go back, then the mode should be edit
-		$back_url = self::BASE . '&mode=image&gid=' . $this->id;
+		$back_url = $this->get_full_url() . '&mode=image&gid=' . $this->id;
 
 		//In case of presort, then we take this url.
 		if ( isset( $_GET['dir'] ) || isset( $_GET['presort'] ) ) {
@@ -228,5 +224,20 @@ class NGG_Sort_Manager implements NCG_Admin_Page {
 	 */
 	function add_help( $screen ) {
 		//None yet.
+	}
+
+	/**
+	 * Get the name of this page. This is the second part of the full name:
+	 *
+	 * admin.php?page=[SLUG]-[PAGE_NAME].
+	 *
+	 * An example is 'admin.php?page=nextcellent-manage-images'
+	 *
+	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
+	 *
+	 * @return string The name.
+	 */
+	public function get_name() {
+		return 'manage';
 	}
 }

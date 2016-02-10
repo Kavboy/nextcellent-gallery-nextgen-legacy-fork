@@ -1,7 +1,7 @@
 <?php
 
-require_once(__DIR__. '/class-ngg-post-admin-page.php');
-require_once( __DIR__ . '/options/class-ncg-option-tab.php' );
+require_once( dirname( __DIR__ ) . '/class-ncg-post-admin-page.php' );
+require_once( __DIR__ . '/class-ncg-option-tab.php' );
 
 /**
  * The settings page for NextCellent.
@@ -28,10 +28,10 @@ require_once( __DIR__ . '/options/class-ncg-option-tab.php' );
  *
  * add_hook( 'ngg_tab_content_my_plugin', 'display_settings');
  */
-class NGG_Options extends NGG_Post_Admin_Page {
+class NCG_Options_Page extends NCG_Post_Admin_Page {
 
 	/**
-	 * @var NCG_Options $options The options.
+	 * @var NCG_Options_Page $options The options.
 	 */
 	private $options;
 
@@ -41,11 +41,12 @@ class NGG_Options extends NGG_Post_Admin_Page {
 	private $current;
 
 	/**
-	 * NGG_Options constructor.
+	 * NCG_Options_Page constructor.
+	 *
+	 * @param string $slug The base slug for the page.
 	 */
-
-	public function __construct() {
-		parent::__construct();
+	public function __construct($slug) {
+		parent::__construct($slug);
 
 		global $ngg;
 
@@ -68,28 +69,28 @@ class NGG_Options extends NGG_Post_Admin_Page {
 	private function load_page( $name ) {
 		switch($name) {
 			case 'general':
-				require_once(__DIR__ . '/options/class-ncg-option-tab-general.php');
-				$this->current = new NCG_Option_Tab_General($this->options, $this->page);
+				require_once( __DIR__ . '/class-ncg-option-tab-general.php' );
+				$this->current = new NCG_Option_Tab_General($this->options, $this->get_full_url());
 				break;
 			case 'images':
-				require_once(__DIR__ . '/options/class-ncg-option-tab-images.php');
-				$this->current = new NCG_Option_Tab_Images($this->options, $this->page);
+				require_once( __DIR__ . '/class-ncg-option-tab-images.php' );
+				$this->current = new NCG_Option_Tab_Images($this->options, $this->get_full_url());
 				break;
 			case 'gallery':
-				require_once(__DIR__ . '/options/class-ncg-option-tab-gallery.php');
-				$this->current = new NCG_Option_Tab_Gallery($this->options, $this->page);
+				require_once( __DIR__ . '/class-ncg-option-tab-gallery.php' );
+				$this->current = new NCG_Option_Tab_Gallery($this->options, $this->get_full_url());
 				break;
 			case 'effects':
-				require_once(__DIR__ . '/options/class-ncg-option-tab-effects.php');
-				$this->current = new NCG_Option_Tab_Effects($this->options, $this->page);
+				require_once( __DIR__ . '/class-ncg-option-tab-effects.php' );
+				$this->current = new NCG_Option_Tab_Effects($this->options, $this->get_full_url());
 				break;
 			case 'watermark':
-				require_once(__DIR__ . '/options/class-ncg-option-tab-watermark.php');
-				$this->current = new NCG_Option_Tab_Watermark($this->options, $this->page);
+				require_once( __DIR__ . '/class-ncg-option-tab-watermark.php' );
+				$this->current = new NCG_Option_Tab_Watermark($this->options, $this->get_full_url());
 				break;
 			case 'slideshow':
-				require_once(__DIR__ . '/options/class-ncg-option-tab-slideshow.php');
-				$this->current = new NCG_Option_Tab_Slideshow($this->options, $this->page);
+				require_once( __DIR__ . '/class-ncg-option-tab-slideshow.php' );
+				$this->current = new NCG_Option_Tab_Slideshow($this->options, $this->get_full_url());
 				break;
 			default:
 				$this->current = $name;
@@ -455,5 +456,21 @@ class NGG_Options extends NGG_Post_Admin_Page {
 			'title'   => 'Edit options',
 			'content' => $help
 		) );
+	}
+
+
+	/**
+	 * Get the name of this page. This is the second part of the full name:
+	 *
+	 * admin.php?page=[SLUG]-[PAGE_NAME].
+	 *
+	 * An example is 'admin.php?page=nextcellent-manage-images'
+	 *
+	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
+	 *
+	 * @return string The name.
+	 */
+	public function get_name() {
+		return 'options';
 	}
 }

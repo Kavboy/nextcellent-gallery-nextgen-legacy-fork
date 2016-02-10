@@ -1,8 +1,8 @@
 <?php  
 
-require_once(__DIR__ . '/class-ngg-post-admin-page.php');
+require_once( __DIR__ . '/class-ncg-post-admin-page.php' );
 
-class NGG_Setup extends NGG_Post_Admin_Page {
+class NCG_Setup extends NCG_Post_Admin_Page {
 
 	public function display() {
 		parent::display();
@@ -92,7 +92,6 @@ class NGG_Setup extends NGG_Post_Admin_Page {
 		if (isset($_POST['resetdefault'])) {
 
 			NGG_Installer::set_default_options();
-			$ngg->load_options();
 
 			nggGallery::show_message(__('Reset all settings to the default parameters.','nggallery'));
 		}
@@ -130,5 +129,20 @@ class NGG_Setup extends NGG_Post_Admin_Page {
 			'title'   => 'Reset',
 			'content' => $help
 		) );
+	}
+
+	/**
+	 * Get the name of this page. This is the second part of the full name:
+	 *
+	 * admin.php?page=[SLUG]-[PAGE_NAME].
+	 *
+	 * An example is 'admin.php?page=nextcellent-manage-images'
+	 *
+	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
+	 *
+	 * @return string The name.
+	 */
+	public function get_name() {
+		return 'setup';
 	}
 }

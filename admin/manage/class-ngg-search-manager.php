@@ -7,14 +7,15 @@ include_once( 'class-ngg-abstract-image-manager.php' );
  *
  * Represents an image search page.
  */
-class NGG_Search_Manager extends NGG_Abstract_Image_Manager {
+class NGG_Search_Manager extends NCG_Abstract_Image_Manager {
 
 	private $search;
 
 	/**
 	 * Select the search parameter and add the gallery ID column.
 	 */
-	public function __construct() {
+	public function __construct($slug) {
+		parent::__construct($slug);
 		$this->search = $_GET['s'];
 
 		add_filter( 'ngg_manage_images_columns', array( $this, 'add_column' ) );
@@ -31,12 +32,12 @@ class NGG_Search_Manager extends NGG_Abstract_Image_Manager {
 		/**
 		 * Display the actual table.
 		 */
-		$table = new NGG_Image_List_Table( self::BASE );
+		$table = new NGG_Image_List_Table( $this->get_full_url() );
 		$table->prepare_items( $request );
 		?>
 		<div class="wrap">
 			<h2><?php printf( __( 'Image results for %s', 'nggallery' ), $this->search ) ?></h2>
-			<form id="update_images" class="nggform" method="POST" action="<?php echo self::BASE . '&mode=search&s=' . $this->search; ?>" accept-charset="utf-8">
+			<form id="update_images" class="nggform" method="POST" action="<?php echo $this->get_full_url() . '&mode=search&s=' . $this->search; ?>" accept-charset="utf-8">
 				<?php wp_nonce_field( 'ngg-update-images', '_ngg_nonce_images' ); ?>
 				<input type="hidden" id="page_type" name="page_type" value="image"/>
 				<?php $table->display(); ?>

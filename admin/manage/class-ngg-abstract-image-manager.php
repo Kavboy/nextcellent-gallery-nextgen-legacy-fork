@@ -1,14 +1,14 @@
 <?php
 
-include_once( 'class-ngg-manager.php' );
+include_once( 'class-ncg-manager.php' );
 include_once( 'class-ngg-image-list-table.php' );
 
 /**
- * Class NGG_Abstract_Image_Manager
+ * Class NCG_Abstract_Image_Manager
  *
  * Contains some common methods to use when displaying images.
  */
-abstract class NGG_Abstract_Image_Manager extends NGG_Manager {
+abstract class NCG_Abstract_Image_Manager extends NCG_Manager {
 
 	public function display() {
 

@@ -11,7 +11,7 @@ abstract class NCG_Option_Tab {
 	protected $options;
 
 	/**
-	 * @var string The relative URL to the current page, e.g. http://example.com/wordpress/wp-admin/admin.php?page=nextcellent-options&tab=images
+	 * @var string The relative URL to the current page, e.g. admin.php?page=nextcellent-options&tab=images
 	 */
 	protected $page;
 

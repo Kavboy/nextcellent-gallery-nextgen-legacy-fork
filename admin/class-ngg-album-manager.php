@@ -1,6 +1,6 @@
 <?php
 
-include_once( __DIR__ . '/interface-ncg-admin-page.php' );
+include_once( __DIR__ . '/class-ncg-admin-page.php' );
 
 class NGG_Album_Manager implements NCG_Admin_Page {
 

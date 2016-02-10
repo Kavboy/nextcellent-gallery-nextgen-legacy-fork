@@ -184,7 +184,7 @@ class NGG_Admin_Launcher {
 			case "add-gallery" :
 				require_once( __DIR__ . '/functions.php' );
 				require_once( __DIR__ . '/class-ngg-adder.php' );
-				$this->page = new NGG_Adder();
+				$this->page = new NCG_Adder($this->base_slug);
 				break;
 			case "manage":
 				require_once( __DIR__ . '/functions.php' );
@@ -192,31 +192,31 @@ class NGG_Admin_Launcher {
 				break;
 			case "manage-album" :
 				require_once( __DIR__ . '/class-ngg-album-manager.php' );
-				$this->page = new NGG_Album_Manager();
+				$this->page = new NGG_Album_Manager($this->base_slug);
 				break;
 			case "options" :
-				require_once( __DIR__ . '/class-ngg-options.php' );
-				$this->page = new NGG_Options();
+				require_once( __DIR__ . '/options/class-ncg-options-page.php' );
+				$this->page = new NCG_Options_Page($this->base_slug);
 				break;
 			case "tags" :
 				require_once( __DIR__ . '/class-ngg-tag-manager.php' );
-				$this->page = new NGG_Tag_Manager();
+				$this->page = new NGG_Tag_Manager($this->base_slug);
 				break;
 			case "style" :
 				require_once( __DIR__ . '/class-ngg-style.php' );
-				$this->page = new NGG_Style();
+				$this->page = new NCG_Style($this->base_slug);
 				break;
 			case "setup" :
 				require_once( __DIR__ . '/class-ngg-setup.php' );
-				$this->page = new NGG_Setup();
+				$this->page = new NCG_Setup($this->base_slug);
 				break;
 			case "roles" :
 				require_once( __DIR__ . '/class-ngg-roles.php' );
-				$this->page = new NGG_Roles();
+				$this->page = new NCG_Roles($this->base_slug);
 				break;
 			case "toplevel_page_" . $this->base_slug:
 				require_once( __DIR__ . '/class-ngg-overview.php' );
-				$this->page = new NGG_Overview();
+				$this->page = new NGG_Overview($this->base_slug);
 				break;
 			default: //Not our page
 				$this->page = null;
@@ -254,28 +254,28 @@ class NGG_Admin_Launcher {
 			//Display the normal page.
 			include_once( 'manage/class-ngg-gallery-manager.php' );
 
-			return new NGG_Gallery_Manager();
+			return new NCG_Gallery_Manager($this->base_slug);
 
 		} elseif ( $_GET['mode'] == 'image' ) {
 
 			//Display overview of a gallery.
 			include_once( 'manage/class-ngg-image-manager.php' );
 
-			return new NGG_Image_Manager();
+			return new NGG_Image_Manager($this->base_slug);
 
 		} elseif ( $_GET['mode'] == 'sort' ) {
 
 			//Display sort page.
 			include_once( 'manage/class-ngg-sort-manager.php' );
 
-			return new NGG_Sort_Manager();
+			return new NGG_Sort_Manager($this->base_slug);
 
 		} elseif ( $_GET['mode'] == 'search' ) {
 
 			//Display search results.
 			include_once( 'manage/class-ngg-search-manager.php' );
 
-			return new NGG_Search_Manager();
+			return new NGG_Search_Manager($this->base_slug);
 		} else {
 			return null;
 		}

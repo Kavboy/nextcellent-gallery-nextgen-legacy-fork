@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . '/interface-ncg-admin-page.php');
+require_once( __DIR__ . '/class-ncg-admin-page.php' );
 
 /**
  * Class to display the overview.

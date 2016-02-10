@@ -233,6 +233,12 @@ class NGG_Installer {
 
 		update_option( 'ngg_options', $ngg_options );
 
+		global $ngg;
+
+		if($ngg->get('options') != null) {
+			$ngg->reload_options();
+		}
+
 	}
 
 	/**

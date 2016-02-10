@@ -1,15 +1,15 @@
 <?php
 
-include_once('class-ngg-post-admin-page.php');
+include_once( 'class-ncg-post-admin-page.php' );
 
 /**
- * Class NGG_Adder
+ * Class NCG_Adder
  *
  * Add new stuff to NextCellent.
  *
  * @todo The whole system with the plupload needs a rework.
  */
-class NGG_Adder extends NGG_Post_Admin_Page {
+class NCG_Adder extends NCG_Post_Admin_Page {
 
 	/**
 	 * Perform the upload and add a new hook for plugins
@@ -388,7 +388,7 @@ class NGG_Adder extends NGG_Post_Admin_Page {
 		?>
 		<!-- create gallery -->
 		<h3><?php _e('Add a new gallery', 'nggallery') ;?></h3>
-		<form name="addgallery" id="addgallery_form" method="POST" action="<?php echo $this->page; ?>" accept-charset="utf-8" >
+		<form name="addgallery" id="addgallery_form" method="POST" action="<?php echo $this->get_full_url(); ?>" accept-charset="utf-8" >
 			<?php wp_nonce_field('ngg_addgallery') ?>
 			<table class="form-table">
 				<tr>
@@ -426,7 +426,7 @@ class NGG_Adder extends NGG_Post_Admin_Page {
 		?>
 		<!-- zip-file operation -->
 		<h3><?php _e('Upload a ZIP File', 'nggallery') ;?></h3>
-		<form name="zipupload" id="zipupload_form" method="POST" enctype="multipart/form-data" action="<?php echo $this->page.'#zipupload'; ?>" accept-charset="utf-8" >
+		<form name="zipupload" id="zipupload_form" method="POST" enctype="multipart/form-data" action="<?php echo $this->get_full_url().'#zipupload'; ?>" accept-charset="utf-8" >
 			<?php wp_nonce_field('ngg_addgallery') ?>
 			<table class="form-table">
 				<tr>
@@ -478,7 +478,7 @@ class NGG_Adder extends NGG_Post_Admin_Page {
 		?>
 		<!-- import folder -->
 		<h3><?php _e('Import an image folder', 'nggallery') ;?></h3>
-		<form name="importfolder" id="importfolder_form" method="POST" action="<?php echo $this->page.'#importfolder'; ?>" accept-charset="utf-8" >
+		<form name="importfolder" id="importfolder_form" method="POST" action="<?php echo $this->get_full_url().'#importfolder'; ?>" accept-charset="utf-8" >
 			<?php wp_nonce_field('ngg_addgallery') ?>
 			<table class="form-table">
 				<tr>
@@ -504,7 +504,7 @@ class NGG_Adder extends NGG_Post_Admin_Page {
 		?>
 		<!-- upload images -->
 		<h3><?php _e('Upload images', 'nggallery') ;?></h3>
-		<form name="uploadimage" id="uploadimage_form" method="POST" enctype="multipart/form-data" action="<?php echo $this->page.'#uploadimage'; ?>" accept-charset="utf-8" >
+		<form name="uploadimage" id="uploadimage_form" method="POST" enctype="multipart/form-data" action="<?php echo $this->get_full_url().'#uploadimage'; ?>" accept-charset="utf-8" >
 			<?php wp_nonce_field('ngg_addgallery') ?>
 			<table class="form-table">
 				<tr>
@@ -637,5 +637,20 @@ class NGG_Adder extends NGG_Post_Admin_Page {
 			'title'   => 'Add things',
 			'content' => $help
 		) );
+	}
+
+	/**
+	 * Get the name of this page. This is the second part of the full name:
+	 *
+	 * admin.php?page=[SLUG]-[PAGE_NAME].
+	 *
+	 * An example is 'admin.php?page=nextcellent-manage-images'
+	 *
+	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
+	 *
+	 * @return string The name.
+	 */
+	public function get_name() {
+		return 'add-gallery';
 	}
 }
