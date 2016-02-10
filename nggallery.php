@@ -5,7 +5,7 @@ Plugin URI: http://www.wpgetready.com/nextcellent-gallery
 Description: A Photo Gallery for WordPress providing NextGEN legacy compatibility from version 1.9.13
 Author: WPGReady, Niknetniko based on Alex Rabe & PhotoCrati work.
 Author URI: http://www.wpgetready.com
-Version: 1.9.30
+Version: 1.9.31
 
 Copyright (c) 2007-2011 by Alex Rabe & NextGEN DEV-Team
 Copyright (c) 2012 Photocrati Media
@@ -45,12 +45,12 @@ if (!class_exists('NCG')) {
      */
     class NCG {
 
-	    const VERSION = '1.9.30';
+	    const VERSION = '1.9.31';
 	    const DB_VERSION = '1.8.3';
 	    const MINIMUM_WP = '4.0';
 	    const MINIMUM_PHP = '5.3';
 
-	    //The base for our admin pages.
+	    //The base for our admin pages. A page will be 'admin.php?page=nextcellent-[NAME]
 	    const ADMIN_BASE = 'nextcellent';
 
 	    /**
