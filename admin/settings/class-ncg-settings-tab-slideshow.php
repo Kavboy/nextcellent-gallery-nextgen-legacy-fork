@@ -1,8 +1,8 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-option-tab.php' );
+require_once( __DIR__ . '/class-ncg-settings-tab.php' );
 
-class NCG_Option_Tab_Slideshow extends NCG_Option_Tab {
+class NCG_Settings_Tab_Slideshow extends NCG_Settings_Tab {
 
 	/**
 	 * Get the name of this tab.

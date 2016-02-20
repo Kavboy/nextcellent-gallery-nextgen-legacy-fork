@@ -1,7 +1,7 @@
 <?php
 
 require_once( dirname( __DIR__ ) . '/class-ncg-post-admin-page.php' );
-require_once( __DIR__ . '/class-ncg-option-tab.php' );
+require_once( __DIR__ . '/class-ncg-settings-tab.php' );
 
 /**
  * The settings page for NextCellent.
@@ -36,7 +36,7 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 	private $options;
 
 	/**
-	 * @var string|NCG_Option_Tab $current The current page or the name of the current page.
+	 * @var string|NCG_Settings_Tab $current The current page or the name of the current page.
 	 */
 	private $current;
 
@@ -67,34 +67,37 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 	 * @see NGG_Options::current
 	 */
 	private function load_page( $name ) {
+
+		$tabs = $this->get_tabs();
+
 		switch($name) {
 			case 'general':
-				require_once( __DIR__ . '/class-ncg-option-tab-general.php' );
-				$this->current = new NCG_Option_Tab_General($this->options, $this->get_full_url());
+				require_once( __DIR__ . '/class-ncg-settings-tab-general.php' );
+				$this->current = new NCG_Settings_Tab_General($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'images':
-				require_once( __DIR__ . '/class-ncg-option-tab-images.php' );
-				$this->current = new NCG_Option_Tab_Images($this->options, $this->get_full_url());
+				require_once( __DIR__ . '/class-ncg-settings-tab-images.php' );
+				$this->current = new NCG_Settings_Tab_Images($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'gallery':
-				require_once( __DIR__ . '/class-ncg-option-tab-gallery.php' );
-				$this->current = new NCG_Option_Tab_Gallery($this->options, $this->get_full_url());
+				require_once( __DIR__ . '/class-ncg-settings-tab-gallery.php' );
+				$this->current = new NCG_Settings_Tab_Gallery($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'effects':
-				require_once( __DIR__ . '/class-ncg-option-tab-effects.php' );
-				$this->current = new NCG_Option_Tab_Effects($this->options, $this->get_full_url());
+				require_once( __DIR__ . '/class-ncg-settings-tab-effects.php' );
+				$this->current = new NCG_Settings_Tab_Effects($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'watermark':
-				require_once( __DIR__ . '/class-ncg-option-tab-watermark.php' );
-				$this->current = new NCG_Option_Tab_Watermark($this->options, $this->get_full_url());
+				require_once( __DIR__ . '/class-ncg-settings-tab-watermark.php' );
+				$this->current = new NCG_Settings_Tab_Watermark($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'slideshow':
-				require_once( __DIR__ . '/class-ncg-option-tab-slideshow.php' );
-				$this->current = new NCG_Option_Tab_Slideshow($this->options, $this->get_full_url());
+				require_once( __DIR__ . '/class-ncg-settings-tab-slideshow.php' );
+				$this->current = new NCG_Settings_Tab_Slideshow($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'advanced':
-				require_once(__DIR__ . '/class-ncg-option-tab-advanced.php' );
-				$this->current = new NCG_Option_Tab_Advanced($this->options, $this->get_full_url());
+				require_once( __DIR__ . '/class-ncg-settings-tab-advanced.php' );
+				$this->current = new NCG_Settings_Tab_Advanced($this->options, $this->get_full_url(), $tabs);
 				break;
 			default:
 				$this->current = $name;
@@ -106,19 +109,20 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 	 */
 	protected function processor() {
 
-		if (isset($_POST['resetdefault'])) {
-
-			check_admin_referer('ngg_uninstall');
-
-			require_once( dirname(__DIR__) . '/class-ngg-installer.php');
-
-			NGG_Installer::set_default_options();
-
-			nggGallery::show_message(__('Reset all settings to the default parameters.','nggallery'));
-
-			return;
+		if(is_string($this->current)) {
+			$this->old_processor();
+		} else {
+			$this->current->processor();
 		}
 
+		do_action( 'ngg_update_options_page' );
+	}
+
+	/**
+	 * This function handles the old way to save settings. This is kept because
+	 * other plugins may rely on NextCellent to save options.
+	 */
+	private function old_processor() {
 		global $nggRewrite;
 
 		$old_state = $this->options['usePermalinks'];
@@ -181,7 +185,7 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 				if ($handle = opendir($path)) {
 					while (false !== ($file = readdir($handle))) {
 						if ($file != '.' && $file != '..') {
-						  @unlink($path . '/' . $file);
+							@unlink($path . '/' . $file);
 						}
 					}
 					closedir($handle);
@@ -194,8 +198,6 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 			check_admin_referer('ngg_settings');
 			$this->rebuild_slugs();
 		}
-
-		do_action( 'ngg_update_options_page' );
 	}
 
 	/**
@@ -210,7 +212,7 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 
 		?>
 		<div class="wrap">
-			<h2><?php _e('Settings', 'nggallery') ?></h2>
+			<h1><?php _e('Settings', 'nggallery') ?></h1>
 			<h2 class="nav-tab-wrapper">
 				<?php
 				foreach($tabs as $tab => $name) {
@@ -234,7 +236,9 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 			?>
 		</div>
 		<?php
-		$this->print_scripts();
+		if(!is_string($this->current)) {
+			$this->current->print_scripts();
+		}
 	}
 
 	/**
@@ -336,96 +340,6 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 
 		return $tabs;
 
-	}
-
-	/**
-	 * Rebuild the slugs with an AJAX-request.
-	 */
-	private function rebuild_slugs() {
-		global $wpdb;
-
-		$total = array();
-		// get the total number of images
-		$total['images'] = intval( $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->nggpictures") );
-		$total['gallery'] = intval( $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->nggallery") );
-		$total['album'] = intval( $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->nggalbum") );
-
-		$messages = array(
-			'images' => __( 'Rebuild image structure : %s / %s images', 'nggallery' ),
-			'gallery' => __( 'Rebuild gallery structure : %s / %s galleries', 'nggallery' ),
-			'album' => __( 'Rebuild album structure : %s / %s albums', 'nggallery' ),
-		);
-
-		foreach ( array_keys( $messages ) as $key ) {
-
-			$message = sprintf( $messages[ $key ] ,
-				"<span class='ngg-count-current'>0</span>",
-				"<span class='ngg-count-total'>" . $total[ $key ] . "</span>"
-			);
-
-			echo "<div class='$key updated'><p class='ngg'>$message</p></div>";
-		}
-
-		$ajax_url = add_query_arg( 'action', 'ngg_rebuild_unique_slugs', admin_url( 'admin-ajax.php' ) );
-		?>
-		<script type="text/javascript">
-			jQuery(document).ready(function($) {
-				var ajax_url = '<?php echo $ajax_url; ?>',
-					_action = 'images',
-					images = <?php echo $total['images']; ?>,
-					gallery = <?php echo $total['gallery']; ?>,
-					album = <?php echo $total['album']; ?>,
-					total = 0,
-					offset = 0,
-					count = 50;
-
-				var $display = $('.ngg-count-current');
-				$('.finished, .gallery, .album').hide();
-				total = images;
-
-				function call_again() {
-					if ( offset > total ) {
-						offset = 0;
-						// 1st run finished
-						if (_action == 'images') {
-							_action = 'gallery';
-							total = gallery;
-							$('.images, .gallery').toggle();
-							$display.html(offset);
-							call_again();
-							return;
-						}
-						// 2nd run finished
-						if (_action == 'gallery') {
-							_action = 'album';
-							total = album;
-							$('.gallery, .album').toggle();
-							$display.html(offset);
-							call_again();
-							return;
-						}
-						// 3rd run finished, exit now
-						if (_action == 'album') {
-							$('.ngg')
-								.html('<?php esc_html_e( 'Done.', 'nggallery' ); ?>')
-								.parent('div').hide();
-							$('.finished').show();
-							return;
-						}
-					}
-
-					$.post(ajax_url, {'_action': _action, 'offset': offset}, function(response) {
-						$display.html(offset);
-
-						offset += count;
-						call_again();
-					});
-				}
-
-				call_again();
-			});
-		</script>
-		<?php
 	}
 
 	public function register_styles() {

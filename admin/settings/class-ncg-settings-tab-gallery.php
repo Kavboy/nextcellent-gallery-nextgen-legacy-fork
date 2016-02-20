@@ -1,17 +1,51 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-option-tab.php' );
+require_once( __DIR__ . '/class-ncg-settings-tab.php' );
 
-class NCG_Option_Tab_Gallery extends NCG_Option_Tab {
+/**
+ * The gallery tab.
+ */
+class NCG_Settings_Tab_Gallery extends NCG_Settings_Tab {
 
 	/**
-	 * Get the name of this tab.
-	 *
-	 * @return string The name of this tab.
+	 * @var array Possibilities to show first on a page.
 	 */
-	public function get_name() {
-		return 'gallery';
+	private $gallery_display;
+
+	/**
+	 * @var array Possibilities to order the thumbnails.
+	 */
+	private $thumbnail_order;
+
+	/**
+	 * @var array The sort orders.
+	 */
+	private $sort_order;
+
+	public function __construct($options, $page, $tabs) {
+		parent::__construct($options, $page, $tabs);
+
+		//Initialize the possibilities.
+
+		$this->gallery_display = array(
+			'gallery'   => __('Thumbnails', 'nggallery'),
+			'slide'     => __('Slideshow', 'nggallery')
+		);
+
+		$this->thumbnail_order = array(
+			'sortorder' => __( 'Custom order', 'nggallery' ),
+			'pid'       => __( 'Image ID', 'nggallery' ),
+			'filename'  => __( 'File name', 'nggallery' ),
+			'alttext'   => __( 'Alt / Title text', 'nggallery' ),
+			'imagedate' => __( 'Image date & time', 'nggallery' )
+		);
+
+		$this->sort_order = array(
+			'ASC'   => __('Ascending', 'nggallery'),
+			'DESC'  => __('Descending', 'nggallery')
+		);
 	}
+
 
 	/**
 	 * Render the content that should be displayed in the tab.
@@ -21,9 +55,8 @@ class NCG_Option_Tab_Gallery extends NCG_Option_Tab {
 	public function render() {
 		?>
 		<h3><?php _e('Gallery settings','nggallery'); ?></h3>
-		<form name="galleryform" method="POST" action="<?php echo $this->page . '#gallery'; ?>">
-			<?php wp_nonce_field('ngg_settings') ?>
-			<input type="hidden" name="page_options" value="galNoPages,galImages,galColumns,galShowSlide,galTextSlide,galTextGallery,galShowOrder,galImgBrowser,galSort,galSortDir,galHiddenImg,galAjaxNav">
+		<form method="POST" action="<?php echo $this->page; ?>">
+			<?php wp_nonce_field('ncg_settings_gallery') ?>
 			<table class="form-table ngg-options">
 				<tr>
 					<th><?php _e('Inline gallery','nggallery') ?></th>
@@ -67,18 +100,8 @@ class NCG_Option_Tab_Gallery extends NCG_Option_Tab {
 				<tr>
 					<th><?php _e('Show first','nggallery'); ?></th>
 					<td>
-						<fieldset>
-							<label>
-								<input name="galShowOrder" type="radio" value="gallery" <?php $this->options->checked( 'galShowOrder', 'gallery'); ?>>
-								<?php _e('Thumbnails', 'nggallery') ;?>
-							</label>
-							<br>
-							<label>
-								<input name="galShowOrder" type="radio" value="slide" <?php $this->options->checked('galShowOrder', 'slide'); ?>>
-								<?php _e('Slideshow', 'nggallery') ;?>
-							</label>
-						</fieldset>
-						<p class="description"><?php _e( 'Choose what visitors will see first.', 'nggallery'); ?></p>
+						<?php $this->render_radio_options('galShowOrder', $this->gallery_display); ?>
+						<p class="description"><?php _e( 'The mode the gallery will be in by default. This is what site visitors will see first.', 'nggallery'); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -116,47 +139,50 @@ class NCG_Option_Tab_Gallery extends NCG_Option_Tab {
 				<tr>
 					<th><?php _e('Sort thumbnails','nggallery'); ?></th>
 					<td>
-						<fieldset>
-							<label>
-								<input name="galSort" type="radio" value="sortorder" <?php $this->options->checked( 'galSort', 'sortorder' ); ?>>
-								<?php _e('Custom order', 'nggallery'); ?>
-							</label><br>
-							<label>
-								<input name="galSort" type="radio" value="pid" <?php $this->options->checked('galSort', 'pid' ); ?>>
-								<?php _e('Image ID', 'nggallery'); ?>
-							</label><br>
-							<label>
-								<input name="galSort" type="radio" value="filename" <?php $this->options->checked('galSort', 'filename'); ?>>
-								<?php _e('File name', 'nggallery') ;?>
-							</label><br>
-							<label>
-								<input name="galSort" type="radio" value="alttext" <?php $this->options->checked('galSort', 'alttext'); ?>>
-								<?php _e('Alt / Title text', 'nggallery') ;?>
-							</label><br>
-							<label>
-								<input name="galSort" type="radio" value="imagedate" <?php $this->options->checked('galSort', 'imagedate' ); ?>>
-								<?php _e('Date / Time', 'nggallery') ;?>
-							</label>
-						</fieldset>
-
+						<?php $this->render_radio_options('galSort', $this->thumbnail_order); ?>
 					</td>
 				</tr>
 				<tr>
 					<th><?php _e('Sort direction','nggallery') ?></th>
 					<td>
-						<label>
-							<input name="galSortDir" type="radio" value="ASC" <?php $this->options->checked('galSortDir', 'ASC'); ?>>
-							<?php _e('Ascending', 'nggallery') ;?>
-						</label><br>
-						<label>
-							<input name="galSortDir" type="radio" value="DESC" <?php $this->options->checked('galSortDir', 'DESC'); ?>>
-							<?php _e('Descending', 'nggallery') ;?>
-						</label>
+						<?php $this->render_radio_options('galSortDir', $this->sort_order); ?>
 					</td>
 				</tr>
 			</table>
-			<?php submit_button( __('Save Changes'), 'primary', 'updateoption' ); ?>
+			<?php submit_button(); ?>
 		</form>
 		<?php
+	}
+
+	/**
+	 * Handle saving the settings.
+	 *
+	 * @return null
+	 */
+	public function processor() {
+
+		check_admin_referer('ncg_settings_gallery');
+
+		//Set all boolean values.
+		$this->save_booleans(array('galNoPages', 'galShowSlide', 'galImgBrowser', 'galHiddenImg', 'galAjaxNav'));
+
+		//Set positive integers.
+		$this->save_number(array('galImages', 'galColumns'));
+
+		//Set text fields.
+		$this->save_text(array('galTextSlide', 'galTextGallery'));
+
+		//Set options with restricted values.
+		$this->save_restricted(array(
+			'galShowOrder'  => array_keys($this->gallery_display),
+			'galSort'       => array_keys($this->thumbnail_order),
+			'galSortDir'    => array_keys($this->sort_order)
+
+		));
+
+		//Save the options.
+		$this->options->save_options();
+
+		$this->success_message();
 	}
 }

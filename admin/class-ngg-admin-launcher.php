@@ -189,7 +189,7 @@ class NGG_Admin_Launcher {
 				$this->page = new NGG_Album_Manager($this->base_slug);
 				break;
 			case "options" :
-				require_once( __DIR__ . '/options/class-ncg-options-page.php' );
+				require_once( __DIR__ . '/settings/class-ncg-settings-page.php' );
 				$this->page = new NCG_Options_Page($this->base_slug);
 				break;
 			case "tags" :

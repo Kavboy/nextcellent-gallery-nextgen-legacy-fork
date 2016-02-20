@@ -10,6 +10,8 @@ class nggGallery {
 
 	/**
 	* Show a error messages
+	 *
+	 * @deprecated Use the NCG utils.
 	*/
 	static function show_error($message) {
 		echo '<div class="error" id="error"><p>' . $message . '</p></div>';
@@ -17,6 +19,8 @@ class nggGallery {
 
 	/**
 	* Show a system messages
+	 *
+	 * @deprecated Use the NCG utils.
 	*/
 	static function show_message($message) {
 		echo '<div class="updated fade" id="message"><p>' . $message . '</p></div>';

@@ -386,6 +386,7 @@ if (!class_exists('NCG')) {
 		    require_once( __DIR__ . '/lib/class-ncg-options.php' );
 
 		    // Load global libraries
+		    require_once( __DIR__ . '/lib/ncg-utils.php' );
 		    require_once( __DIR__ . '/lib/core.php' );
 		    require_once( __DIR__ . '/lib/ngg-db.php' );
 		    require_once( __DIR__ . '/lib/image.php' );
