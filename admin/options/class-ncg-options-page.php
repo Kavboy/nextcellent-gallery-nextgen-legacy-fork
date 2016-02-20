@@ -92,6 +92,10 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 				require_once( __DIR__ . '/class-ncg-option-tab-slideshow.php' );
 				$this->current = new NCG_Option_Tab_Slideshow($this->options, $this->get_full_url());
 				break;
+			case 'advanced':
+				require_once(__DIR__ . '/class-ncg-option-tab-advanced.php' );
+				$this->current = new NCG_Option_Tab_Advanced($this->options, $this->get_full_url());
+				break;
 			default:
 				$this->current = $name;
 		}
@@ -101,6 +105,19 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 	 * Save/Load options and add a new hook for plugins
 	 */
 	protected function processor() {
+
+		if (isset($_POST['resetdefault'])) {
+
+			check_admin_referer('ngg_uninstall');
+
+			require_once( dirname(__DIR__) . '/class-ngg-installer.php');
+
+			NGG_Installer::set_default_options();
+
+			nggGallery::show_message(__('Reset all settings to the default parameters.','nggallery'));
+
+			return;
+		}
 
 		global $nggRewrite;
 
@@ -303,7 +320,8 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 		$tabs['effects'] = __('Effects', 'nggallery');
 		$tabs['watermark'] = __('Watermark', 'nggallery');
 		$tabs['slideshow'] = __('Slideshow', 'nggallery');
-
+		$tabs['advanced'] = __('Advanced', 'nggallery');
+ 
 		/**
 		 * Add your own settings tab to NextCellent.
 		 *

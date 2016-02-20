@@ -97,12 +97,6 @@ class NGG_Admin_Launcher {
 				$this->sluggify('roles'),
 				array( $this, 'show_menu' ) );
 		}
-
-		if ( ! is_multisite() || is_super_admin() ) {
-			add_submenu_page( $this->base_slug, __( 'Reset / Uninstall', 'nggallery' ), __( 'Reset / Uninstall', 'nggallery' ),
-				'activate_plugins', $this->sluggify('setup'),
-				array( $this, 'show_menu' ) );
-		}
 	}
 
 	/**
@@ -205,10 +199,6 @@ class NGG_Admin_Launcher {
 			case "style" :
 				require_once( __DIR__ . '/class-ngg-style.php' );
 				$this->page = new NCG_Style($this->base_slug);
-				break;
-			case "setup" :
-				require_once( __DIR__ . '/class-ngg-setup.php' );
-				$this->page = new NCG_Setup($this->base_slug);
 				break;
 			case "roles" :
 				require_once( __DIR__ . '/class-ngg-roles.php' );
