@@ -1,11 +1,13 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-settings-tab.php' );
+namespace NextCellent\Admin\Settings;
+
+require_once( __DIR__ . '/class-settings-tab.php' );
 
 /**
  * The effects tab.
  */
-class NCG_Settings_Tab_Effects extends NCG_Settings_Tab {
+class Tab_Effects extends Settings_Tab {
 
 	/**
 	 * @var array The possible effects. This is used to generate options and sanitize input.
@@ -44,20 +46,20 @@ class NCG_Settings_Tab_Effects extends NCG_Settings_Tab {
 			<li><code>%IMG_HEIGHT%</code> - <?php _e('The height of the image.', 'nggallery'); ?></li>
 		</ul>
 		<form method="POST" action="<?php echo $this->page; ?>">
-			<?php wp_nonce_field('ncg_settings_effects') ?>
+			<?php $this->nonce() ?>
 			<table class="form-table ngg-options">
 				<tr>
-					<th><label for="thumbEffect"><?php _e('JavaScript Thumbnail effect','nggallery') ?></label></th>
+					<th><label for="<?php echo \NCG_Options::EFFECT_TYPE ?>"><?php _e('JavaScript Thumbnail effect','nggallery') ?></label></th>
 					<td>
-						<select size="1" id="thumbEffect" name="thumbEffect" onchange="inserCode(this.value)">
-							<?php $this->render_select_options('thumbEffect', $this->effects); ?>
+						<select size="1" id="<?php echo \NCG_Options::EFFECT_TYPE ?>" name="<?php echo \NCG_Options::EFFECT_TYPE ?>" onchange="inserCode(this.value)">
+							<?php $this->render_select_options(\NCG_Options::EFFECT_TYPE, $this->effects); ?>
 						</select>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="thumbCode"><?php _e('Effect Code','nggallery'); ?></label></th>
+					<th><label for="<?php echo \NCG_Options::EFFECT_CODE ?>"><?php _e('Effect Code','nggallery'); ?></label></th>
 					<td>
-						<textarea class="normal-text code" id="thumbCode" name="thumbCode" cols="50" rows="5"><?php echo stripslashes(esc_textarea($this->options['thumbCode'])); ?></textarea>
+						<textarea class="normal-text code" id="<?php echo \NCG_Options::EFFECT_CODE ?>" name="<?php echo \NCG_Options::EFFECT_CODE ?>" cols="50" rows="5"><?php echo stripslashes(esc_textarea($this->options[\NCG_Options::EFFECT_CODE])); ?></textarea>
 					</td>
 				</tr>
 			</table>
@@ -68,22 +70,19 @@ class NCG_Settings_Tab_Effects extends NCG_Settings_Tab {
 	}
 
 	/**
-	 * Handle saving the settings.
-	 *
-	 * @return null
+	 * Handle saving the settings. The referrer is already checked at this
+	 * point, so you do not need to do that.
 	 */
 	public function processor() {
 
-		check_admin_referer('ncg_settings_effects');
-
 		//Set options with restricted data.
 		$this->save_restricted(array(
-			'thumbEffect'   => array_keys($this->effects)
+			\NCG_Options::EFFECT_TYPE   => array_keys($this->effects)
 		));
 
 		//Set the thumbnail code.
-		if(isset($_POST['thumbCode'])) {
-			$this->options->set_option('thumbCode', $_POST['thumbCode']);
+		if(isset($_POST[\NCG_Options::EFFECT_CODE])) {
+			$this->options->set_option(\NCG_Options::EFFECT_CODE, $_POST[\NCG_Options::EFFECT_CODE]);
 		}
 
 		//Save the options.

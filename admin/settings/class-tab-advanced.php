@@ -1,8 +1,10 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-settings-tab.php' );
+namespace NextCellent\Admin\Settings;
 
-class NCG_Settings_Tab_Advanced extends NCG_Settings_Tab {
+require_once( __DIR__ . '/class-settings-tab.php' );
+
+class Tab_Advanced extends Settings_Tab {
 
 	/**
 	 * Render the content that should be displayed in the tab.
@@ -14,7 +16,7 @@ class NCG_Settings_Tab_Advanced extends NCG_Settings_Tab {
 		?>
 		<h3><?php _e( 'Reset settings', 'nggallery' ); ?></h3>
 		<form method="POST" action="<?php echo $this->page ?>">
-			<?php wp_nonce_field( 'ncg_settings_reset' ) ?>
+			<?php $this->nonce(); ?>
 			<p>
 				<?php _e( 'Reset all options and settings to their default values.', 'nggallery' ); ?><br>
 				<span class="wp-ui-text-notification"><?php _e('Note that this has no impact on the galleries or images. This action only affects the settings.', 'nggallery') ?></span>
@@ -25,16 +27,13 @@ class NCG_Settings_Tab_Advanced extends NCG_Settings_Tab {
 	}
 
 	/**
-	 * Handle saving the settings.
-	 *
-	 * @return null
+	 * Handle saving the settings. The referrer is already checked at this
+	 * point, so you do not need to do that.
 	 */
 	public function processor() {
 
-		check_admin_referer( 'ncg_settings_reset' );
-
 		require_once( dirname( __DIR__ ) . '/class-ngg-installer.php' );
 
-		NextCellent\Utils\show_success( __( 'All settings were reset to their default value.', 'nggallery' ) );
+		\NextCellent\Utils\show_success( __( 'All settings were reset to their default value.', 'nggallery' ) );
 	}
 }

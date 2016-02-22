@@ -1,8 +1,10 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-settings-tab.php' );
+namespace NextCellent\Admin\Settings;
 
-class NCG_Settings_Tab_Images extends NCG_Settings_Tab {
+require_once( __DIR__ . '/class-settings-tab.php' );
+
+class Tab_Images extends Settings_Tab {
 
 	/**
 	 * Get the name of this tab.
@@ -21,9 +23,8 @@ class NCG_Settings_Tab_Images extends NCG_Settings_Tab {
 	public function render() {
 		?>
 		<h3><?php _e('Image settings','nggallery'); ?></h3>
-		<form name="imagesettings" method="POST" action="<?php echo $this->page; ?>">
-			<?php wp_nonce_field('ngg_settings') ?>
-			<input type="hidden" name="page_options" value="imgResize,imgWidth,imgHeight,imgQuality,imgBackup,imgAutoResize,thumbwidth,thumbheight,thumbfix,thumbquality,thumbDifferentSize">
+		<form method="POST" action="<?php echo $this->page; ?>">
+			<?php $this->nonce(); ?>
 			<table class="form-table ngg-options">
 				<tr>
 					<th><?php _e('Resize images','nggallery') ?></th>
@@ -92,15 +93,55 @@ class NCG_Settings_Tab_Images extends NCG_Settings_Tab {
 					<td><input type="number" step="1" min="0" max="100" class="small-text" name="thumbquality" id="thumbquality" value="<?php echo $this->options['thumbquality']; ?>">%</td>
 				</tr>
 			</table>
-			<h3><?php _e('Single picture','nggallery') ?></h3>
+			<h3><?php _e('Advanced','nggallery') ?></h3>
 			<table class="form-table ngg-options">
 				<tr>
 					<th><?php _e('Clear cache folder','nggallery'); ?></th>
-					<td><input type="submit" name="clearcache" class="button-secondary"  value="<?php _e('Proceed now &raquo;','nggallery') ;?>"/></td>
+					<td><?php submit_button( __('Clear cache','nggallery'), 'secondary', 'clear_cache'); ?></td>
 				</tr>
 			</table>
-			<?php submit_button( __('Save Changes'), 'primary', 'updateoption' ); ?>
+			<?php submit_button(); ?>
 		</form>
 		<?php
+	}
+
+	/**
+	 * Handle saving the settings. The referrer is already checked at this
+	 * point, so you do not need to do that.
+	 */
+	public function processor() {
+
+		//If we need to clear the cache, we do only that.
+		if(isset($_POST['clear_cache'])) {
+			$this->clear_cache();
+			return;
+		}
+
+		$this->save_booleans(array('imgBackup', 'imgAutoResize', 'thumbfix', 'thumbDifferentSize'));
+
+		//Set positive integers.
+		$this->save_number(array('imgWidth', 'imgHeight', 'imgQuality', 'thumbwidth', 'thumbheight', 'thumbquality'));
+
+		//Save the options.
+		$this->options->save_options();
+
+		$this->success_message();
+	}
+
+	private function clear_cache() {
+
+		$path = NCG_PATH . $this->options['gallerypath'] . 'cache/';
+
+		if (is_dir($path))
+			if ($handle = opendir($path)) {
+				while (false !== ($file = readdir($handle))) {
+					if ($file != '.' && $file != '..') {
+						unlink($path . '/' . $file);
+					}
+				}
+				closedir($handle);
+			}
+
+		\NextCellent\Utils\show_success(__('The image cache was cleared successfully.','nggallery'));
 	}
 }

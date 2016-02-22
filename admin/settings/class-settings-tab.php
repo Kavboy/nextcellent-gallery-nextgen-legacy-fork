@@ -1,9 +1,13 @@
 <?php
 
+namespace NextCellent\Admin\Settings;
+
+use NCG_Options;
+
 /**
  * A tab in the options screen.
  */
-abstract class NCG_Settings_Tab {
+abstract class Settings_Tab {
 
 	/**
 	 * @var NCG_Options $options The options.
@@ -43,9 +47,8 @@ abstract class NCG_Settings_Tab {
 	}
 
 	/**
-	 * Handle saving the settings.
-	 *
-	 * @return null
+	 * Handle saving the settings. The referrer is already checked at this
+	 * point, so you do not need to do that.
 	 */
 	public abstract function processor();
 
@@ -150,6 +153,13 @@ abstract class NCG_Settings_Tab {
 		}
 		$out .= '</fieldset>';
 		echo $out;
+	}
+
+	/**
+	 * Do the WordPress nonce for this page.
+	 */
+	protected function nonce() {
+		wp_nonce_field( 'ncg_settings_' . $this->get_name() );
 	}
 
 	/**

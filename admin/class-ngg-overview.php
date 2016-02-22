@@ -6,9 +6,15 @@ require_once( __DIR__ . '/class-ncg-admin-page.php' );
  * Class to display the overview.
  * @since 1.9.24
  */
-class NGG_Overview implements NCG_Admin_Page {
+class NGG_Overview extends NCG_Admin_Page {
 
-	public function __construct() {
+	/**
+	 * @param string $slug The slug for this page. It is recommended you pass this parameter.
+	 *                     For example, with slug 'nextcellent', the page is 'nextcellent-[NAME]'.
+	 */
+	public function __construct($slug) {
+
+		parent::__construct($slug);
 
 		add_meta_box( 'overview', __( 'At a Glance', 'nggallery' ), array(
 			$this,
@@ -948,5 +954,20 @@ class NGG_Overview implements NCG_Admin_Page {
 			'title'   => 'Content',
 			'content' => $help
 		) );
+	}
+
+	/**
+	 * Get the name of this page. This is the second part of the full name:
+	 *
+	 * admin.php?page=[SLUG]-[PAGE_NAME].
+	 *
+	 * An example is 'admin.php?page=nextcellent-manage-images'
+	 *
+	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
+	 *
+	 * @return string The name.
+	 */
+	public function get_name() {
+		return "";
 	}
 }

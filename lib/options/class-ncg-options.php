@@ -1,5 +1,9 @@
 <?php
 
+use NextCellent\Lib\Options\InvalidOptionException;
+
+require_once( __DIR__ . '/class-invalid-option-exception.php' );
+
 /**
  * This class manages NextCellent's options. When used inside NextCellent, the instance should be taken from
  * the registry:
@@ -12,7 +16,6 @@
  * This class implements the ArrayAccess interface. In this implementation, you are able to
  * access the normal options with the array notation (but NOT the multisite options).
  *
- * @api
  * @since 1.9.31
  */
 class NCG_Options implements ArrayAccess {
@@ -21,6 +24,90 @@ class NCG_Options implements ArrayAccess {
 	 * The name of the option NextCellent saves the array to.
 	 */
 	const FIELD = 'ngg_options';
+
+	/**
+	 * The various options. You should always use these constants, and not the name
+	 * of the option directly, as those are not guaranteed to stay the same.
+	 *
+	 * Important note: these are not guaranteed to stay the same over the options.
+	 * If you wish to use one of these options in third party plugins, you must
+	 * always check if the const exists.
+	 */
+	const GALLERY_PATH = 'gallerypath';
+	const DELETE_IMAGES_FROM_DISK = 'deleteImg';
+	const USE_ADVANCED_UPLOADER = 'swfUpload';
+	const USE_PERMALINKS = 'usePermalinks';
+	//This should not be changed for backwards compatibility.
+	const PERMALINK_SLUG = 'nggallery';
+	const GRAPHICS_LIBRARY = 'graphicLibrary';
+	const IMAGE_MAGIC_PATH = 'imageMagickDir';
+	const USE_MEDIA_RSS = 'useMediaRSS';
+	const USE_PICLENS = 'usePicLens';
+	const DO_SILENT_DB_UPDATE = 'silentUpdate';
+
+	const USE_RELATED_IMAGES = 'activateTags';
+	const RELATED_IMAGES_SOURCE = 'appendType';
+	const MAX_RELATED_IMAGES = 'maxImages';
+
+	const THUMB_WIDTH = 'thumbwidth';
+	const THUMB_HEIGHT = 'thumbheight';
+	const THUMB_USE_FIXED_SIZE = 'thumbfix';
+	const THUMB_QUALITY = 'thumbquality';
+
+	const IMG_MAX_WIDTH = 'imgWidth';
+	const IMG_MAX_HEIGHT = 'imgHeight';
+	const IMG_QUALITY = 'imgQuality';
+	const IMG_USE_BACKUP = 'imgBackup';
+	const IMG_AUTO_RESIZE = 'imgAutoResize';
+
+	const GAL_IMAGES_PER_PAGE = 'galImages';
+	const GAL_GALLERIES_PER_PAGE = 'galPagedGalleries';
+	const GAL_NUMBER_OF_COLUMNS = 'galColumns';
+	const GAL_SHOW_SLIDESHOW = 'galShowSlide';
+	const GAL_SLIDESHOW_TEXT = 'galTextSlide';
+	const GAL_GALLERY_TEXT = 'galTextGallery';
+	const GAL_SHOW_ORDER = 'galShowOrder';
+	const GAL_SORT = 'galSort';
+	const GAL_SORT_DIRECTION = 'galSortDir';
+	const GAL_NO_PAGES = 'galNoPages';
+	const GAL_USE_IMAGE_BROWSER = 'galImgBrowser';
+	const GAL_SHOW_ALL_IMAGES = 'galHiddenImg';
+	const GAL_USE_AJAX = 'galAjaxNav';
+
+	const EFFECT_TYPE = 'thumbEffect';
+	const EFFECT_CODE = 'thumbCode';
+
+	const WM_POSITION = 'wmPos';
+	const WM_X_POSITION = 'wmXpos';
+	const WM_Y_POSITION = 'wmYpos';
+	const WM_TYPE = 'wmType';
+	const WM_IMAGE_PATH = 'wmPath';
+	const WM_FONT = 'wmFont';
+	const WM_FONT_SIZE = 'wmSize';
+	const WM_TEXT = 'wmText';
+	const WM_TEXT_COLOUR = 'wmColor';
+	const WM_TEXT_ALPHA = 'wmOpaque';
+
+	const SLIDE_EFFECT = 'slideFx';
+	const SLIDE_WIDTH = 'irWidth';
+	const SLIDE_HEIGHT = 'irHeight';
+	const SLIDE_FIT_SIZE = 'irAutoDim';
+	const SLIDE_TIME = 'irRotatetime';
+	const SLIDE_USE_LOOP = 'irLoop';
+	const SLIDE_USE_DRAG = 'irDrag';
+	const SLIDE_SHOW_NAV = 'irNavigation';
+	const SLIDE_SHOW_NAV_DOTS = 'irNavigationDots';
+	const SLIDE_AUTO_PLAY = 'irAutoplay';
+	const SLIDE_PAUSE_ON_HOVER = 'irAutoplayHover';
+	const SLIDE_NR_OF_IMAGES = 'irNumber';
+	const SLIDE_NEXT_ON_CLICK = 'irClick';
+
+	const STYLE_USE_CSS = 'activateCSS';
+	const STYLE_CSS_FILE = 'CSSfile';
+
+	const MU_GALLERY_PATH = 'gallerypath';
+	const MU_CSS_FILE = 'wpmuCSSfile';
+	const MU_DO_SILENT_DB_UPDATE = 'silentUpdate';
 
 	/**
 	 * @var array $options The options.
@@ -136,29 +223,29 @@ class NCG_Options implements ArrayAccess {
 			'silentUpdate' => false,
 		);
 
-		if(is_multisite()) {
+		if ( is_multisite() ) {
 			$defaults['gallerypath'] = str_replace( "%BLOG_ID%", get_current_blog_id(), $mu_defaults['gallerypath'] );
 			$defaults['CSSfile']     = $mu_defaults['wpmuCSSfile'];
 		}
 
-		$this->default_options = $defaults;
+		$this->default_options    = $defaults;
 		$this->default_mu_options = $mu_defaults;
 
-		$this->options = get_option(self::FIELD);
+		$this->options = get_option( self::FIELD );
 
 		//If the options do not exist.
-		if(!$this->options) {
+		if ( ! $this->options ) {
 			$this->install_options();
-			$this->options = get_option(self::FIELD);
+			$this->options = get_option( self::FIELD );
 		}
 
-		if(is_multisite()) {
-			$this->mu_options = get_site_option(self::FIELD);
+		if ( is_multisite() ) {
+			$this->mu_options = get_site_option( self::FIELD );
 
 			//If the options do not exist.
-			if(!$this->mu_options) {
+			if ( ! $this->mu_options ) {
 				$this->install_mu_options();
-				$this->mu_options = get_site_option(self::FIELD);
+				$this->mu_options = get_site_option( self::FIELD );
 			}
 		} else {
 			$this->mu_options = null;
@@ -214,7 +301,7 @@ class NCG_Options implements ArrayAccess {
 	 * @return bool True if the option was updated, otherwise false.
 	 */
 	public function update_option( $option, $value ) {
-		$this->set_option($option, $value);
+		$this->set_option( $option, $value );
 
 		return $this->save_options();
 	}
@@ -224,8 +311,13 @@ class NCG_Options implements ArrayAccess {
 	 *
 	 * @param string $option The name of the option.
 	 * @param mixed $value   The value of the option. If not scalar, it should be serialized.
+	 *
+	 * @throws InvalidOptionException If the option is not a predefined option.
 	 */
 	public function set_option( $option, $value ) {
+		if ( is_null( $this->get( $option ) ) ) {
+			throw new InvalidOptionException( $option );
+		}
 		$this->options[ $option ] = $value;
 	}
 
@@ -239,7 +331,7 @@ class NCG_Options implements ArrayAccess {
 	 * @return bool True if the option was updated, otherwise false.
 	 */
 	public function update_options( $options ) {
-		$this->set_options($options);
+		$this->set_options( $options );
 
 		return $this->save_options();
 	}
@@ -251,7 +343,7 @@ class NCG_Options implements ArrayAccess {
 	 **/
 	public function set_options( $options ) {
 		foreach ( $options as $option => $value ) {
-			$this->options[ $option ] = $value;
+			$this->set_option( $option, $value );
 		}
 	}
 
@@ -302,7 +394,7 @@ class NCG_Options implements ArrayAccess {
 	 * @return bool True if the option was updated, otherwise false.
 	 */
 	public function update_mu_option( $option, $value ) {
-		$this->mu_options[ $option ] = $value;
+		$this->set_mu_option( $option, $value );
 
 		return $this->save_mu_options();
 	}
@@ -313,8 +405,13 @@ class NCG_Options implements ArrayAccess {
 	 *
 	 * @param string $option The name of the option.
 	 * @param mixed $value   The value of the option. If not scalar, it should be serialized.
+	 *
+	 * @throws InvalidOptionException If the option does not exist.
 	 */
 	public function set_mu_option( $option, $value ) {
+		if ( is_null( $this->get_mu_option( $option ) ) ) {
+			throw new InvalidOptionException( $option );
+		}
 		$this->mu_options[ $option ] = $value;
 	}
 
@@ -326,7 +423,7 @@ class NCG_Options implements ArrayAccess {
 	 * @return bool True if the option was updated, otherwise false.
 	 */
 	public function update_mu_options( $options ) {
-		$this->set_mu_options($options);
+		$this->set_mu_options( $options );
 
 		return $this->save_mu_options();
 	}
@@ -338,12 +435,12 @@ class NCG_Options implements ArrayAccess {
 	 */
 	public function set_mu_options( $options ) {
 		foreach ( $options as $option => $value ) {
-			$this->mu_options[ $option ] = $value;
+			$this->set_mu_option( $option, $value );
 		}
 	}
 
 	/**
-	 * Delete a multisite option. It will be unset, and the options will be saved. If the option does not exist,
+	 * Delete a multi site option. It will be unset, and the options will be saved. If the option does not exist,
 	 * nothing will happen.
 	 *
 	 * @param string $option The option to delete.
@@ -356,7 +453,7 @@ class NCG_Options implements ArrayAccess {
 	}
 
 	/**
-	 * Save the multisite options.
+	 * Save the multi site options.
 	 *
 	 * @see update_site_option()
 	 *
@@ -416,8 +513,8 @@ class NCG_Options implements ArrayAccess {
 	 */
 	private function option( $options, $defaults, $option ) {
 		//If the option is not present in the saved options, it's maybe in the defaults.
-		if ( !array_key_exists( $option, $options ) ) {
-			if ( !array_key_exists( $option,  $defaults ) ) {
+		if ( ! array_key_exists( $option, $options ) ) {
+			if ( ! array_key_exists( $option, $defaults ) ) {
 				return null;
 			} else {
 				return $defaults[ $option ];
@@ -436,7 +533,7 @@ class NCG_Options implements ArrayAccess {
 	 * @return boolean True if it exists, otherwise false.
 	 */
 	public function offsetExists( $offset ) {
-		return array_key_exists($offset, $this->options);
+		return array_key_exists( $offset, $this->options );
 	}
 
 	/**
@@ -448,7 +545,7 @@ class NCG_Options implements ArrayAccess {
 	 * @return mixed Can return all value types.
 	 */
 	public function offsetGet( $offset ) {
-		return $this->get($offset);
+		return $this->get( $offset );
 	}
 
 	/**
@@ -458,15 +555,15 @@ class NCG_Options implements ArrayAccess {
 	 * When an offset is set, the options are saved. This is not efficient for setting a large number of
 	 *        options.
 	 *
-	 * @see update_options() for the alternative that does enable a lot of options.
+	 * @see   update_options() for the alternative that does enable a lot of options.
 	 *
 	 * @param string $offset The offset to assign the value to.
-	 * @param mixed $value  The value to set.
+	 * @param mixed $value   The value to set.
 	 *
 	 * @return void
 	 */
 	public function offsetSet( $offset, $value ) {
-		$this->update_option($offset, $value);
+		$this->update_option( $offset, $value );
 	}
 
 	/**
@@ -481,6 +578,6 @@ class NCG_Options implements ArrayAccess {
 	 * @since 5.0.0
 	 */
 	public function offsetUnset( $offset ) {
-		$this->delete_option($offset);
+		$this->delete_option( $offset );
 	}
 }

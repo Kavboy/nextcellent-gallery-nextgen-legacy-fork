@@ -1,8 +1,10 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-settings-tab.php' );
+namespace NextCellent\Admin\Settings;
 
-class NCG_Settings_Tab_General extends NCG_Settings_Tab {
+require_once( __DIR__ . '/class-settings-tab.php' );
+
+class Tab_General extends Settings_Tab {
 
 	/**
 	 * @var array The different graphics libraries.
@@ -46,7 +48,7 @@ class NCG_Settings_Tab_General extends NCG_Settings_Tab {
 		?>
 		<h3><?php _e( 'General settings', 'nggallery' ); ?></h3>
 		<form method="post" action="<?php echo $this->page; ?>">
-			<?php wp_nonce_field('ncg_settings_general') ?>
+			<?php $this->nonce(); ?>
 			<table class="form-table ngg-options">
 				<tr>
 					<th><label for="gallerypath"><?php _e('Gallery path','nggallery'); ?></label></th>
@@ -152,17 +154,19 @@ class NCG_Settings_Tab_General extends NCG_Settings_Tab {
 	}
 
 	/**
-	 * Handle saving the settings.
+	 * Handle saving the settings. The referrer is already checked at this
+	 * point, so you do not need to do that.
 	 */
 	public function processor() {
-
-		check_admin_referer('ncg_settings_general');
 
 		//If we need to recreate the permalinks, we do only that.
 		if(isset($_POST['create_permalinks'])) {
 			$this->rebuild_permalinks();
 			return;
 		}
+
+		$old_slug = $this->options['permalinkSlug'];
+		$old_permalink_use = $this->options['usePermalinks'];
 
 		//Set all boolean values.
 		$booleans = array('useMediaRSS', 'usePicLens', 'usePermalinks', 'activateTags');
@@ -195,6 +199,12 @@ class NCG_Settings_Tab_General extends NCG_Settings_Tab {
 
 		//Save the options.
 		$this->options->save_options();
+
+		//TODO: move this from global state.
+		if ( $old_permalink_use != $this->options['usePermalinks'] || $old_slug != $this->options['permalinkSlug'] ) {
+			global $nggRewrite;
+			$nggRewrite->flush();
+		}
 
 		$this->success_message();
 	}

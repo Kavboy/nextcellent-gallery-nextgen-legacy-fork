@@ -40,8 +40,10 @@ check_for_nextgen();
  */
 if (!class_exists('NCG')) {
 
-    /**
-     * Class nggLoader
+	/**
+	 * Class nggLoader
+	 *
+	 * @property-read NCG_Options options The options.
      */
     class NCG {
 
@@ -95,7 +97,6 @@ if (!class_exists('NCG')) {
 	     * @param string $name
 	     *
 	     * @deprecated 1.9.31
-	     * @see get()
 	     *
 	     * @return object|null
 	     */
@@ -168,7 +169,8 @@ if (!class_exists('NCG')) {
 		    //Register the admin hooks.
 		    if(is_admin() && !defined( 'DOING_AJAX' )) {
 			    //The admin hooks are registered in the constructor of NGG_Admin_Launcher
-			    $this->registry->add('admin-launcher', new NGG_Admin_Launcher(self::ADMIN_BASE));
+			    $admin = new NGG_Admin_Launcher(self::ADMIN_BASE);
+			    $admin->register();
 		    }
 	    }
 
@@ -193,7 +195,7 @@ if (!class_exists('NCG')) {
 			// Content Filters
 			add_filter('ngg_gallery_name', 'sanitize_title');
 
-	        $options = $this->registry->get('options');
+	        $options = $this->options;
 
 			// Check if we are in the admin area
 			if ( !is_admin() ) {
@@ -212,7 +214,7 @@ if (!class_exists('NCG')) {
 			}
 
 	        //Check for a database upgrade.
-	        if( get_option( 'ngg_db_version' ) != NCG_DB_VERSION && isset($_GET['page']) ) {
+	        if( get_option( 'ngg_db_version' ) != self::DB_VERSION && isset($_GET['page']) ) {
 
 		        /**
 		         * If the silentUpgrade option is not empty, we try and do the upgrade now.
@@ -328,13 +330,11 @@ if (!class_exists('NCG')) {
 	    }
 
 	    /**
-	     * Define constants.
+	     * Define constants. You should use the $ncg instance whenever possible.
 	     */
         public function define_constant() {
 
-	        //The database version.
-	        define('NCG_DB_VERSION', self::DB_VERSION);
-	        //The NextCellent version.
+	        //The NextCellent version. This is provided for easy access in other plugins.
 	        define('NCG_VERSION', self::VERSION);
 	        //The path to the NextCellent plugin folder.
 	        define('NCG_PATH', str_replace('\\', '/', plugin_dir_path(__FILE__)));
@@ -383,7 +383,7 @@ if (!class_exists('NCG')) {
 
 		    //Include the options and the dependency manager.
 		    require_once( __DIR__ . '/lib/class-ncg-registry.php' );
-		    require_once( __DIR__ . '/lib/class-ncg-options.php' );
+		    require_once( __DIR__ . '/lib/options/class-ncg-options.php' );
 
 		    // Load global libraries
 		    require_once( __DIR__ . '/lib/ncg-utils.php' );
@@ -512,7 +512,7 @@ if (!class_exists('NCG')) {
 				return;
 			}
 
-	        $options = $this->get('options');
+	        $options = $this->options;
 
 			//Add thickbox if necessary.
 			if ($options['thumbEffect'] == 'thickbox') {
@@ -571,7 +571,7 @@ if (!class_exists('NCG')) {
 	     */
 		public function load_styles() {
 
-			$options = $this->get('options');
+			$options = $this->options;
 
             //Notice stylesheet selection has this priority:
             //1-sytlesheet loaded from filter ngg_load_stylesheet
@@ -746,9 +746,15 @@ if (!class_exists('NCG')) {
 	//Register an alias for backwards compatibility.
 	class_alias('NCG', 'nggLoader');
 
-	// Let's start the holy plugin
+	//Let's start the holy plugin.
+	global $ncg;
+	$ncg = new NCG();
+
+	/**
+	 * @deprecated Use $ncg instead.
+	 */
 	global $ngg;
-	$ngg = new NCG();
+	$ngg = $ncg;
 }
 
 /**

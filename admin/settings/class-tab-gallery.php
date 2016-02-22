@@ -1,11 +1,13 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-settings-tab.php' );
+namespace NextCellent\Admin\Settings;
+
+require_once( __DIR__ . '/class-settings-tab.php' );
 
 /**
  * The gallery tab.
  */
-class NCG_Settings_Tab_Gallery extends NCG_Settings_Tab {
+class Tab_Gallery extends Settings_Tab {
 
 	/**
 	 * @var array Possibilities to show first on a page.
@@ -56,7 +58,7 @@ class NCG_Settings_Tab_Gallery extends NCG_Settings_Tab {
 		?>
 		<h3><?php _e('Gallery settings','nggallery'); ?></h3>
 		<form method="POST" action="<?php echo $this->page; ?>">
-			<?php wp_nonce_field('ncg_settings_gallery') ?>
+			<?php $this->nonce(); ?>
 			<table class="form-table ngg-options">
 				<tr>
 					<th><?php _e('Inline gallery','nggallery') ?></th>
@@ -155,13 +157,10 @@ class NCG_Settings_Tab_Gallery extends NCG_Settings_Tab {
 	}
 
 	/**
-	 * Handle saving the settings.
-	 *
-	 * @return null
+	 * Handle saving the settings. The referrer is already checked at this
+	 * point, so you do not need to do that.
 	 */
 	public function processor() {
-
-		check_admin_referer('ncg_settings_gallery');
 
 		//Set all boolean values.
 		$this->save_booleans(array('galNoPages', 'galShowSlide', 'galImgBrowser', 'galHiddenImg', 'galAjaxNav'));

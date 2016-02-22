@@ -1,8 +1,10 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-settings-tab.php' );
+namespace NextCellent\Admin\Settings;
 
-class NCG_Settings_Tab_Watermark extends NCG_Settings_Tab {
+require_once( __DIR__ . '/class-settings-tab.php' );
+
+class Tab_Watermark extends Settings_Tab {
 
 	/**
 	 * Get the name of this tab.
@@ -20,17 +22,16 @@ class NCG_Settings_Tab_Watermark extends NCG_Settings_Tab {
 	 */
 	public function render() {
 		// take the first image as sample
-		$image_array = nggdb::find_last_images(0, 1);
+		$image_array = \nggdb::find_last_images(0, 1);
 		$ngg_image = $image_array[0];
 		$imageID  = $ngg_image->pid;
 
 		?>
 
 		<h3><?php _e('Watermark','nggallery'); ?></h3>
-		<p><?php _e('Please note : you can only activate the watermark under -> Manage Galleries. This action cannot be undone.', 'nggallery') ?></p>
-		<form name="watermarkform" method="POST" action="<?php echo $this->page . '#watermark'; ?>">
-			<?php wp_nonce_field('ngg_settings') ?>
-			<input type="hidden" name="page_options" value="wmPos,wmXpos,wmYpos,wmType,wmPath,wmFont,wmSize,wmColor,wmText,wmOpaque" />
+		<p><?php _e('Please note: you can only activate the watermark under -> Manage Galleries. This action cannot be undone.', 'nggallery') ?></p>
+		<form method="POST" action="<?php echo $this->page; ?>">
+			<?php $this->nonce(); ?>
 			<div id="wm-preview">
 				<h3><?php esc_html_e('Preview','nggallery') ?></h3>
 				<label for="wm-preview-select"><?php _e('Select an image','nggallery'); ?></label>
@@ -95,9 +96,9 @@ class NCG_Settings_Tab_Watermark extends NCG_Settings_Tab {
 					<td>
 						<select name="wmFont" size="1">
 							<?php
-							$fontlist = $this->get_fonts();
-							foreach ( $fontlist as $fontfile ) {
-								echo "\n".'<option value="'.$fontfile.'" '. $this->options->selected('wmFont', $fontfile).' >'.$fontfile.'</option>';
+							$font_list = $this->get_fonts();
+							foreach ( $font_list as $font ) {
+								echo "\n".'<option value="'.$font.'" '. $this->options->selected('wmFont', $font).' >'.$font.'</option>';
 							}
 							?>
 						</select><br>
@@ -105,7 +106,7 @@ class NCG_Settings_Tab_Watermark extends NCG_Settings_Tab {
 							<?php if ( !function_exists('ImageTTFBBox') ) {
 								_e( 'This function will not work, cause you need the FreeType library', 'nggallery' );
 							} else {
-								_e( 'You can upload more fonts in the folder <strong>nggallery/fonts</strong>', 'nggallery' );
+								printf( __( 'You can upload more fonts in the folder <code>%s</code>', 'nggallery' ), NCG_PATH . 'fonts/');
 							} ?>
 						</span>
 					</td>
@@ -116,7 +117,7 @@ class NCG_Settings_Tab_Watermark extends NCG_Settings_Tab {
 				</tr>
 				<tr>
 					<th><label for="wmColor"><?php _e('Color','nggallery'); ?></label></th>
-					<td><input class="picker" type="text" id="wmColor" name="wmColor" value="<?php echo $this->options['wmColor'] ?>">
+					<td><input type="color" id="wmColor" name="wmColor" value="#<?php echo $this->options['wmColor'] ?>">
 				</tr>
 				<tr>
 					<th><label for="wmText"><?php _e('Text','nggallery'); ?></label></th>
@@ -128,7 +129,7 @@ class NCG_Settings_Tab_Watermark extends NCG_Settings_Tab {
 				</tr>
 			</table>
 			<div class="clear"></div>
-			<?php submit_button( __('Save Changes'), 'primary', 'updateoption' ); ?>
+			<?php submit_button(); ?>
 		</form>
 
 		<?php
@@ -144,21 +145,23 @@ class NCG_Settings_Tab_Watermark extends NCG_Settings_Tab {
 		$ttf_fonts = array ();
 
 		// Files in wp-content/plugins/nggallery/fonts directory
-		$plugin_root = NGGALLERY_ABSPATH . 'fonts';
+		$plugin_root = NCG_PATH . '/fonts';
 
-		$plugins_dir = @ dir($plugin_root);
+		$plugins_dir = dir($plugin_root);
 		if ($plugins_dir) {
 			while (($file = $plugins_dir->read()) !== false) {
 				if (preg_match('|^\.+$|', $file))
 					continue;
 				if (is_dir($plugin_root.'/'.$file)) {
-					$plugins_subdir = @ dir($plugin_root.'/'.$file);
+					$plugins_subdir = dir($plugin_root.'/'.$file);
 					if ($plugins_subdir) {
 						while (($subfile = $plugins_subdir->read()) !== false) {
-							if (preg_match('|^\.+$|', $subfile))
+							if (preg_match('|^\.+$|', $subfile)) {
 								continue;
-							if (preg_match('|\.ttf$|', $subfile))
+							}
+							if (preg_match('|\.ttf$|', $subfile)) {
 								$ttf_fonts[] = "$file/$subfile";
+							}
 						}
 					}
 				} else {
@@ -169,5 +172,63 @@ class NCG_Settings_Tab_Watermark extends NCG_Settings_Tab {
 		}
 
 		return $ttf_fonts;
+	}
+
+	/**
+	 * Handle saving the settings. The referrer is already checked at this
+	 * point, so you do not need to do that.
+	 */
+	public function processor() {
+
+		$this->save_booleans(array(
+			'irAutoDim', 'imgAutoResize', 'thumbfix', 'thumbDifferentSize', 'irLoop', 'irDrag', 'irNavigation',
+			'irNavigationDots', 'irAutoplay', 'irAutoplayHover', 'irClick'
+		));
+
+		//Set positive integers.
+		$this->save_number( array( 'wmXpos', 'wmYpos', 'wmSize', 'wmOpaque' ) );
+
+		$this->save_text( array('wmPath', 'wmText', 'wmFont') );
+
+		$this->save_restricted( array(
+			'wmPos'  => array(
+				'topLeft', 'topCenter', 'topRight', 'midLeft', 'midCenter', 'midRight',
+				'botLeft', 'botCenter', 'botRight'
+			),
+			'wmType'    => array('image', 'text')
+		));
+
+		if(isset($_POST['wmColor'])) {
+			$colour = $_POST['wmColor'];
+			//Try matching.
+			if(preg_match('/^#[a-f0-9]{6}$/i', $colour)) {
+				$this->options->set_option('wmColor', ltrim($colour, '#'));
+			} elseif(preg_match('/^[a-f0-9]{6}$/i', $colour)) {
+				$this->options->set_option('wmColor', $colour);
+			}
+		}
+
+		//Save the options.
+		$this->options->save_options();
+
+		$this->success_message();
+	}
+
+	public function print_scripts() {
+		?>
+		<script type="text/javascript">
+			jQuery(document).ready( function($) {
+				//Set preview for watermark.
+				$('#wm-preview-select').on("nggAutocompleteDone", function() {
+					$('#wm-preview-image').attr("src", '<?php echo home_url( 'index.php' ); ?>' + '?callback=image&pid=' + this.value + '&mode=watermark');
+					$('#wm-preview-image-url').attr("href", '<?php echo home_url( 'index.php' ); ?>' + '?callback=image&pid=' + this.value + '&mode=watermark');
+				});
+
+				jQuery("#wm-preview-select").nggAutocomplete( {
+					type: 'image',domain: "<?php echo home_url('index.php', is_ssl() ? 'https' : 'http'); ?>"
+				});
+			});
+		</script>
+		<?php
 	}
 }

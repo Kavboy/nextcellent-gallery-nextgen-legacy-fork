@@ -1,7 +1,11 @@
 <?php
 
+namespace NextCellent\Admin\Settings;
+
+use NCG_Post_Admin_Page;
+
 require_once( dirname( __DIR__ ) . '/class-ncg-post-admin-page.php' );
-require_once( __DIR__ . '/class-ncg-settings-tab.php' );
+require_once( __DIR__ . '/class-settings-tab.php' );
 
 /**
  * The settings page for NextCellent.
@@ -28,20 +32,20 @@ require_once( __DIR__ . '/class-ncg-settings-tab.php' );
  *
  * add_hook( 'ngg_tab_content_my_plugin', 'display_settings');
  */
-class NCG_Options_Page extends NCG_Post_Admin_Page {
+class Settings_Page extends NCG_Post_Admin_Page {
 
 	/**
-	 * @var NCG_Options_Page $options The options.
+	 * @var Settings_Page $options The options.
 	 */
 	private $options;
 
 	/**
-	 * @var string|NCG_Settings_Tab $current The current page or the name of the current page.
+	 * @var string|Settings_Tab $current The current page or the name of the current page.
 	 */
 	private $current;
 
 	/**
-	 * NCG_Options_Page constructor.
+	 * Settings_Page constructor.
 	 *
 	 * @param string $slug The base slug for the page.
 	 */
@@ -50,7 +54,7 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 
 		global $ngg;
 
-		$this->options = $ngg->get('options');
+		$this->options = $ngg->options;
 
 		$tab = 'general';
 		if(isset($_GET['tab'])) {
@@ -72,32 +76,32 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 
 		switch($name) {
 			case 'general':
-				require_once( __DIR__ . '/class-ncg-settings-tab-general.php' );
-				$this->current = new NCG_Settings_Tab_General($this->options, $this->get_full_url(), $tabs);
+				require_once( __DIR__ . '/class-tab-general.php' );
+				$this->current = new Tab_General($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'images':
-				require_once( __DIR__ . '/class-ncg-settings-tab-images.php' );
-				$this->current = new NCG_Settings_Tab_Images($this->options, $this->get_full_url(), $tabs);
+				require_once( __DIR__ . '/class-tab-images.php' );
+				$this->current = new Tab_Images($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'gallery':
-				require_once( __DIR__ . '/class-ncg-settings-tab-gallery.php' );
-				$this->current = new NCG_Settings_Tab_Gallery($this->options, $this->get_full_url(), $tabs);
+				require_once( __DIR__ . '/class-tab-gallery.php' );
+				$this->current = new Tab_Gallery($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'effects':
-				require_once( __DIR__ . '/class-ncg-settings-tab-effects.php' );
-				$this->current = new NCG_Settings_Tab_Effects($this->options, $this->get_full_url(), $tabs);
+				require_once( __DIR__ . '/class-tab-effects.php' );
+				$this->current = new Tab_Effects($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'watermark':
-				require_once( __DIR__ . '/class-ncg-settings-tab-watermark.php' );
-				$this->current = new NCG_Settings_Tab_Watermark($this->options, $this->get_full_url(), $tabs);
+				require_once( __DIR__ . '/class-tab-watermark.php' );
+				$this->current = new Tab_Watermark($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'slideshow':
-				require_once( __DIR__ . '/class-ncg-settings-tab-slideshow.php' );
-				$this->current = new NCG_Settings_Tab_Slideshow($this->options, $this->get_full_url(), $tabs);
+				require_once( __DIR__ . '/class-tab-slideshow.php' );
+				$this->current = new Tab_Slideshow($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'advanced':
-				require_once( __DIR__ . '/class-ncg-settings-tab-advanced.php' );
-				$this->current = new NCG_Settings_Tab_Advanced($this->options, $this->get_full_url(), $tabs);
+				require_once( __DIR__ . '/class-tab-advanced.php' );
+				$this->current = new Tab_Advanced($this->options, $this->get_full_url(), $tabs);
 				break;
 			default:
 				$this->current = $name;
@@ -112,7 +116,20 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 		if(is_string($this->current)) {
 			$this->old_processor();
 		} else {
+
+			//Check the referrer.
+			check_admin_referer( 'ncg_settings_' . $this->current->get_name() );
+
+
 			$this->current->processor();
+
+			/**
+			 * Fires when settings are updated on a settings page.
+			 *
+			 * @param array $_POST The post variables. Use this, and not $_POST, as $_POST might
+			 *                     be empty in the future.
+			 */
+			do_action( 'ncg_settings_updated_' . $this->current->get_name(), $_POST);
 		}
 
 		do_action( 'ngg_update_options_page' );
@@ -121,6 +138,8 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 	/**
 	 * This function handles the old way to save settings. This is kept because
 	 * other plugins may rely on NextCellent to save options.
+	 *
+	 * @deprecated Please update your plugin to manage your own settings.
 	 */
 	private function old_processor() {
 		global $nggRewrite;
@@ -170,33 +189,11 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 			$this->options->save_options();
 
 			// Flush Rewrite rules
-			if ( $old_state != $this->options['usePermalinks'] || $old_slug != $this->options['permalinkSlug'] )
+			if ( $old_state != $this->options['usePermalinks'] || $old_slug != $this->options['permalinkSlug'] ) {
 				$nggRewrite->flush();
+			}
 
-			nggGallery::show_message(__('Settings updated successfully','nggallery'));
-		}
-
-		if ( isset($_POST['clearcache']) ) {
-			check_admin_referer('ngg_settings');
-
-			$path = WINABSPATH . $this->options['gallerypath'] . 'cache/';
-
-			if (is_dir($path))
-				if ($handle = opendir($path)) {
-					while (false !== ($file = readdir($handle))) {
-						if ($file != '.' && $file != '..') {
-							@unlink($path . '/' . $file);
-						}
-					}
-					closedir($handle);
-				}
-
-			nggGallery::show_message(__('Cache cleared','nggallery'));
-		}
-
-		if ( isset($_POST['createslugs']) ) {
-			check_admin_referer('ngg_settings');
-			$this->rebuild_slugs();
+			\NextCellent\Utils\show_success(__('Settings updated successfully','nggallery'));
 		}
 	}
 
@@ -253,63 +250,6 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 	}
 
 	/**
-	 * Print the JavaScript.
-	 */
-	private function print_scripts() {
-		?>
-		<script type="text/javascript">
-			function insertcode(value) {
-				var effectcode, extra;
-				switch (value) {
-					case 'none':
-						effectcode = "";
-						break;
-					case "thickbox":
-						effectcode = 'class="thickbox" rel="%GALLERY_NAME%"';
-						break;
-					case "lightbox":
-						effectcode = 'rel="lightbox[%GALLERY_NAME%]"';
-						break;
-					case "highslide":
-						effectcode = 'class="highslide" onclick="return hs.expand(this, { slideshowGroup: %GALLERY_NAME% })"';
-						break;
-					case "shutter":
-						effectcode = 'class="shutterset_%GALLERY_NAME%"';
-						break;
-					case "photoSwipe":
-						effectcode = 'data-size="%IMG_WIDTH%x%IMG_HEIGHT%"';
-						extra = 'Works with <a href="https://wordpress.org/plugins/photo-swipe/">PhotoSwipe</a>.';
-						break;
-					default:
-						break;
-				}
-				jQuery("#thumbCode").val(effectcode);
-				jQuery("#effects-more").html(extra);
-			}
-
-			jQuery(document).ready( function($) {
-				//$('html,body').scrollTop(0);
-				//Set tabs.
-				$('#slider').tabs({ fxFade: true, fxSpeed: 'fast' }).css('display', 'block');
-
-				//Set colorpicker.
-				$('.picker').wpColorPicker();
-
-				//Set preview for watermark.
-				$('#wm-preview-select').on("nggAutocompleteDone", function() {
-					$('#wm-preview-image').attr("src", '<?php echo home_url( 'index.php' ); ?>' + '?callback=image&pid=' + this.value + '&mode=watermark');
-                    $('#wm-preview-image-url').attr("href", '<?php echo home_url( 'index.php' ); ?>' + '?callback=image&pid=' + this.value + '&mode=watermark');
-				});
-
-                jQuery("#wm-preview-select").nggAutocomplete( {
-                    type: 'image',domain: "<?php echo home_url('index.php', is_ssl() ? 'https' : 'http'); ?>"
-                });
-			});
-		</script>
-		<?php
-	}
-
-	/**
 	 * Create array for tabs and add a filter for other plugins to inject more tabs
 	 *
 	 * @return array $tabs
@@ -345,14 +285,12 @@ class NCG_Options_Page extends NCG_Post_Admin_Page {
 	public function register_styles() {
 		wp_enqueue_style( 'nggtabs');
 		wp_enqueue_style( 'nggadmin' );
-		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style( 'ngg-jqueryui' );
 		wp_enqueue_style( 'jqueryFileTree');
 	}
 
 	public function register_scripts() {
 		wp_enqueue_script( 'jquery-ui-tabs' );
-		wp_enqueue_script( 'wp-color-picker' );
 		wp_enqueue_script( 'ngg-autocomplete' );
 	}
 

@@ -1,8 +1,32 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-settings-tab.php' );
+namespace NextCellent\Admin\Settings;
 
-class NCG_Settings_Tab_Slideshow extends NCG_Settings_Tab {
+require_once( __DIR__ . '/class-settings-tab.php' );
+
+class Tab_Slideshow extends Settings_Tab {
+
+	/**
+	 * @var array The possible effects for the slideshow.
+	 */
+	private $effects;
+
+	public function __construct( $options, $page, $tabs ) {
+		parent::__construct( $options, $page, $tabs );
+
+		$this->effects = array(
+			__( 'Attention Seekers', 'nggallery' )  => array( "bounce", "flash", "pulse", "rubberBand", "shake", "swing", "tada", "wobble"),
+			__( 'Bouncing Entrances', 'nggallery' ) => array( "bounceIn", "bounceInDown", "bounceInLeft", "bounceInRight", "bounceInUp" ),
+			__( 'Fading Entrances', 'nggallery' )   => array( "fadeIn", "fadeInDown", "fadeInDownBig", "fadeInLeft", "fadeInLeftBig", "fadeInRight", "fadeInRightBig", "fadeInUp", "fadeInUpBig"),
+			__( 'Fading Exits', 'nggallery' )       => array( "fadeOut", "fadeOutDown", "fadeOutDownBig", "fadeOutLeft", "fadeOutLeftBig", "fadeOutRight", "fadeOutRightBig", "fadeOutUp", "fadeOutUpBig"),
+			__( 'Flippers', 'nggallery' )           => array( "flip", "flipInX", "flipInY", "flipOutX", "flipOutY" ),
+			__( 'Lightspeed', 'nggallery' )         => array( "lightSpeedIn", "lightSpeedOut"),
+			__( 'Rotating Entrances', 'nggallery' )	=> array( "rotateIn", "rotateInDownLeft", "rotateInDownRight", "rotateInUpLeft", "rotateInUpRight" ),
+			__( 'Rotating Exits', 'nggallery' )     => array( "rotateOut", "rotateOutDownLeft", "rotateOutDownRight", "rotateOutUpLeft", "rotateOutUpRight" ),
+			__( 'Specials', 'nggallery' )           => array( "hinge", "rollIn", "rollOut" ),
+			__( 'Zoom Entrances', 'nggallery' )     => array( "zoomIn", "zoomInDown", "zoomInLeft", "zoomInRight", "zoomInUp" )
+		);
+	}
 
 	/**
 	 * Get the name of this tab.
@@ -20,8 +44,8 @@ class NCG_Settings_Tab_Slideshow extends NCG_Settings_Tab {
 	 */
 	public function render() {
 		?>
-		<form name="player_options" method="POST" action="<?php echo $this->page.'#slideshow'; ?>">
-			<?php wp_nonce_field('ngg_settings'); ?>
+		<form name="player_options" method="POST" action="<?php echo $this->page; ?>">
+			<?php $this->nonce(); ?>
 			<input type="hidden" name="page_options" value="irAutoDim,slideFx,irWidth,irHeight,irRotatetime,irLoop,irDrag,irNavigation,irNavigationDots,irAutoplay,irAutoplayTimeout,irAutoplayHover,irNumber,irClick" />
 			<h3><?php _e('Slideshow','nggallery'); ?></h3>
 			<table class="form-table ngg-options">
@@ -46,20 +70,7 @@ class NCG_Settings_Tab_Slideshow extends NCG_Settings_Tab {
 					<td>
 						<select size="1" name="slideFx" id="slideFx">
 							<?php
-							$options = array(
-								__( 'Attention Seekers', 'nggallery' )  => array( "bounce", "flash", "pulse", "rubberBand", "shake", "swing", "tada", "wobble"),
-								__( 'Bouncing Entrances', 'nggallery' ) => array( "bounceIn", "bounceInDown", "bounceInLeft", "bounceInRight", "bounceInUp" ),
-								__( 'Fading Entrances', 'nggallery' )   => array( "fadeIn", "fadeInDown", "fadeInDownBig", "fadeInLeft", "fadeInLeftBig", "fadeInRight", "fadeInRightBig", "fadeInUp", "fadeInUpBig"),
-								__( 'Fading Exits', 'nggallery' )       => array( "fadeOut", "fadeOutDown", "fadeOutDownBig", "fadeOutLeft", "fadeOutLeftBig", "fadeOutRight", "fadeOutRightBig", "fadeOutUp", "fadeOutUpBig"),
-								__( 'Flippers', 'nggallery' )           => array( "flip", "flipInX", "flipInY", "flipOutX", "flipOutY" ),
-								__( 'Lightspeed', 'nggallery' )         => array( "lightSpeedIn", "lightSpeedOut"),
-								__( 'Rotating Entrances', 'nggallery' )	=> array( "rotateIn", "rotateInDownLeft", "rotateInDownRight", "rotateInUpLeft", "rotateInUpRight" ),
-								__( 'Rotating Exits', 'nggallery' )     => array( "rotateOut", "rotateOutDownLeft", "rotateOutDownRight", "rotateOutUpLeft", "rotateOutUpRight" ),
-								__( 'Specials', 'nggallery' )           => array( "hinge", "rollIn", "rollOut" ),
-								__( 'Zoom Entrances', 'nggallery' )     => array( "zoomIn", "zoomInDown", "zoomInLeft", "zoomInRight", "zoomInUp" )
-							);
-
-							foreach( $options as $option => $val ) {
+							foreach( $this->effects as $option => $val ) {
 								echo $this->convert_fx_to_optgroup( $val, $option );
 							}
 							?>
@@ -132,7 +143,7 @@ class NCG_Settings_Tab_Slideshow extends NCG_Settings_Tab {
 					</td>
 				</tr>
 			</table>
-			<?php submit_button( __('Save Changes'), 'primary', 'updateoption' ); ?>
+			<?php submit_button(); ?>
 		</form>
 		<?php
 	}
@@ -150,7 +161,7 @@ class NCG_Settings_Tab_Slideshow extends NCG_Settings_Tab {
 		if ( is_null( $title ) ) {
 			$out = null;
 		} else {
-			$out = '<optgroup label="' . $title . '">';
+			$out = "<optgroup label='$title'>";
 		}
 
 		foreach ( $data as $option ) {
@@ -162,5 +173,38 @@ class NCG_Settings_Tab_Slideshow extends NCG_Settings_Tab {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Handle saving the settings. The referrer is already checked at this
+	 * point, so you do not need to do that.
+	 */
+	public function processor() {
+
+		$this->save_booleans(array(
+			'irAutoDim', 'imgAutoResize', 'thumbfix', 'thumbDifferentSize', 'irLoop', 'irDrag', 'irNavigation',
+			'irNavigationDots', 'irAutoplay', 'irAutoplayHover', 'irClick'
+		));
+
+		//Set positive integers.
+		$this->save_number(array(
+			'imgWidth', 'imgHeight', 'imgQuality', 'thumbwidth', 'thumbheight', 'thumbquality', 'irWidth', 'irHeight',
+			'irRotatetime',  'irAutoplayTimeout', 'irNumber'
+		));
+
+		$effects = array();
+		//Flatten the effects array.
+		foreach ( $this->effects as $effect ) {
+			$effects = array_merge($effects, $effect);
+		}
+
+		$this->save_restricted(array(
+			'slideFx'  => $effects
+		));
+
+		//Save the options.
+		$this->options->save_options();
+
+		$this->success_message();
 	}
 }

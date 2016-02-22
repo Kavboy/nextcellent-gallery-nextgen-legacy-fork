@@ -235,7 +235,7 @@ class NGG_Installer {
 
 		global $ngg;
 
-		if($ngg->get('options') != null) {
+		if($ngg->options != null) {
 			$ngg->reload_options();
 		}
 

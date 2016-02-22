@@ -20,17 +20,19 @@ class NGG_Admin_Launcher {
 	private $page;
 
 	/**
-	 * The admin launcher isn't more than a bunch of functions that run when certain actions/filters are executed.
-	 *
-	 * See the link for the order in which the hooks are fired, as this is important.
-	 * @link https://codex.wordpress.org/Plugin_API/Action_Reference#Actions_Run_During_an_Admin_Page_Request
-	 *
 	 * @param string $slug The base slug for the admin pages URL.
 	 */
 	public function __construct($slug) {
-
 		$this->base_slug = $slug;
+	}
 
+	/**
+	 * Register this class into the WordPress hooks.
+	 *
+	 * See the link for the order in which the hooks are fired, as this is important.
+	 * @link https://codex.wordpress.org/Plugin_API/Action_Reference#Actions_Run_During_an_Admin_Page_Request
+	 */
+	public function register() {
 		//Register the settings we need.
 		add_action( 'admin_init', array($this, 'register_settings'));
 
@@ -189,8 +191,8 @@ class NGG_Admin_Launcher {
 				$this->page = new NGG_Album_Manager($this->base_slug);
 				break;
 			case "options" :
-				require_once( __DIR__ . '/settings/class-ncg-settings-page.php' );
-				$this->page = new NCG_Options_Page($this->base_slug);
+				require_once( __DIR__ . '/settings/class-settings-page.php' );
+				$this->page = new \NextCellent\Admin\Settings\Settings_Page($this->base_slug);
 				break;
 			case "tags" :
 				require_once( __DIR__ . '/class-ngg-tag-manager.php' );
