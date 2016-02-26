@@ -46,12 +46,12 @@ class NGG_Overview extends NCG_Admin_Page {
 	}
 
 
-	function register_styles() {
+	public function register_styles() {
 		wp_enqueue_style( 'nggadmin' );
 		wp_enqueue_style( 'thickbox' );
 	}
 
-	function register_scripts() {
+	public function register_scripts() {
 		add_thickbox();
 		wp_enqueue_script( 'postbox' );
 	}

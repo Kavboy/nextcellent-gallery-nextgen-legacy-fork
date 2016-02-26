@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // If this file is called directly, abort.
+
 if ( !defined( 'WPINC' )) {
 	die;
 }
@@ -41,9 +42,10 @@ check_for_nextgen();
 if (!class_exists('NCG')) {
 
 	/**
-	 * Class nggLoader
+	 * Class NCG
 	 *
-	 * @property-read NCG_Options options The options.
+	 * @property-read NextCellent\Options\Options options The options.
+	 * @property-read NextCellent\Database\Manager manager The database manager.
      */
     class NCG {
 
@@ -56,7 +58,7 @@ if (!class_exists('NCG')) {
 	    const ADMIN_BASE = 'nextcellent';
 
 	    /**
-	     * @var NCG_Registry $registry The registry for dependencies.
+	     * @var NextCellent\NCG_Registry $registry The registry for dependencies.
 	     */
 	    private $registry;
 
@@ -74,11 +76,19 @@ if (!class_exists('NCG')) {
 	        $this->load_dependencies();
 
 	        //Make the registry.
-	        $this->registry = new NCG_Registry();
+	        $this->registry = new \NextCellent\NCG_Registry();
 
 	        //Add the options to the registry.
 	        /** @noinspection PhpInternalEntityUsedInspection */
-	        $this->registry->add('options', new NCG_Options());
+	        $this->registry->add('options', new \NextCellent\Options\Options());
+
+	        //Add the database manager.
+	        global $wpdb;
+	        /** @noinspection PhpInternalEntityUsedInspection */
+	        $manager = new \NextCellent\Database\Manager($wpdb);
+
+	        //Add image factories.
+	        $this->registry->add('manager', $manager);
 
 			//Define constants.
 			$this->define_constant();
@@ -127,7 +137,7 @@ if (!class_exists('NCG')) {
 	     */
 	    public function reload_options() {
 		    /** @noinspection PhpInternalEntityUsedInspection */
-		    $this->registry->add('options', new NCG_Options());
+		    $this->registry->add('options', new NextCellent\Options\Options());
 	    }
 
 	    /**
@@ -139,9 +149,6 @@ if (!class_exists('NCG')) {
 		    register_activation_hook( __FILE__, array($this, 'activate') );
 		    //Register the deactivation function.
 		    register_deactivation_hook( __FILE__, array($this, 'deactivate') );
-
-		    //Register the uninstall hook.
-		    register_uninstall_hook( __FILE__, array(__CLASS__, 'uninstall') );
 
 		    //Load the text domain
 		    add_action( 'plugins_loaded', function() {
@@ -381,9 +388,8 @@ if (!class_exists('NCG')) {
 	     */
 	    private function load_dependencies() {
 
-		    //Include the options and the dependency manager.
-		    require_once( __DIR__ . '/lib/class-ncg-registry.php' );
-		    require_once( __DIR__ . '/lib/options/class-ncg-options.php' );
+		    //Include the autloader
+		    require_once( __DIR__ . '/src/autoloader.php' );
 
 		    // Load global libraries
 		    require_once( __DIR__ . '/lib/ncg-utils.php' );
@@ -394,6 +400,9 @@ if (!class_exists('NCG')) {
 		    require_once( __DIR__ . '/lib/post-thumbnail.php' );
 		    require_once( __DIR__ . '/lib/multisite.php' );
 		    require_once( __DIR__ . '/lib/sitemap.php' );
+
+		    //Load models
+		    require_once( __DIR__ . '/src/models/class-image.php' );
 
 		    //Load the widgets
 		    require_once( __DIR__ . '/widgets/class-ngg-slideshow-widget.php' );
@@ -631,9 +640,9 @@ if (!class_exists('NCG')) {
 		 * Removes all transients created by NextCellent. Called during activation
 		 * and deactivation routines.
 		 *
-		 * This function is static because we need it during uninstall.
+		 * This function is static and public because we need it during uninstall.
 		 */
-		private static function remove_transients()
+		public static function remove_transients()
 		{
 			global $wpdb, $_wp_using_ext_object_cache;
 
@@ -700,17 +709,6 @@ if (!class_exists('NCG')) {
         public function deactivate() {
 			// Clean up transients
 			self::remove_transients();
-		}
-
-	    /**
-	     * Uninstall the plugin. This is static, since WP needs this.
-	     */
-        public static function uninstall() {
-			// Clean up transients
-			self::remove_transients();
-
-			include_once (dirname (__FILE__) . '/admin/class-ngg-installer.php');
-			NGG_Installer::uninstall();
 		}
 
 		// Add links to Plugins page

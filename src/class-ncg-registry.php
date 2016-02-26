@@ -1,5 +1,7 @@
 <?php
 
+namespace NextCellent;
+
 /**
  * The registry is responsible for enabling dependency injection, for use in NextCellent.
  *

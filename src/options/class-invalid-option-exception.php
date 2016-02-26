@@ -1,6 +1,6 @@
 <?php
 
-namespace NextCellent\Lib\Options;
+namespace NextCellent\Options;
 
 
 /**

@@ -1,8 +1,6 @@
 <?php
 
-use NextCellent\Lib\Options\InvalidOptionException;
-
-require_once( __DIR__ . '/class-invalid-option-exception.php' );
+namespace NextCellent\Options;
 
 /**
  * This class manages NextCellent's options. When used inside NextCellent, the instance should be taken from
@@ -18,7 +16,7 @@ require_once( __DIR__ . '/class-invalid-option-exception.php' );
  *
  * @since 1.9.31
  */
-class NCG_Options implements ArrayAccess {
+class Options implements \ArrayAccess {
 
 	/**
 	 * The name of the option NextCellent saves the array to.

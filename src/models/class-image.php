@@ -1,0 +1,164 @@
+<?php
+
+namespace NextCellent\Models;
+
+use NextCellent\Database\Database_Exception;
+use NextCellent\Database\Manager;
+use NextCellent\Database\Not_Found_Exception;
+
+/**
+ * The NextCellent image model.
+ *
+ * @property int $id The id of the image.
+ * @property int $gallery_id The id of the gallery this image is in.
+ * @property string $filename The filename.
+ * @property string $description The description.
+ * @property string $alt_text The alt/title text.
+ * @property string $date The date when this image was taken. In MySQL format.
+ * @property bool $exclude If the image should be excluded or not.
+ * @property string $slug The slug.
+ * @property int $sort_order The order of the image in the gallery.
+ * @property array The metadata saved in the database.
+ */
+class Image extends Model {
+
+	/**
+	 * Define the database column names.
+	 */
+	const ID = 'pid';
+	const SLUG = 'image_slug';
+	const POST_ID = 'post_id';
+	const GALLERY_ID = 'galleryid';
+	const FILENAME = 'filename';
+	const DESCRIPTION = 'description';
+	const ALT_TEXT = 'alttext';
+	const DATE = 'imagedate';
+	const EXCLUDE = 'exclude';
+	const SORT_ORDER = 'sortorder';
+	const META_DATA = 'meta_data';
+
+	/**
+	 * Count all images.
+	 *
+	 * @return int The number of images.
+	 */
+	public static function count() {
+		return parent::count(Manager::get()->get_image_table());
+	}
+
+	/**
+	 * Get an image from the database. This will throw an exception
+	 * if the image is not found.
+	 *
+	 * @see Image_Factory::get_image_or_null()
+	 *
+	 * @param int $id The ID of the image.
+	 *
+	 * @return Image The image instance.
+	 * @throws Not_Found_Exception If the image could not be found.
+	 */
+	public static function find( $id ) {
+		$result = Image::find_or_null($id);
+
+		if($result === null) {
+			throw new Not_Found_Exception(__('Image', 'nggallery'), $id);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get an image from the database, or null if it does not exist.
+	 *
+	 * @param int $id
+	 *
+	 * @return Image|null The image or null.
+	 */
+	public static function find_or_null($id) {
+
+		$manager = Manager::get();
+
+		$result = $manager->get_row(
+			'SELECT * FROM ' . $manager->get_image_table() . ' WHERE ' . self::ID . ' = %d',
+			$id
+		);
+
+		if($result === null) {
+			return null;
+		} else {
+			return Image::to_image($result);
+		}
+	}
+
+	/**
+	 * Convert a row of results from the database to an Image class.
+	 *
+	 * @param array $data Associative array of data.
+	 *
+	 * @return Image The image instance.
+	 */
+	private static function to_image( $data ) {
+		$image = new Image();
+		$image->set_properties( array(
+			'id'          => $data[ self::ID ],
+			'slug'        => $data[ self::SLUG ],
+			'gallery_id'  => $data[ self::GALLERY_ID ],
+			'filename'    => $data[ self::FILENAME ],
+			'description' => $data[ self::DESCRIPTION ],
+			'alt_text'    => $data[ self::ALT_TEXT ],
+			'date'        => $data[ self::DATE ],
+			'exclude'     => (bool) $data[ self::EXCLUDE ],
+			'sort_order'  => (bool) $data[ self::EXCLUDE ],
+			'meta_data'   => unserialize( $data[ self::META_DATA ] )
+		) );
+
+		return $image;
+	}
+
+	/**
+	 * Convert this class to an array for saving the data.
+	 *
+	 * @return array The associative array.
+	 */
+	protected function to_array() {
+		return array(
+			self::ID => $this->properties['id'],
+			self::SLUG => $this->properties['slug'],
+			self::GALLERY_ID => $this->properties['gallery_id'],
+			self::FILENAME => $this->properties['filename'],
+			self::DESCRIPTION => $this->properties['description'],
+			self::ALT_TEXT => $this->properties['alt_text'],
+			self::DATE => $this->properties['date'],
+			self::EXCLUDE => $this->properties['exclude'],
+			self::SORT_ORDER => $this->properties['sort_order'],
+			self::META_DATA => serialize($this->properties['meta_data'])
+		);
+	}
+
+	/**
+	 * Delete an image from the database.
+	 *
+	 * @throws Database_Exception If something went wrong or more than one image was deleted.
+	 * @throws Not_Found_Exception If the image does not exist.
+	 */
+	public function delete() {
+
+		$result = $this->manager->delete($this->manager->get_image_table(), self::ID, $this->id);
+
+		if($result > 1 ) {
+			throw new Database_Exception(__('More than one image was deleted!'));
+		}
+
+		if($result < 1) {
+			throw new Not_Found_Exception(__('Cannot delete non-existing image.'));
+		}
+	}
+
+	public function save() {
+		return parent::save( $this->manager->get_image_table(), self::ID, $this->id );
+	}
+
+	public function __toString() {
+		return "NextCellent image #$this->id, $this->filename";
+	}
+}
