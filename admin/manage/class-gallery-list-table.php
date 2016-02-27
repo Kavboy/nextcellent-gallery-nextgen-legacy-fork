@@ -1,5 +1,7 @@
 <?php
 
+namespace NextCellent\Admin\Manage;
+
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
@@ -12,7 +14,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  * This class was written with WP_List_Table from WordPress 4.3.
  * If this doesn't work anymore in the future, it's because that class has changed.
  */
-class NGG_Gallery_List_Table extends WP_List_Table {
+class Gallery_List_Table extends \WP_List_Table {
 
 	private $base;
 
@@ -31,7 +33,7 @@ class NGG_Gallery_List_Table extends WP_List_Table {
 	public function prepare_items() {
 
 		/**
-		 * @global $nggdb nggdb
+		 * @global $nggdb \nggdb
 		 */
 		global $nggdb;
 
@@ -93,7 +95,7 @@ class NGG_Gallery_List_Table extends WP_List_Table {
 	 * @return string
 	 */
 	protected function column_cb( $item ) {
-		if ( nggAdmin::can_manage_this_gallery( $item->author ) ) {
+		if ( \nggAdmin::can_manage_this_gallery( $item->author ) ) {
 			return '<input name="doaction[]" type="checkbox" value="' . $item->gid . '" />';
 		} else {
 			return "";
@@ -101,7 +103,7 @@ class NGG_Gallery_List_Table extends WP_List_Table {
 	}
 
 	protected function column_title( $item ) {
-		if ( nggAdmin::can_manage_this_gallery( $item->author ) ) {
+		if ( \nggAdmin::can_manage_this_gallery( $item->author ) ) {
 			$out = '<a href="' . wp_nonce_url( $this->base . '&mode=image&gid=' . $item->gid,
 					'ngg_editgallery' ) . '" class="edit" title="' . __( 'Edit' ) . '">';
 			$out .= esc_html( $item->title );
@@ -117,7 +119,7 @@ class NGG_Gallery_List_Table extends WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table
 	 *
-	 * @param  nggGallery $item    Data
+	 * @param  \nggGallery $item    Data
 	 * @param  String $column_name - Current column name
 	 *
 	 * @return Mixed

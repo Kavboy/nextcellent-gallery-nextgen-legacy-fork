@@ -1,12 +1,12 @@
 <?php
 
-require_once( __DIR__ . '/class-ncg-admin-page.php' );
+namespace NextCellent\Admin;
 
 /**
  * Class to display the overview.
  * @since 1.9.24
  */
-class NGG_Overview extends NCG_Admin_Page {
+class Overview_Page extends Admin_Page {
 
 	/**
 	 * @param string $slug The slug for this page. It is recommended you pass this parameter.
@@ -907,7 +907,7 @@ class NGG_Overview extends NCG_Admin_Page {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function add_help( $screen ) {
 		//The tab content

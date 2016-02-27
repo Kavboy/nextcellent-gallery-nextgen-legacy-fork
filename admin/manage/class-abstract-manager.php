@@ -1,13 +1,15 @@
 <?php
 
-require_once( dirname( __DIR__ ) . '/class-ncg-admin-page.php' );
+namespace NextCellent\Admin\Manage;
+
+use NextCellent\Admin\Admin_Page;
 
 /**
- * Class NCG_Manager
+ * Class Abstract_Manager
  *
  * Contains common JavaScript and other code for the managing pages.
  */
-abstract class NCG_Manager extends NCG_Admin_Page {
+abstract class Abstract_Manager extends Admin_Page {
 
 	/**
 	 * Subclasses should override this method, but must call the parent function.
@@ -369,7 +371,7 @@ abstract class NCG_Manager extends NCG_Admin_Page {
 				);
 				$command = 'resize_image';
 				$title   = __( 'Resize images', 'nggallery' );
-				nggAdmin::do_ajax_operation( $command, $list, $title, $mode, $data );
+				\nggAdmin::do_ajax_operation( $command, $list, $title, $mode, $data );
 				return;
 			case 'new_thumbnails':
 				$data = array(
@@ -379,16 +381,16 @@ abstract class NCG_Manager extends NCG_Admin_Page {
 				);
 				$command = 'create_thumbnail';
 				$title   = __( 'Create new thumbnails', 'nggallery' );
-				nggAdmin::do_ajax_operation( $command, $list, $title, $mode, $data );
+				\nggAdmin::do_ajax_operation( $command, $list, $title, $mode, $data );
 				return;
 			case 'copy_to':
 				$dest_gid = (int) $_POST['dest_gid'];
-				nggAdmin::copy_images( $list, $dest_gid );
+				\nggAdmin::copy_images( $list, $dest_gid );
 
 				return;
 			case 'move_to':
 				$dest_gid = (int) $_POST['dest_gid'];
-				nggAdmin::move_images( $list, $dest_gid );
+				\nggAdmin::move_images( $list, $dest_gid );
 
 				return;
 			case 'add_tags':
@@ -399,7 +401,7 @@ abstract class NCG_Manager extends NCG_Admin_Page {
 						wp_set_object_terms( $pic_id, $tag_list, 'ngg_tag', true );
 					}
 				}
-				nggGallery::show_message( __( 'Tags changed', 'nggallery' ) );
+				\nggGallery::show_message( __( 'Tags changed', 'nggallery' ) );
 
 				return;
 			case 'delete_tags':
@@ -416,7 +418,7 @@ abstract class NCG_Manager extends NCG_Admin_Page {
 						wp_set_object_terms( $pic_id, $new_tags, 'ngg_tag' );
 					}
 				}
-				nggGallery::show_message( __( 'Tags changed', 'nggallery' ) );
+				\nggGallery::show_message( __( 'Tags changed', 'nggallery' ) );
 
 				return;
 			case 'overwrite_tags':
@@ -427,27 +429,27 @@ abstract class NCG_Manager extends NCG_Admin_Page {
 						wp_set_object_terms( $pic_id, $tag_list, 'ngg_tag' );
 					}
 				}
-				nggGallery::show_message( __( 'Tags changed', 'nggallery' ) );
+				\nggGallery::show_message( __( 'Tags changed', 'nggallery' ) );
 
 				return;
 			case 'set_title':
 				$new_title = $_POST['text'];
 				if ( is_array( $list ) ) {
 					foreach ( $list as $pic_id ) {
-						nggdb::update_image($pic_id, false, false, false, $new_title);
+						\nggdb::update_image($pic_id, false, false, false, $new_title);
 					}
 				}
-				nggGallery::show_message( __('Image title updated', 'nggallery') );
+				\nggGallery::show_message( __('Image title updated', 'nggallery') );
 
 				return;
 			case 'set_descr':
 				$new_descr = $_POST['text'];
 				if ( is_array( $list ) ) {
 					foreach ( $list as $pic_id ) {
-						nggdb::update_image($pic_id, false, false, $new_descr);
+						\nggdb::update_image($pic_id, false, false, $new_descr);
 					}
 				}
-				nggGallery::show_message( __('Image description updated', 'nggallery') );
+				\nggGallery::show_message( __('Image description updated', 'nggallery') );
 
 				return;
 			default:
@@ -461,7 +463,7 @@ abstract class NCG_Manager extends NCG_Admin_Page {
 	protected function handle_bulk_actions() {
 		//Check the nonce.
 		if ( wp_verify_nonce( $_POST['_wpnonce'], 'bulk-ngg-manager' ) === false ) {
-			nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
+			\nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
 
 			return;
 		}
@@ -481,7 +483,7 @@ abstract class NCG_Manager extends NCG_Admin_Page {
 				$deleted = false;
 				foreach ( $_POST['doaction'] as $id ) {
 					// get the path to the gallery
-					$gallery = nggdb::find_gallery( $id );
+					$gallery = \nggdb::find_gallery( $id );
 					if ( $gallery ) {
 						//TODO:Remove also Tag reference, look here for ids instead filename
 						$imagelist = $wpdb->get_col( "SELECT filename FROM $wpdb->nggpictures WHERE galleryid = '$gallery->gid' " );
@@ -499,13 +501,13 @@ abstract class NCG_Manager extends NCG_Admin_Page {
 						}
 					}
 					do_action( 'ngg_delete_gallery', $id );
-					$deleted = nggdb::delete_gallery( $id );
+					$deleted = \nggdb::delete_gallery( $id );
 				}
 
 				if ( $deleted ) {
-					nggGallery::show_message( __( 'Gallery deleted successfully.', 'nggallery' ) );
+					\nggGallery::show_message( __( 'Gallery deleted successfully.', 'nggallery' ) );
 				} else {
-					nggGallery::show_error( __( 'Something went wrong.', 'nggallery' ) );
+					\nggGallery::show_error( __( 'Something went wrong.', 'nggallery' ) );
 				}
 
 			}
@@ -521,11 +523,11 @@ abstract class NCG_Manager extends NCG_Admin_Page {
 							@unlink( $image->imagePath . "_backup" );
 						}
 						do_action( 'ngg_delete_picture', $image->pid );
-						$delete_pic = nggdb::delete_image( $image->pid );
+						$delete_pic = \nggdb::delete_image( $image->pid );
 					}
 				}
 				if ( $delete_pic ) {
-					nggGallery::show_message( __( 'Pictures deleted successfully ', 'nggallery' ) );
+					\nggGallery::show_message( __( 'Pictures deleted successfully ', 'nggallery' ) );
 				}
 			}
 		}

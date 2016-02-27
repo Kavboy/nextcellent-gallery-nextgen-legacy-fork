@@ -1,13 +1,13 @@
 <?php
 
-include_once( 'class-ngg-abstract-image-manager.php' );
+namespace NextCellent\Admin\Manage;
 
 /**
- * Class NGG_Search_Manager
+ * Class Search_Manager
  *
  * Represents an image search page.
  */
-class NGG_Search_Manager extends NCG_Abstract_Image_Manager {
+class Search_Manager extends Abstract_Image_Manager {
 
 	private $search;
 
@@ -32,7 +32,7 @@ class NGG_Search_Manager extends NCG_Abstract_Image_Manager {
 		/**
 		 * Display the actual table.
 		 */
-		$table = new NGG_Image_List_Table( $this->get_full_url() );
+		$table = new Image_List_Table( $this->get_full_url() );
 		$table->prepare_items( $request );
 		?>
 		<div class="wrap">
@@ -72,7 +72,7 @@ class NGG_Search_Manager extends NCG_Abstract_Image_Manager {
 	 * @access private
 	 *
 	 * @param string $name
-	 * @param nggImage $item
+	 * @param \nggImage $item
 	 */
 	public function add_column_content( $name, $item ) {
 		if ( $name === "gid" ) {
@@ -111,7 +111,7 @@ class NGG_Search_Manager extends NCG_Abstract_Image_Manager {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	function add_help( $screen ) {
 		//None yet.

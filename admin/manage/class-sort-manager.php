@@ -1,14 +1,15 @@
 <?php
 
-include_once( 'class-ncg-manager.php' );
-include_once( dirname( __DIR__ ) . '/class-ncg-admin-page.php' );
+namespace NextCellent\Admin\Manage;
+
+use NextCellent\Admin\Admin_Page;
 
 /**
- * Class NGG_Sort_Manager
+ * Class Sort_Manager
  *
  * This class represents the page where a user can sort the gallery.
  */
-class NGG_Sort_Manager extends NCG_Admin_Page {
+class Sort_Manager extends Admin_Page {
 
 	private $id;
 
@@ -26,7 +27,7 @@ class NGG_Sort_Manager extends NCG_Admin_Page {
 
 		if ( $options['galSort'] != "sortorder" ) {
 			//Disable sort button and provide feedback why is disabled
-			nggGallery::show_error( __( 'To enable manual Sort set Custom Order Sort. See Settings->Gallery Settings->Sort Options',
+			\nggGallery::show_error( __( 'To enable manual Sort set Custom Order Sort. See Settings->Gallery Settings->Sort Options',
 				'nggallery' ) );
 			echo '<a href="' . $this->get_full_url() . '&mode=image&gid=' . $this->id . '">' . __( 'Go back',
 					'nggallery' ) . '</a>';
@@ -39,7 +40,7 @@ class NGG_Sort_Manager extends NCG_Admin_Page {
 		}
 
 		/**
-		 * @global $nggdb nggdb
+		 * @global $nggdb \nggdb
 		 */
 		global $nggdb;
 
@@ -171,7 +172,7 @@ class NGG_Sort_Manager extends NCG_Admin_Page {
 
 		//Check the nonce.
 		if ( wp_verify_nonce( $_POST['_wpnonce'], 'ngg-update-sort' ) === false ) {
-			nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
+			\nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
 
 			return;
 		}
@@ -200,7 +201,7 @@ class NGG_Sort_Manager extends NCG_Admin_Page {
 
 			do_action( 'ngg_gallery_sort', $this->id );
 
-			nggGallery::show_message( __( 'Sort order changed', 'nggallery' ) );
+			\nggGallery::show_message( __( 'Sort order changed', 'nggallery' ) );
 		}
 	}
 
@@ -220,7 +221,7 @@ class NGG_Sort_Manager extends NCG_Admin_Page {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	function add_help( $screen ) {
 		//None yet.

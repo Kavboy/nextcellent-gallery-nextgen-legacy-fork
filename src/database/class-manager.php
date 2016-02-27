@@ -103,6 +103,25 @@ class Manager {
 	}
 
 	/**
+	 * Get an array of results.
+	 *
+	 * The query syntax is the same for the WordPress prepare function.
+	 *
+	 * @see wpdb::prepare()
+	 * @see wpdb::get_result()
+	 *
+	 * @param string $query The query.
+	 * @param array $args
+	 *
+	 * @return array|null The data or null if not found.
+	 */
+	public function get_results($query, $args = array()) {
+		$prepared = $this->connection->prepare($query, $args);
+
+		return $this->connection->get_results($prepared, ARRAY_A);
+	}
+
+	/**
 	 * Execute a query.
 	 *
 	 * The query syntax is the same for the WordPress prepare function.

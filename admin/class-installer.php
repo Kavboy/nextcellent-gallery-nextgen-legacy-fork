@@ -1,11 +1,15 @@
 <?php
 
+namespace NextCellent\Admin;
+
 /**
- * Class NGG_Installer
+ * Class Installer
  *
  * Installs and removes the NextCellent database tables and options.
+ *
+ * @todo This needs to move away from admin.
  */
-class NGG_Installer {
+class Installer {
 
 	/**
 	 * Create all tables and options.
@@ -118,7 +122,7 @@ class NGG_Installer {
 		$options = get_option( 'ngg_options' );
 		// set the default settings, if we didn't upgrade
 		if ( empty( $options ) ) {
-			NGG_Installer::set_default_options();
+			Installer::set_default_options();
 		}
 
 		// if all is passed , save the DBVERSION
@@ -282,13 +286,13 @@ class NGG_Installer {
 		delete_option( 'ngg_next_update' );
 
 		//As last item, we remove all capabilities.
-		NGG_Installer::ngg_remove_capability( "NextGEN Gallery overview" );
-		NGG_Installer::ngg_remove_capability( "NextGEN Use TinyMCE" );
-		NGG_Installer::ngg_remove_capability( "NextGEN Upload images" );
-		NGG_Installer::ngg_remove_capability( "NextGEN Manage gallery" );
-		NGG_Installer::ngg_remove_capability( "NextGEN Edit album" );
-		NGG_Installer::ngg_remove_capability( "NextGEN Change style" );
-		NGG_Installer::ngg_remove_capability( "NextGEN Change options" );
+		Installer::ngg_remove_capability( "NextGEN Gallery overview" );
+		Installer::ngg_remove_capability( "NextGEN Use TinyMCE" );
+		Installer::ngg_remove_capability( "NextGEN Upload images" );
+		Installer::ngg_remove_capability( "NextGEN Manage gallery" );
+		Installer::ngg_remove_capability( "NextGEN Edit album" );
+		Installer::ngg_remove_capability( "NextGEN Change style" );
+		Installer::ngg_remove_capability( "NextGEN Change options" );
 	}
 
 }

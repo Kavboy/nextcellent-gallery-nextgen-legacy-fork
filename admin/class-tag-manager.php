@@ -1,6 +1,6 @@
 <?php
 
-require_once( __DIR__ . "/class-ncg-admin-page.php" );
+namespace NextCellent\Admin;
 
 /**
  * Tag management page. Inspired from the Simple Tags plugin by Amaury Balmer.
@@ -8,7 +8,7 @@ require_once( __DIR__ . "/class-ncg-admin-page.php" );
  *
  * @todo Rewrite this into a decent class
  */
-class NGG_Tag_Manager extends NCG_Admin_Page {
+class Tag_Manager extends Admin_Page {
 
 	public function display() {
 		$action_status = array('message' => '', 'status' => 'ok');
@@ -20,14 +20,14 @@ class NGG_Tag_Manager extends NCG_Admin_Page {
 			if ( $_POST['tag_action'] == 'renametag' ) {
 				$oldtag = (isset($_POST['renametag_old'])) ? $_POST['renametag_old'] : '';
 				$newtag = (isset($_POST['renametag_new'])) ? $_POST['renametag_new'] : '';
-				$action_status = nggTags::rename_tags( $oldtag, $newtag );
+				$action_status = \nggTags::rename_tags( $oldtag, $newtag );
 			} elseif ( $_POST['tag_action'] == 'deletetag' ) {
 				$todelete = (isset($_POST['deletetag_name'])) ? $_POST['deletetag_name'] : '';
-				$action_status = nggTags::delete_tags( $todelete );
+				$action_status = \nggTags::delete_tags( $todelete );
 			} elseif ( $_POST['tag_action'] == 'editslug' ) {
 				$matchtag = (isset($_POST['tagname_match'])) ? $_POST['tagname_match'] : '';
 				$newslug   = (isset($_POST['tagslug_new'])) ? $_POST['tagslug_new'] : '';
-				$action_status = nggTags::edit_tag_slug( $matchtag, $newslug );
+				$action_status = \nggTags::edit_tag_slug( $matchtag, $newslug );
 			}
 		}
 
@@ -137,7 +137,7 @@ class NGG_Tag_Manager extends NCG_Admin_Page {
 							<div id="ajax_area_tagslist">
 								<ul>
 									<?php
-									$tags = (array) nggTags::find_tags($param, true);
+									$tags = (array) \nggTags::find_tags($param, true);
 									foreach( $tags as $tag ) {
 										//TODO:Tag link should be call a list of images in manage gallery
 										//echo '<li><span>' . $tag->name . '</span>&nbsp;<a href="'.(ngg_get_tag_link( $tag->term_id )).'" title="'.sprintf(__('View all images tagged with %s', 'nggallery'), $tag->name).'">('.$tag->count.')</a></li>'."\n";
@@ -305,7 +305,7 @@ class NGG_Tag_Manager extends NCG_Admin_Page {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function add_help( $screen ) {
 		$help = '<p>' . __( 'Organize your pictures with tags.',

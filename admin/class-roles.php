@@ -1,12 +1,12 @@
 <?php
 
-include_once( 'class-ncg-post-admin-page.php' );
+namespace NextCellent\Admin;
 
 
 /**
  * The roles admin screen
  */
-class NCG_Roles extends NCG_Post_Admin_Page {
+class Roles extends Post_Admin_Page {
 
 	public function display() {
 		parent::display();
@@ -79,7 +79,7 @@ class NCG_Roles extends NCG_Post_Admin_Page {
 			$this->ngg_set_capability($_POST['change_style'],"NextGEN Change style");
 			$this->ngg_set_capability($_POST['change_options'],"NextGEN Change options");
 
-			nggGallery::show_message(__('Updated capabilities',"nggallery"));
+			\nggGallery::show_message(__('Updated capabilities',"nggallery"));
 		}
 	}
 
@@ -156,7 +156,7 @@ class NCG_Roles extends NCG_Post_Admin_Page {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function add_help( $screen ) {
 		$help = '<p>' . __( 'You can assign the lowest user role that has access to a certain feature. Needless to say, all greater user roles will also have access to that feature.',

@@ -18,7 +18,8 @@ use NextCellent\Database\Not_Found_Exception;
  * @property bool $exclude If the image should be excluded or not.
  * @property string $slug The slug.
  * @property int $sort_order The order of the image in the gallery.
- * @property array The metadata saved in the database.
+ * @property array $meta_data The metadata saved in the database.
+ * @property-read string $tags The image tags.
  */
 class Image extends Model {
 
@@ -43,7 +44,7 @@ class Image extends Model {
 	 * @return int The number of images.
 	 */
 	public static function count() {
-		return parent::count(Manager::get()->get_image_table());
+		return parent::count_table(Manager::get()->get_image_table());
 	}
 
 	/**
@@ -95,14 +96,16 @@ class Image extends Model {
 	 *
 	 * @param array $data Associative array of data.
 	 *
+	 * @internal This function is for internal use only.
+	 *
 	 * @return Image The image instance.
 	 */
-	private static function to_image( $data ) {
+	public static function to_image( $data ) {
 		$image = new Image();
 		$image->set_properties( array(
-			'id'          => $data[ self::ID ],
+			'id'          => (int) $data[ self::ID ],
 			'slug'        => $data[ self::SLUG ],
-			'gallery_id'  => $data[ self::GALLERY_ID ],
+			'gallery_id'  => (int) $data[ self::GALLERY_ID ],
 			'filename'    => $data[ self::FILENAME ],
 			'description' => $data[ self::DESCRIPTION ],
 			'alt_text'    => $data[ self::ALT_TEXT ],
@@ -122,16 +125,16 @@ class Image extends Model {
 	 */
 	protected function to_array() {
 		return array(
-			self::ID => $this->properties['id'],
-			self::SLUG => $this->properties['slug'],
-			self::GALLERY_ID => $this->properties['gallery_id'],
-			self::FILENAME => $this->properties['filename'],
+			self::ID          => $this->properties['id'],
+			self::SLUG        => $this->properties['slug'],
+			self::GALLERY_ID  => $this->properties['gallery_id'],
+			self::FILENAME    => $this->properties['filename'],
 			self::DESCRIPTION => $this->properties['description'],
-			self::ALT_TEXT => $this->properties['alt_text'],
-			self::DATE => $this->properties['date'],
-			self::EXCLUDE => $this->properties['exclude'],
-			self::SORT_ORDER => $this->properties['sort_order'],
-			self::META_DATA => serialize($this->properties['meta_data'])
+			self::ALT_TEXT    => $this->properties['alt_text'],
+			self::DATE        => $this->properties['date'],
+			self::EXCLUDE     => $this->properties['exclude'],
+			self::SORT_ORDER  => $this->properties['sort_order'],
+			self::META_DATA   => serialize( $this->properties['meta_data'] )
 		);
 	}
 
@@ -143,22 +146,28 @@ class Image extends Model {
 	 */
 	public function delete() {
 
-		$result = $this->manager->delete($this->manager->get_image_table(), self::ID, $this->id);
+		$manager = Manager::get();
+
+		$result = $manager->delete($manager->get_image_table(), self::ID, $this->id);
 
 		if($result > 1 ) {
-			throw new Database_Exception(__('More than one image was deleted!'));
+			throw new Database_Exception(__('More than one image was deleted!', 'nggallery'));
 		}
 
 		if($result < 1) {
-			throw new Not_Found_Exception(__('Cannot delete non-existing image.'));
+			throw new Not_Found_Exception(__('Cannot delete non-existing image.', 'nggallery'));
 		}
 	}
 
 	public function save() {
-		return parent::save( $this->manager->get_image_table(), self::ID, $this->id );
+		return parent::save_model( Manager::get()->get_image_table(), self::ID, $this->id );
 	}
 
 	public function __toString() {
 		return "NextCellent image #$this->id, $this->filename";
+	}
+
+	protected function get_tags() {
+		return wp_get_object_terms($this->id, 'ngg_tag', 'fields=all');
 	}
 }

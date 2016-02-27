@@ -1,14 +1,15 @@
 <?php
 
-include_once( 'class-ncg-manager.php' );
-include_once( 'class-ngg-image-list-table.php' );
+namespace NextCellent\Admin\Manage;
+
+use NextCellent\Admin\Manage\Abstract_Manager;
 
 /**
- * Class NCG_Abstract_Image_Manager
+ * Class Abstract_Image_Manager
  *
  * Contains some common methods to use when displaying images.
  */
-abstract class NCG_Abstract_Image_Manager extends NCG_Manager {
+abstract class Abstract_Image_Manager extends Abstract_Manager {
 
 	public function display() {
 
@@ -93,7 +94,7 @@ abstract class NCG_Abstract_Image_Manager extends NCG_Manager {
 	private function handle_update_images() {
 
 		if ( wp_verify_nonce( $_POST['_ngg_nonce_images'], 'ngg-update-images' ) === false ) {
-			nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
+			\nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
 
 			return;
 		}
@@ -119,7 +120,7 @@ abstract class NCG_Abstract_Image_Manager extends NCG_Manager {
 					// only uptade this field if someone change the alttext
 					if ( $image->alttext != $alttext[ $image->pid ] ) {
 						$image->alttext    = $alttext[ $image->pid ];
-						$image->image_slug = nggdb::get_unique_slug( sanitize_title( $image->alttext ), 'image',
+						$image->image_slug = \nggdb::get_unique_slug( sanitize_title( $image->alttext ), 'image',
 							$image->pid );
 					}
 
@@ -155,6 +156,6 @@ abstract class NCG_Abstract_Image_Manager extends NCG_Manager {
 			}
 		}
 
-		nggGallery::show_message( __( 'Update successful', "nggallery" ) );
+		\nggGallery::show_message( __( 'Update successful', "nggallery" ) );
 	}
 }

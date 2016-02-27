@@ -1,8 +1,8 @@
 <?php
 
-include_once( __DIR__ . '/class-ncg-admin-page.php' );
+namespace NextCellent\Admin;
 
-class NGG_Album_Manager implements NCG_Admin_Page {
+class Album_Manager extends Admin_Page {
 
 	/**
 	 * The selected album ID.
@@ -45,7 +45,7 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 	public function display() {
 
 		/**
-		 * @global nggdb $nggdb
+		 * @global \nggdb $nggdb
 		 */
 		global $nggdb;
 
@@ -78,18 +78,18 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 
 		if ( isset( $_POST['add'] ) && isset ( $_POST['newalbum'] ) ) {
 
-			if ( ! nggGallery::current_user_can( 'NextGEN Add/Delete album' ) ) {
+			if ( ! \nggGallery::current_user_can( 'NextGEN Add/Delete album' ) ) {
 				wp_die( __( 'Cheatin&#8217; uh?' ) );
 			}
 
-			$result          = nggdb::add_album( $_POST['newalbum'] );
+			$result          = \nggdb::add_album( $_POST['newalbum'] );
 			$this->currentID = ( $result ) ? $result : 0;
 
 			//hook for other plugins
 			do_action( 'ngg_add_album', $this->currentID );
 
 			if ( $result ) {
-				nggGallery::show_message( __( 'Updated successfully', 'nggallery' ) );
+				\nggGallery::show_message( __( 'Updated successfully', 'nggallery' ) );
 			}
 		}
 
@@ -109,17 +109,17 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 			//hook for other plugins
 			do_action( 'ngg_update_album_sortorder', $this->currentID );
 
-			nggGallery::show_message( __( 'Updated successfully', 'nggallery' ) );
+			\nggGallery::show_message( __( 'Updated successfully', 'nggallery' ) );
 
 		}
 
 		if ( isset( $_POST['delete'] ) ) {
 
-			if ( ! nggGallery::current_user_can( 'NextGEN Add/Delete album' ) ) {
+			if ( ! \nggGallery::current_user_can( 'NextGEN Add/Delete album' ) ) {
 				wp_die( __( 'Cheatin&#8217; uh?' ) );
 			}
 
-			$result = nggdb::delete_album( $this->currentID );
+			$result = \nggdb::delete_album( $this->currentID );
 
 			//hook for other plugins
 			do_action( 'ngg_delete_album', $this->currentID );
@@ -128,7 +128,7 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 			$this->currentID = 0;
 
 			if ( $result ) {
-				nggGallery::show_message( __( 'Album deleted', 'nggallery' ) );
+				\nggGallery::show_message( __( 'Album deleted', 'nggallery' ) );
 			}
 		}
 
@@ -139,7 +139,7 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 
 		check_admin_referer( 'ngg_thickbox_form' );
 
-		if ( ! nggGallery::current_user_can( 'NextGEN Edit album settings' ) ) {
+		if ( ! \nggGallery::current_user_can( 'NextGEN Edit album settings' ) ) {
 			wp_die( __( 'Cheatin&#8217; uh?' ) );
 		}
 
@@ -149,7 +149,7 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 		$link = (int) $_POST['pageid'];
 
 		// slug must be unique, we use the title for that
-		$slug = nggdb::get_unique_slug( sanitize_title( $name ), 'album', $this->currentID );
+		$slug = \nggdb::get_unique_slug( sanitize_title( $name ), 'album', $this->currentID );
 
 		$result = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->nggalbum SET slug= '%s', name= '%s', albumdesc= '%s', previewpic= %d, pageid= %d WHERE id = '%d'",
 			$slug, $name, $desc, $prev, $link, $this->currentID ) );
@@ -158,7 +158,7 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 		do_action( 'ngg_update_album', $this->currentID, $_POST );
 
 		if ( $result ) {
-			nggGallery::show_message( __( 'Updated successfully', 'nggallery' ) );
+			\nggGallery::show_message( __( 'Updated successfully', 'nggallery' ) );
 		}
 	}
 
@@ -306,17 +306,17 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 						<?php if ( $this->currentID > 0 ) { ?>
 							<input class="button-primary" type="submit" name="update" value="<?php esc_attr_e( 'Update',
 								'nggallery' ); ?>"/>
-							<?php if ( nggGallery::current_user_can( 'NextGEN Edit album settings' ) ) { ?>
+							<?php if ( \nggGallery::current_user_can( 'NextGEN Edit album settings' ) ) { ?>
 								<input class="button-secondary" type="submit" name="showThickbox" value="<?php esc_attr_e( 'Edit album',
 									'nggallery' ); ?>" onclick="showDialog(); return false;"/>
 							<?php } ?>
-							<?php if ( nggGallery::current_user_can( 'NextGEN Add/Delete album' ) ) { ?>
+							<?php if ( \nggGallery::current_user_can( 'NextGEN Add/Delete album' ) ) { ?>
 								<input class="button-secondary action " type="submit" name="delete" value="<?php esc_attr_e( 'Delete',
 									'nggallery' ); ?>" onclick="javascript:check=confirm('<?php echo esc_js( 'Delete album?',
 									'nggallery' ); ?>');if(check==false) return false;"/>
 							<?php } ?>
 						<?php } else { ?>
-							<?php if ( nggGallery::current_user_can( 'NextGEN Add/Delete album' ) ) { ?>
+							<?php if ( \nggGallery::current_user_can( 'NextGEN Add/Delete album' ) ) { ?>
 								<span><?php esc_html_e( 'Add new album', 'nggallery' ); ?>&nbsp;</span>
 								<input class="search-input" id="newalbum" name="newalbum" type="text" value=""/>
 								<input class="button-secondary action" type="submit" name="add" value="<?php esc_attr_e( 'Add',
@@ -454,7 +454,7 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 											echo '<option value="0" selected="selected">' . __( 'No picture',
 													'nggallery' ) . '</option>';
 										} else {
-											$picture = nggdb::find_image( $album->previewpic );
+											$picture = \nggdb::find_image( $album->previewpic );
 											echo '<option value="' . $picture->pid . '" selected="selected" >' . $picture->pid . ' - ' . ( empty( $picture->alltext ) ? esc_attr( $picture->filename ) : esc_attr( $picture->alltext ) ) . ' </option>' . "\n";
 										}
 										?>
@@ -506,7 +506,7 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 	private function get_container( $id = 0, $used = false ) {
 
 		/**
-		 * @global nggdb $nggdb
+		 * @global \nggdb $nggdb
 		 */
 		global $nggdb;
 
@@ -572,17 +572,17 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 				<div class="innerhandle">
 					<div class="item_top ' . $class . '">
 						<a href="#" class="min" title="close">&#9473;</a>
-						ID: ' . $obj['id'] . ' | ' . wp_html_excerpt( esc_html( nggGallery::i18n( $obj['title'] ) ),
+						ID: ' . $obj['id'] . ' | ' . wp_html_excerpt( esc_html( \nggGallery::i18n( $obj['title'] ) ),
 				25 ) . '
 					</div>
 					<div class="itemContent">
 							' . $preview_image . '
 							<p><strong>' . __( 'Name',
-				'nggallery' ) . ': </strong>' . esc_html( nggGallery::i18n( $obj['name'] ) ) . '</p>
+				'nggallery' ) . ': </strong>' . esc_html( \nggGallery::i18n( $obj['name'] ) ) . '</p>
 							<p><strong>' . __( 'Title',
-				'nggallery' ) . ': </strong>' . esc_html( nggGallery::i18n( $obj['title'] ) ) . '</p>
+				'nggallery' ) . ': </strong>' . esc_html( \nggGallery::i18n( $obj['title'] ) ) . '</p>
 							<p><strong>' . __( 'Page',
-				'nggallery' ) . ': </strong>' . esc_html( nggGallery::i18n( $obj['pagenname'] ) ) . '</p>
+				'nggallery' ) . ': </strong>' . esc_html( \nggGallery::i18n( $obj['pagenname'] ) ) . '</p>
 							' . apply_filters( 'ngg_display_album_item_content', '', $obj ) . '
 						</div>
 				</div>
@@ -626,7 +626,7 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function add_help( $screen ) {
 		$help = '<p>' . __( 'Organize your galleries into albums.',
@@ -638,5 +638,20 @@ class NGG_Album_Manager implements NCG_Admin_Page {
 			'title'   => 'Organize everything',
 			'content' => $help
 		) );
+	}
+
+	/**
+	 * Get the name of this page. This is the second part of the full name:
+	 *
+	 * admin.php?page=[SLUG]-[PAGE_NAME].
+	 *
+	 * An example is 'admin.php?page=nextcellent-manage-images'
+	 *
+	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
+	 *
+	 * @return string The name.
+	 */
+	public function get_name() {
+		return 'album';
 	}
 }

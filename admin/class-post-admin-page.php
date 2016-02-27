@@ -1,13 +1,13 @@
 <?php
 
-include_once( 'class-ncg-admin-page.php' );
+namespace NextCellent\Admin;
 
 /**
- * Class NCG_Post_Admin_Page
+ * Class Post_Admin_Page
  *
  * Represents a page that needs to process POST parameters.
  */
-abstract class NCG_Post_Admin_Page extends NCG_Admin_Page {
+abstract class Post_Admin_Page extends Admin_Page {
 
 	/**
 	 * @param string $slug The slug for this page. It is recommended you pass this parameter.

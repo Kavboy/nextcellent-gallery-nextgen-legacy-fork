@@ -10,23 +10,7 @@ use NextCellent\Database\Manager;
  */
 abstract class Model {
 
-	/**
-	 * @var Manager The database manager.
-	 */
-	protected $manager;
-
 	protected $properties = array();
-
-	/**
-	 * @param Manager $manager The database manager.
-	 */
-	public function __construct($manager = null) {
-		if($manager == null) {
-			$this->manager = Manager::get();
-		} else {
-			$this->manager = $manager;
-		}
-	}
 
 	/**
 	 * Count all rows in a given table.
@@ -35,7 +19,7 @@ abstract class Model {
 	 *
 	 * @return int The number of rows.
 	 */
-	protected static function count($table) {
+	protected static function count_table($table) {
 		$manager = Manager::get();
 
 		return $manager->get_int('SELECT COUNT(*) FROM ' . $table);
@@ -44,6 +28,8 @@ abstract class Model {
 	public function __get( $name ) {
 		if(array_key_exists($name, $this->properties)) {
 			return $this->properties[$name];
+		} elseif(method_exists($this, 'get_' . $name)) {
+			return call_user_func(array($this, 'get_' . $name));
 		} else {
 			throw new Wrong_Property_Exception($name);
 		}
@@ -59,8 +45,8 @@ abstract class Model {
 		}
 	}
 
-	public function save($table, $column, $id) {
-		return $this->manager->update($table, $this->to_array(), array(
+	public function save_model($table, $column, $id) {
+		return Manager::get()->update($table, $this->to_array(), array(
 			$column => $id
 		));
 	}

@@ -1,9 +1,11 @@
 <?php
 
+namespace NextCellent\Admin;
+
 /**
  * Almost every page in the admin section must implement this interface.
  */
-abstract class NCG_Admin_Page {
+abstract class Admin_Page {
 
 	/**
 	 * @var string The base slug of the admin page.
@@ -43,7 +45,7 @@ abstract class NCG_Admin_Page {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	public abstract function add_help($screen);
 

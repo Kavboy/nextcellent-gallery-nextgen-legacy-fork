@@ -280,8 +280,8 @@ add_action('wp_ajax_ngg_dashboard', 'ngg_ajax_dashboard');
 
 function ngg_ajax_dashboard() {
 
-   	require_once( dirname( dirname(__FILE__) ) . '/admin/class-ngg-admin-launcher.php');
-	require_once( dirname( dirname(__FILE__) ) . '/admin/class-ngg-overview.php');
+   	require_once( dirname( dirname( __FILE__ ) ) . '/admin/class-launcher.php' );
+	require_once( dirname( dirname( __FILE__ ) ) . '/admin/class-overview-page.php' );
 
    	if ( !current_user_can('NextGEN Gallery overview') )
 		die('-1');

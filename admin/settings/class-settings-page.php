@@ -2,11 +2,8 @@
 
 namespace NextCellent\Admin\Settings;
 
-use NCG_Post_Admin_Page;
+use NextCellent\Admin\Post_Admin_Page;
 use WP_Screen;
-
-require_once( dirname( __DIR__ ) . '/class-ncg-post-admin-page.php' );
-require_once( __DIR__ . '/class-settings-tab.php' );
 
 /**
  * The settings page for NextCellent.
@@ -33,7 +30,7 @@ require_once( __DIR__ . '/class-settings-tab.php' );
  *
  * add_hook( 'ngg_tab_content_my_plugin', 'display_settings');
  */
-class Settings_Page extends NCG_Post_Admin_Page {
+class Settings_Page extends Post_Admin_Page {
 
 	/**
 	 * @var Settings_Page $options The options.
@@ -77,31 +74,24 @@ class Settings_Page extends NCG_Post_Admin_Page {
 
 		switch($name) {
 			case 'general':
-				require_once( __DIR__ . '/class-tab-general.php' );
 				$this->current = new Tab_General($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'images':
-				require_once( __DIR__ . '/class-tab-images.php' );
 				$this->current = new Tab_Images($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'gallery':
-				require_once( __DIR__ . '/class-tab-gallery.php' );
 				$this->current = new Tab_Gallery($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'effects':
-				require_once( __DIR__ . '/class-tab-effects.php' );
 				$this->current = new Tab_Effects($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'watermark':
-				require_once( __DIR__ . '/class-tab-watermark.php' );
 				$this->current = new Tab_Watermark($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'slideshow':
-				require_once( __DIR__ . '/class-tab-slideshow.php' );
 				$this->current = new Tab_Slideshow($this->options, $this->get_full_url(), $tabs);
 				break;
 			case 'advanced':
-				require_once( __DIR__ . '/class-tab-advanced.php' );
 				$this->current = new Tab_Advanced($this->options, $this->get_full_url(), $tabs);
 				break;
 			default:

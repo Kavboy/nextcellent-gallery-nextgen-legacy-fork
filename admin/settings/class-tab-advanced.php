@@ -2,8 +2,6 @@
 
 namespace NextCellent\Admin\Settings;
 
-require_once( __DIR__ . '/class-settings-tab.php' );
-
 class Tab_Advanced extends Settings_Tab {
 
 	/**
@@ -32,7 +30,7 @@ class Tab_Advanced extends Settings_Tab {
 	 */
 	public function processor() {
 
-		require_once( dirname( __DIR__ ) . '/class-ngg-installer.php' );
+		require_once( dirname( __DIR__ ) . '/class-installer.php' );
 
 		\NextCellent\show_success( __( 'All settings were reset to their default value.', 'nggallery' ) );
 	}

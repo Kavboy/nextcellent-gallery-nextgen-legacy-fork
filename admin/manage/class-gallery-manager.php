@@ -1,13 +1,13 @@
 <?php
-include_once( __DIR__ . '/class-ngg-gallery-list-table.php' );
-include_once( __DIR__ . '/class-ncg-manager.php' );
+
+namespace NextCellent\Admin\Manage;
 
 /**
- * Class NCG_Gallery_Manager
+ * Class Gallery_Manager
  *
  * Display the gallery managing page.
  */
-class NCG_Gallery_Manager extends NCG_Manager {
+class Gallery_Manager extends Abstract_Manager {
 
 	/**
 	 * Display the page.
@@ -26,12 +26,12 @@ class NCG_Gallery_Manager extends NCG_Manager {
 		/**
 		 * Display the actual table.
 		 */
-		$table = new NGG_Gallery_List_Table( $this->get_full_url() );
+		$table = new Gallery_List_Table( $this->get_full_url() );
 		$table->prepare_items();
 		?>
 		<div class="wrap">
 			<h2><?php _e( 'Galleries', 'nggallery' ); ?>
-				<?php if ( current_user_can( 'NextGEN Upload images' ) && nggGallery::current_user_can( 'NextGEN Add new gallery' ) ) { ?>
+				<?php if ( current_user_can( 'NextGEN Upload images' ) && \nggGallery::current_user_can( 'NextGEN Add new gallery' ) ) { ?>
 					<a class="add-new-h2" id="new-gallery" href="#"><?php _e( 'Add new gallery', 'nggallery' ) ?></a>
 				<?php }; ?>
 			</h2>
@@ -103,9 +103,9 @@ class NCG_Gallery_Manager extends NCG_Manager {
 	private function handle_add_gallery() {
 
 		if ( wp_verify_nonce( $_POST['_wpnonce'],
-				'ngg_add_gallery' ) === false || ! nggGallery::current_user_can( 'NextGEN Add new gallery' )
+				'ngg_add_gallery' ) === false || ! \nggGallery::current_user_can( 'NextGEN Add new gallery' )
 		) {
-			nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
+			\nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
 
 			return;
 		}
@@ -116,7 +116,7 @@ class NCG_Gallery_Manager extends NCG_Manager {
 		$default_path = $options['gallerypath'];
 		$new_gallery  = esc_attr( $_POST['gallery_name'] );
 		if ( ! empty( $new_gallery ) ) {
-			nggAdmin::create_gallery( $new_gallery, $default_path );
+			\nggAdmin::create_gallery( $new_gallery, $default_path );
 		}
 
 		do_action( 'ngg_update_addgallery_page' );
@@ -125,11 +125,11 @@ class NCG_Gallery_Manager extends NCG_Manager {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function add_help( $screen ) {
 		add_filter( 'manage_' . $screen->id . '_columns',
-			array( 'NGG_Gallery_List_Table', 'get_columns_static' ), 0 );
+			array( 'Gallery_List_Table', 'get_columns_static' ), 0 );
 		$args = array(
 			'label'   => __( 'Galleries', 'nggallery' ),
 			'default' => 25,

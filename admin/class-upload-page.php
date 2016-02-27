@@ -1,15 +1,15 @@
 <?php
 
-include_once( 'class-ncg-post-admin-page.php' );
+namespace NextCellent\Admin;
 
 /**
- * Class NCG_Adder
+ * Class Upload
  *
  * Add new stuff to NextCellent.
  *
  * @todo The whole system with the plupload needs a rework.
  */
-class NCG_Adder extends NCG_Post_Admin_Page {
+class Upload_Page extends Post_Admin_Page {
 
 	/**
 	 * Perform the upload and add a new hook for plugins
@@ -19,7 +19,7 @@ class NCG_Adder extends NCG_Post_Admin_Page {
 	protected function processor() {
 
 		/**
-		 * @global nggdb $nggdb
+		 * @global \nggdb $nggdb
 		 */
 		global $nggdb;
 
@@ -30,68 +30,68 @@ class NCG_Adder extends NCG_Post_Admin_Page {
 		if ( isset( $_POST['addgallery'] ) ) {
 			check_admin_referer( 'ngg_addgallery' );
 
-			if ( ! nggGallery::current_user_can( 'NextGEN Add new gallery' ) ) {
+			if ( !  \nggGallery::current_user_can( 'NextGEN Add new gallery' ) ) {
 				wp_die( __( 'Cheatin&#8217; uh?' ) );
 			}
 
 			$new_gallery = esc_attr( $_POST['galleryname'] );
 			$description = esc_attr( $_POST['gallerydesc'] );
 			if ( ! empty( $new_gallery ) ) {
-				nggAdmin::create_gallery( $new_gallery, $default_path, true, $description );
+				\nggAdmin::create_gallery( $new_gallery, $default_path, true, $description );
 			}
 		}
 
 		if ( isset( $_POST['zipupload'] ) ) {
 			check_admin_referer( 'ngg_addgallery' );
 
-			if ( ! nggGallery::current_user_can( 'NextGEN Upload a zip' ) ) {
+			if ( ! \nggGallery::current_user_can( 'NextGEN Upload a zip' ) ) {
 				wp_die( __( 'Cheatin&#8217; uh?' ) );
 			}
 
 			if ( $_FILES['zipfile']['error'] == 0 || ( ! empty( $_POST['zipurl'] ) ) ) {
-				nggAdmin::import_zipfile( intval( $_POST['zipgalselect'] ) );
+				\nggAdmin::import_zipfile( intval( $_POST['zipgalselect'] ) );
 			} else {
-				nggGallery::show_error( __( 'Upload failed!', 'nggallery' ) );
+				\nggGallery::show_error( __( 'Upload failed!', 'nggallery' ) );
 			}
 		}
 
 		if ( isset( $_POST['importfolder'] ) ) {
 			check_admin_referer( 'ngg_addgallery' );
 
-			if ( ! nggGallery::current_user_can( 'NextGEN Import image folder' ) ) {
+			if ( ! \nggGallery::current_user_can( 'NextGEN Import image folder' ) ) {
 				wp_die( __( 'Cheatin&#8217; uh?' ) );
 			}
 
 			$galleryfolder = $_POST['galleryfolder'];
 			if ( ( ! empty( $galleryfolder ) ) AND ( $default_path != $galleryfolder ) ) {
-				nggAdmin::import_gallery( $galleryfolder );
+				\nggAdmin::import_gallery( $galleryfolder );
 			}
 		}
 
 		if ( isset( $_POST['uploadimage'] ) ) {
 			check_admin_referer( 'ngg_addgallery' );
 
-			if ( ! nggGallery::current_user_can( 'NextGEN Upload in all galleries' ) ) {
+			if ( ! \nggGallery::current_user_can( 'NextGEN Upload in all galleries' ) ) {
 				wp_die( __( 'Cheatin&#8217; uh?' ) );
 			}
 
 			if ( $_FILES['imagefiles']['error'][0] == 0 ) {
-				nggAdmin::upload_images();
+				\nggAdmin::upload_images();
 			} else {
-				nggGallery::show_error( __( 'Upload failed! ' . nggAdmin::decode_upload_error( $_FILES['imagefiles']['error'][0] ),
+				\nggGallery::show_error( __( 'Upload failed! ' . \nggAdmin::decode_upload_error( $_FILES['imagefiles']['error'][0] ),
 					'nggallery' ) );
 			}
 		}
 
 		if ( isset( $_POST['swf_callback'] ) ) {
 			if ( $_POST['galleryselect'] == '0' ) {
-				nggGallery::show_error( __( 'You didn\'t select a gallery!', 'nggallery' ) );
+				\nggGallery::show_error( __( 'You didn\'t select a gallery!', 'nggallery' ) );
 			} else {
 				if ( $_POST['swf_callback'] == '-1' ) {
-					nggGallery::show_error( __( 'Upload failed!', 'nggallery' ) );
+					\nggGallery::show_error( __( 'Upload failed!', 'nggallery' ) );
 				} else {
 					$gallery = $nggdb->find_gallery( (int) $_POST['galleryselect'] );
-					nggAdmin::import_gallery( $gallery->path );
+					\nggAdmin::import_gallery( $gallery->path );
 				}
 			}
 		}
@@ -122,12 +122,12 @@ class NCG_Adder extends NCG_Post_Admin_Page {
 		parent::display();
 
 		/**
-		 * @global nggdb $nggdb
+		 * @global \nggdb $nggdb
 		 */
 		global $nggdb;
 
 		$args = array(
-			'max_size'  => nggGallery::check_memory_limit(),
+			'max_size'  => \nggGallery::check_memory_limit(),
 			'galleries' => $nggdb->find_all_galleries('gid', 'DESC'),
 			'options'   => get_option('ngg_options')
 
@@ -366,16 +366,16 @@ class NCG_Adder extends NCG_Post_Admin_Page {
 
 		$tabs = array();
 
-		if ( nggGallery::current_user_can( 'NextGEN Add new gallery' ))
+		if ( \nggGallery::current_user_can( 'NextGEN Add new gallery' ))
 			$tabs['addgallery'] = __('New gallery', 'nggallery');
 
 		if ( !empty ($args['galleries']) )
 			$tabs['uploadimage'] = __( 'Images', 'nggallery' );
 
-		if ( wpmu_enable_function('wpmuZipUpload') && nggGallery::current_user_can( 'NextGEN Upload a zip' ) )
+		if ( wpmu_enable_function('wpmuZipUpload') && \nggGallery::current_user_can( 'NextGEN Upload a zip' ) )
 			$tabs['zipupload'] = __('ZIP file', 'nggallery');
 
-		if ( wpmu_enable_function('wpmuImportFolder') && nggGallery::current_user_can( 'NextGEN Import image folder' ) )
+		if ( wpmu_enable_function('wpmuImportFolder') && \nggGallery::current_user_can( 'NextGEN Import image folder' ) )
 			$tabs['importfolder'] = __('Import folder', 'nggallery');
 
 		$tabs = apply_filters('ngg_addgallery_tabs', $tabs);
@@ -570,7 +570,7 @@ class NCG_Adder extends NCG_Post_Admin_Page {
 	 */
 	private function print_galleries($galleries) {
 		foreach($galleries as $gallery) {
-			if ( current_user_can( 'NextGEN Upload in all galleries' ) ||  nggAdmin::can_manage_this_gallery($gallery->author) ) {
+			if ( current_user_can( 'NextGEN Upload in all galleries' ) ||  \nggAdmin::can_manage_this_gallery($gallery->author) ) {
 				$name = ( empty( $gallery->title ) ) ? $gallery->name : $gallery->title;
 				echo '<option value="' . $gallery->gid . '" >' . $gallery->gid . ' - ' . esc_attr( $name ) . '</option>';
 			}
@@ -599,18 +599,18 @@ class NCG_Adder extends NCG_Post_Admin_Page {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function add_help( $screen ) {
 		/**
-		 * @global nggdb $nggdb
+		 * @global \nggdb $nggdb
 		 */
 		global $nggdb;
 		$gallerylist = $nggdb->find_all_galleries( 'gid', 'DESC' ); //look for galleries
 
 		$help = '<p>' . __( 'On this page you can add galleries and pictures to those galleries.',
 				'nggallery' ) . '</p>';
-		if ( nggGallery::current_user_can( 'NextGEN Add new gallery' ) ) {
+		if ( \nggGallery::current_user_can( 'NextGEN Add new gallery' ) ) {
 			$help .= '<p><strong>' . __( 'New gallery',
 					'nggallery' ) . '</strong> - ' . __( 'Add new galleries to NextCellent.',
 					'nggallery' ) . '</p>';
@@ -622,11 +622,11 @@ class NCG_Adder extends NCG_Post_Admin_Page {
 			$help .= '<p><strong>' . __( 'Images',
 					'nggallery' ) . '</strong> - ' . __( 'Add new images to a gallery.', 'nggallery' ) . '</p>';
 		}
-		if ( wpmu_enable_function( 'wpmuZipUpload' ) && nggGallery::current_user_can( 'NextGEN Upload a zip' ) && ! empty ( $gallerylist ) ) {
+		if ( wpmu_enable_function( 'wpmuZipUpload' ) && \nggGallery::current_user_can( 'NextGEN Upload a zip' ) && ! empty ( $gallerylist ) ) {
 			$help .= '<p><strong>' . __( 'ZIP file',
 					'nggallery' ) . '</strong> - ' . __( 'Add images from a ZIP file.', 'nggallery' ) . '</p>';
 		}
-		if ( wpmu_enable_function( 'wpmuImportFolder' ) && nggGallery::current_user_can( 'NextGEN Import image folder' ) ) {
+		if ( wpmu_enable_function( 'wpmuImportFolder' ) && \nggGallery::current_user_can( 'NextGEN Import image folder' ) ) {
 			$help .= '<p><strong>' . __( 'Import folder',
 					'nggallery' ) . '</strong> - ' . __( 'Import a folder from the server as a new gallery.',
 					'nggallery' ) . '</p>';

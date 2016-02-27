@@ -2,8 +2,6 @@
 
 namespace NextCellent\Admin\Settings;
 
-require_once( __DIR__ . '/class-settings-tab.php' );
-
 class Tab_Slideshow extends Settings_Tab {
 
 	/**

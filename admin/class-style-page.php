@@ -1,8 +1,8 @@
 <?php  
 
-include_once('class-ncg-post-admin-page.php');
+namespace NextCellent\Admin;
 
-class NCG_Style extends NCG_Post_Admin_Page {
+class Style_Page extends Post_Admin_Page {
 	
 	/**
 	 * Find stylesheets.
@@ -85,7 +85,7 @@ class NCG_Style extends NCG_Post_Admin_Page {
 	 */
 	static function output_css_files_dropdown( $css_list, $act_css_file ) {
 		foreach ( $css_list as $file) {
-			$a_cssfile = NCG_Style::ngg_get_cssfiles_data($file);
+			$a_cssfile = Style_Page::ngg_get_cssfiles_data($file);
 			$css_name = esc_attr( $a_cssfile['Name'] );
 			$css_folder = esc_attr( $a_cssfile['Folder'] );
 			if ( $css_name != '' ) {
@@ -102,6 +102,7 @@ class NCG_Style extends NCG_Post_Admin_Page {
 	 */
 	protected function processor() {
 		global $ngg;
+		$options = get_option('ngg-options');
 		$i = 0;
 
 		if ( isset( $_POST['activate'] ) ) {
@@ -110,14 +111,14 @@ class NCG_Style extends NCG_Post_Admin_Page {
 			$activate = $_POST['activateCSS']; 
 			
 			// save option now
-			$ngg->options['activateCSS'] = $activate;
-			$ngg->options['CSSfile'] = $file;
+			$options['activateCSS'] = $activate;
+			$options['CSSfile'] = $file;
 			update_option('ngg_options', $ngg->options);
 			
 			if ( isset($activate) ) {
-				nggGallery::show_message(__('Successfully selected CSS file.','nggallery') );
+				\nggGallery::show_message(__('Successfully selected CSS file.','nggallery') );
 			} else {
-				nggGallery::show_message(__('No CSS file will be used.','nggallery') );
+				\nggGallery::show_message(__('No CSS file will be used.','nggallery') );
 			}
 		}
 
@@ -148,18 +149,18 @@ class NCG_Style extends NCG_Post_Admin_Page {
 				//copy the file
 				if ( copy($old_path, $new_path) ) {
 					//set option to new file
-					$ngg->options['CSSfile'] = $new_path;
+					$options['CSSfile'] = $new_path;
 					update_option('ngg_options', $ngg->options);
 				} else {
-					nggGallery::show_error(__('Could not move file.','nggallery'));
+					\nggGallery::show_error(__('Could not move file.','nggallery'));
 					return;
 				}
 			}
 	
 			if ( file_put_contents($old_path, $newcontent) ) {
-				nggGallery::show_message(__('CSS file successfully updated.','nggallery'));
+				\nggGallery::show_message(__('CSS file successfully updated.','nggallery'));
 			} else {
-				nggGallery::show_error(__('Could not save file.','nggallery'));
+				\nggGallery::show_error(__('Could not save file.','nggallery'));
 			}
 		}
 		
@@ -179,12 +180,12 @@ class NCG_Style extends NCG_Post_Admin_Page {
 			
 			//move file
 			if ( rename( $old_path, $new_path) ) {
-				nggGallery::show_message(__('CSS file successfully moved.','nggallery'));
+				\nggGallery::show_message(__('CSS file successfully moved.','nggallery'));
 				//set option to new file
-				$ngg->options['CSSfile'] = $new_path;
+				$options['CSSfile'] = $new_path;
 				update_option('ngg_options', $ngg->options);
 			} else {
-				nggGallery::show_error(__('Could not move the CSS file.','nggallery'));
+				\nggGallery::show_error(__('Could not move the CSS file.','nggallery'));
 			}
 		}
 	}
@@ -214,19 +215,19 @@ class NCG_Style extends NCG_Post_Admin_Page {
 		}
 		
 		//if someone uses the filter, don't display this page.
-		if ( !$theme_css_exists && $set_css_file = nggGallery::get_theme_css_file() ) {
-			nggGallery::show_error( __('Your CSS file is set by a theme or another plugin.','nggallery') . "<br><br>" . __('This CSS file will be applied:','nggallery') . "<br>" . $set_css_file);
+		if ( !$theme_css_exists && $set_css_file = \nggGallery::get_theme_css_file() ) {
+			\nggGallery::show_error( __('Your CSS file is set by a theme or another plugin.','nggallery') . "<br><br>" . __('This CSS file will be applied:','nggallery') . "<br>" . $set_css_file);
 			return;
 		}
 		
 		//load all files
 		if ( !isset($act_cssfile) ) {
-			$csslist = NCG_Style::ngg_get_cssfiles($dir);
+			$csslist = Style_Page::ngg_get_cssfiles($dir);
 			$act_cssfile = $ngg->options['CSSfile'];
 		}
 		
 		//get the data from the file
-		$act_css_data = NCG_Style::ngg_get_cssfiles_data($act_cssfile);
+		$act_css_data = Style_Page::ngg_get_cssfiles_data($act_cssfile);
 		$act_css_name = $act_css_data['Name'];
 		$act_css_description = $act_css_data['Description'];
 		$act_css_author = $act_css_data['Author'];
@@ -332,7 +333,7 @@ class NCG_Style extends NCG_Post_Admin_Page {
 	/**
 	 * A possibility to add help to the screen.
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	 public function add_help($screen) {
         $help = '<p>' . __( 'You can edit the css file to adjust how your gallery looks.',
@@ -346,4 +347,17 @@ class NCG_Style extends NCG_Post_Admin_Page {
 			'content' => $help
 		) );
 	}
+/**
+	 * Get the name of this page. This is the second part of the full name:
+	 *
+	 * admin.php?page=[SLUG]-[PAGE_NAME].
+	 *
+	 * An example is 'admin.php?page=nextcellent-manage-images'
+	 *
+	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
+	 *
+	 * @return string The name.
+	 */public function get_name() {
+		 return 'style';
+	 }
 }

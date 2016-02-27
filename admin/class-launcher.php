@@ -1,11 +1,19 @@
 <?php
 
+namespace NextCellent\Admin;
+
+use NextCellent\Admin\Manage\Gallery_Manager;
+use NextCellent\Admin\Manage\Image_Manager;
+use NextCellent\Admin\Manage\Search_Manager;
+use NextCellent\Admin\Manage\Sort_Manager;
+use NextCellent\Admin\Settings\Settings_Page;
+
 /**
- * NGG_Admin_Launcher - Admin Section for NextGEN Gallery
+ * Launcher - Admin Section for NextGEN Gallery
  *
  * @since   1.9.30
  */
-class NGG_Admin_Launcher {
+class Launcher {
 
 	/**
 	 * @var string $base_slug The base slug for admin pages.
@@ -14,7 +22,7 @@ class NGG_Admin_Launcher {
 	private $base_slug;
 
 	/**
-	 * @var NCG_Admin_Page $page The page we want to display.
+	 * @var Admin_Page $page The page we want to display.
 	 * @since 1.9.31
 	 */
 	private $page;
@@ -133,10 +141,6 @@ class NGG_Admin_Launcher {
 		add_submenu_page( $this->base_slug, __( 'Network settings', 'nggallery' ), __( 'Network settings', 'nggallery' ),
 			'nggallery-wpmu',
 			$this->base_slug, array( $this, 'show_network_settings' ) );
-
-		add_submenu_page( $this->base_slug, __( 'Reset / Uninstall', 'nggallery' ), __( 'Reset / Uninstall', 'nggallery' ),
-			'activate_plugins',
-			'nggallery-setup', array( $this, 'show_menu' ) );
 	}
 
 	/**
@@ -160,7 +164,6 @@ class NGG_Admin_Launcher {
 	 */
 	public function show_network_settings() {
 		$this->show_upgrade_page();
-		include_once( __DIR__ . '/class-ngg-style.php' );
 		include_once( __DIR__ . '/wpmu.php' );
 		nggallery_wpmu_setup();
 	}
@@ -168,7 +171,7 @@ class NGG_Admin_Launcher {
 	/**
 	 * Make the screen object for the screen we want to display.
 	 *
-	 * @param WP_Screen $current_screen The current screen.
+	 * @param \WP_Screen $current_screen The current screen.
 	 */
 	public function make_page($current_screen) {
 
@@ -179,36 +182,29 @@ class NGG_Admin_Launcher {
 		switch ( $slug ) {
 			case "add-gallery" :
 				require_once( __DIR__ . '/functions.php' );
-				require_once( __DIR__ . '/class-ngg-adder.php' );
-				$this->page = new NCG_Adder($this->base_slug);
+				$this->page = new Upload_Page($this->base_slug);
 				break;
 			case "manage":
 				require_once( __DIR__ . '/functions.php' );
 				$this->page = $this->get_manager();
 				break;
 			case "manage-album" :
-				require_once( __DIR__ . '/class-ngg-album-manager.php' );
-				$this->page = new NGG_Album_Manager($this->base_slug);
+				$this->page = new Album_Manager($this->base_slug);
 				break;
 			case "options" :
-				require_once( __DIR__ . '/settings/class-settings-page.php' );
-				$this->page = new \NextCellent\Admin\Settings\Settings_Page($this->base_slug);
+				$this->page = new Settings_Page($this->base_slug);
 				break;
 			case "tags" :
-				require_once( __DIR__ . '/class-ngg-tag-manager.php' );
-				$this->page = new NGG_Tag_Manager($this->base_slug);
+				$this->page = new Tag_Manager($this->base_slug);
 				break;
 			case "style" :
-				require_once( __DIR__ . '/class-ngg-style.php' );
-				$this->page = new NCG_Style($this->base_slug);
+				$this->page = new Style_Page($this->base_slug);
 				break;
 			case "roles" :
-				require_once( __DIR__ . '/class-ngg-roles.php' );
-				$this->page = new NCG_Roles($this->base_slug);
+				$this->page = new Roles($this->base_slug);
 				break;
 			case "toplevel_page_" . $this->base_slug:
-				require_once( __DIR__ . '/class-ngg-overview.php' );
-				$this->page = new NGG_Overview($this->base_slug);
+				$this->page = new Overview_Page($this->base_slug);
 				break;
 			default: //Not our page
 				$this->page = null;
@@ -237,37 +233,29 @@ class NGG_Admin_Launcher {
 	 * - sort mode of a gallery,
 	 * - search mode.
 	 *
-	 * @return NCG_Admin_Page The correct managing page or null if the page could not be found.
+	 * @return Admin_Page The correct managing page or null if the page could not be found.
 	 */
 	private function get_manager() {
 
 		if ( ! isset( $_GET['mode'] ) || $_GET['mode'] === 'gallery' ) {
 
 			//Display the normal page.
-			include_once( 'manage/class-ngg-gallery-manager.php' );
-
-			return new NCG_Gallery_Manager($this->base_slug);
+			return new Gallery_Manager($this->base_slug);
 
 		} elseif ( $_GET['mode'] == 'image' ) {
 
 			//Display overview of a gallery.
-			include_once( 'manage/class-ngg-image-manager.php' );
-
-			return new NGG_Image_Manager($this->base_slug);
+			return new Image_Manager($this->base_slug);
 
 		} elseif ( $_GET['mode'] == 'sort' ) {
 
 			//Display sort page.
-			include_once( 'manage/class-ngg-sort-manager.php' );
-
-			return new NGG_Sort_Manager($this->base_slug);
+			return new Sort_Manager($this->base_slug);
 
 		} elseif ( $_GET['mode'] == 'search' ) {
 
 			//Display search results.
-			include_once( 'manage/class-ngg-search-manager.php' );
-
-			return new NGG_Search_Manager($this->base_slug);
+			return new Search_Manager($this->base_slug);
 		} else {
 			return null;
 		}
@@ -369,7 +357,7 @@ class NGG_Admin_Launcher {
 	 *
 	 * @since 1.9.24
 	 *
-	 * @param WP_Screen $screen The current screen.
+	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function edit_current_screen( $screen ) {
 

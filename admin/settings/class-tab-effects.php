@@ -2,8 +2,6 @@
 
 namespace NextCellent\Admin\Settings;
 
-require_once( __DIR__ . '/class-settings-tab.php' );
-
 /**
  * The effects tab.
  */

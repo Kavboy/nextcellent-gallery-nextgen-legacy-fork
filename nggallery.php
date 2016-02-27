@@ -44,6 +44,7 @@ if (!class_exists('NCG')) {
 	 * Class NCG
 	 *
 	 * @property-read NextCellent\Options\Options options The options.
+	 * @property-read NextCellent\Database\Manager manager The database manager.
      */
     class NCG {
 
@@ -79,6 +80,14 @@ if (!class_exists('NCG')) {
 	        //Add the options to the registry.
 	        /** @noinspection PhpInternalEntityUsedInspection */
 	        $this->registry->add('options', new \NextCellent\Options\Options());
+
+	        //Add the database manager.
+	        global $wpdb;
+	        /** @noinspection PhpInternalEntityUsedInspection */
+	        $manager = new \NextCellent\Database\Manager($wpdb);
+
+	        //Add image factories.
+	        $this->registry->add('manager', $manager);
 
 			//Define constants.
 			$this->define_constant();
@@ -165,8 +174,8 @@ if (!class_exists('NCG')) {
 
 		    //Register the admin hooks.
 		    if(is_admin() && !defined( 'DOING_AJAX' )) {
-			    //The admin hooks are registered in the constructor of NGG_Admin_Launcher
-			    $admin = new NGG_Admin_Launcher(self::ADMIN_BASE);
+			    //The admin hooks are registered in the constructor of Launcher
+			    $admin = new NextCellent\Admin\Launcher(self::ADMIN_BASE);
 			    $admin->register();
 		    }
 	    }
@@ -379,7 +388,7 @@ if (!class_exists('NCG')) {
 	    private function load_dependencies() {
 
 		    //Include the autloader
-		    require_once( __DIR__ . '/src/autoloader.php' );
+		    require( __DIR__ . '/src/autoloader.php' );
 
 		    //Include utils
 		    require_once( __DIR__ . '/src/ncg-utils.php' );
@@ -417,7 +426,9 @@ if (!class_exists('NCG')) {
 			    require_once( __DIR__ . '/lib/rewrite.php' );
 			    require_once( __DIR__ . '/admin/tinymce/tinymce.php' );
 			    if(is_admin()) {
-				    require_once( __DIR__ . '/admin/class-ngg-admin-launcher.php' );
+				    //Require the admin auto loader.
+				    require(__DIR__ . '/admin/autoloader.php' );
+				    //require_once( __DIR__ . '/admin/class-launcher.php' );
 				    require_once( __DIR__ . '/admin/media-upload.php' );
 			    }
 		    }
@@ -615,7 +626,7 @@ if (!class_exists('NCG')) {
 		public function multisite_new_blog( $blog_id ) {
 			global $wpdb;
 
-			include_once (dirname (__FILE__) . '/admin/class-ngg-installer.php');
+			include_once( dirname( __FILE__ ) . '/admin/class-installer.php' );
 
 			if (is_plugin_active_for_network( NCG_BASENAME )) {
 				$current_blog = $wpdb->blogid;
@@ -667,7 +678,7 @@ if (!class_exists('NCG')) {
 		    // Clean up transients
 		    self::remove_transients();
 
-		    require_once( __DIR__ . '/admin/class-ngg-installer.php' );
+		    require_once( __DIR__ . '/admin/class-installer.php' );
 
 		    if ( is_multisite() ) {
 			    $network       = isset( $_SERVER['SCRIPT_NAME'] ) ? $_SERVER['SCRIPT_NAME'] : "";

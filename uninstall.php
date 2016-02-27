@@ -26,5 +26,5 @@ NCG::remove_transients();
 
 
 //Run the uninstaller.
-include_once (dirname (__FILE__) . '/admin/class-ngg-installer.php');
+include_once( dirname( __FILE__ ) . '/admin/class-installer.php' );
 NGG_Installer::uninstall();
