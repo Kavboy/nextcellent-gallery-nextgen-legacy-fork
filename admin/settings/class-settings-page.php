@@ -3,6 +3,7 @@
 namespace NextCellent\Admin\Settings;
 
 use NCG_Post_Admin_Page;
+use WP_Screen;
 
 require_once( dirname( __DIR__ ) . '/class-ncg-post-admin-page.php' );
 require_once( __DIR__ . '/class-settings-tab.php' );
@@ -193,7 +194,7 @@ class Settings_Page extends NCG_Post_Admin_Page {
 				$nggRewrite->flush();
 			}
 
-			\NextCellent\Utils\show_success(__('Settings updated successfully','nggallery'));
+			\NextCellent\show_success(__('Settings updated successfully','nggallery'));
 		}
 	}
 

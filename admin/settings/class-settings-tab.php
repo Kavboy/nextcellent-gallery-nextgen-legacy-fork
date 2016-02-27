@@ -2,7 +2,7 @@
 
 namespace NextCellent\Admin\Settings;
 
-use NCG_Options;
+use NextCellent\Options\Options;
 
 /**
  * A tab in the options screen.
@@ -10,7 +10,7 @@ use NCG_Options;
 abstract class Settings_Tab {
 
 	/**
-	 * @var NCG_Options $options The options.
+	 * @var Options $options The options.
 	 */
 	protected $options;
 
@@ -73,7 +73,7 @@ abstract class Settings_Tab {
 	 * Show a success message.
 	 */
 	protected function success_message() {
-		\NextCellent\Utils\show_success(sprintf(__('The settings "%s" were saved successfully.', 'nggallery'), $this->tabs[$this->get_name()]));
+		\NextCellent\show_success(sprintf(__('The settings "%s" were saved successfully.', 'nggallery'), $this->tabs[$this->get_name()]));
 	}
 
 	/**
@@ -83,7 +83,7 @@ abstract class Settings_Tab {
 	 */
 	protected function save_booleans($options) {
 		foreach ( $options as $option ) {
-			$this->options->set_option($option, isset($_POST[$option]) && \NextCellent\Utils\convert_to_bool($_POST[$option]));
+			$this->options->set_option($option, isset($_POST[$option]) && \NextCellent\convert_to_bool($_POST[$option]));
 		}
 	}
 

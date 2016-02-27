@@ -3,14 +3,14 @@
 Plugin Name: NextCellent Gallery
 Plugin URI: http://www.wpgetready.com/nextcellent-gallery
 Description: A Photo Gallery for WordPress providing NextGEN legacy compatibility from version 1.9.13
-Author: WPGReady, Niknetniko based on Alex Rabe & PhotoCrati work.
+Author: WPGReady, niknetniko based on Alex Rabe & PhotoCrati work.
 Author URI: http://www.wpgetready.com
 Version: 1.9.31
 
 Copyright (c) 2007-2011 by Alex Rabe & NextGEN DEV-Team
 Copyright (c) 2012 Photocrati Media
 Copyright (c) 2013-2014 WPGetReady
-Copyright (c) 2014-2016 WPGetReady, Niknetniko
+Copyright (c) 2014-2016 WPGetReady, niknetniko
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // If this file is called directly, abort.
-
 if ( !defined( 'WPINC' )) {
 	die;
 }
@@ -45,7 +44,6 @@ if (!class_exists('NCG')) {
 	 * Class NCG
 	 *
 	 * @property-read NextCellent\Options\Options options The options.
-	 * @property-read NextCellent\Database\Manager manager The database manager.
      */
     class NCG {
 
@@ -81,14 +79,6 @@ if (!class_exists('NCG')) {
 	        //Add the options to the registry.
 	        /** @noinspection PhpInternalEntityUsedInspection */
 	        $this->registry->add('options', new \NextCellent\Options\Options());
-
-	        //Add the database manager.
-	        global $wpdb;
-	        /** @noinspection PhpInternalEntityUsedInspection */
-	        $manager = new \NextCellent\Database\Manager($wpdb);
-
-	        //Add image factories.
-	        $this->registry->add('manager', $manager);
 
 			//Define constants.
 			$this->define_constant();
@@ -391,8 +381,10 @@ if (!class_exists('NCG')) {
 		    //Include the autloader
 		    require_once( __DIR__ . '/src/autoloader.php' );
 
+		    //Include utils
+		    require_once( __DIR__ . '/src/ncg-utils.php' );
+
 		    // Load global libraries
-		    require_once( __DIR__ . '/lib/ncg-utils.php' );
 		    require_once( __DIR__ . '/lib/core.php' );
 		    require_once( __DIR__ . '/lib/ngg-db.php' );
 		    require_once( __DIR__ . '/lib/image.php' );
@@ -400,9 +392,6 @@ if (!class_exists('NCG')) {
 		    require_once( __DIR__ . '/lib/post-thumbnail.php' );
 		    require_once( __DIR__ . '/lib/multisite.php' );
 		    require_once( __DIR__ . '/lib/sitemap.php' );
-
-		    //Load models
-		    require_once( __DIR__ . '/src/models/class-image.php' );
 
 		    //Load the widgets
 		    require_once( __DIR__ . '/widgets/class-ngg-slideshow-widget.php' );

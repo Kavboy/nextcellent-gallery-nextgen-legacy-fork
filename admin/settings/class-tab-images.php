@@ -142,6 +142,6 @@ class Tab_Images extends Settings_Tab {
 				closedir($handle);
 			}
 
-		\NextCellent\Utils\show_success(__('The image cache was cleared successfully.','nggallery'));
+		\NextCellent\show_success(__('The image cache was cleared successfully.','nggallery'));
 	}
 }

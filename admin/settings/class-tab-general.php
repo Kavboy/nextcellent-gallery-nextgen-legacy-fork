@@ -236,11 +236,11 @@ class Tab_General extends Settings_Tab {
 				"<span class='ngg-count-total'>" . $total[ $key ] . "</span>"
 			);
 
-			\NextCellent\Utils\show_notice("$key notice-success", $message, false);
+			\NextCellent\show_notice("$key notice-success", $message, false);
 		}
 
 		//Output the done message now.
-		\NextCellent\Utils\show_notice('notice-success finished', __('Permalinks updated successfully.', 'nggallery'), false);
+		\NextCellent\show_notice('notice-success finished', __('Permalinks updated successfully.', 'nggallery'), false);
 
 		$ajax_url = add_query_arg( 'action', 'ngg_rebuild_unique_slugs', admin_url( 'admin-ajax.php' ) );
 		?>

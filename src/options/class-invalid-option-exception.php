@@ -2,13 +2,14 @@
 
 namespace NextCellent\Options;
 
+use NextCellent\Exception;
 
 /**
  * This exception is thrown when a non-existing option is saved.
  *
  * @package NextCellent\Lib\Exceptions
  */
-class InvalidOptionException extends \Exception {
+class InvalidOptionException extends Exception {
 
 	private $option;
 

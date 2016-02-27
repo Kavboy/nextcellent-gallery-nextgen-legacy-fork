@@ -34,6 +34,6 @@ class Tab_Advanced extends Settings_Tab {
 
 		require_once( dirname( __DIR__ ) . '/class-ngg-installer.php' );
 
-		\NextCellent\Utils\show_success( __( 'All settings were reset to their default value.', 'nggallery' ) );
+		\NextCellent\show_success( __( 'All settings were reset to their default value.', 'nggallery' ) );
 	}
 }

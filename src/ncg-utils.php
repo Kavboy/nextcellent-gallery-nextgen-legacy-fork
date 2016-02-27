@@ -3,7 +3,7 @@
  * This is a collection of helper methods.
  */
 
-namespace NextCellent\Utils;
+namespace NextCellent;
 
 /**
  * Show a success admin notice.
