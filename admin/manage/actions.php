@@ -5,8 +5,8 @@
  * @access private
  */
 
+//Load WordPress if needed.
 require_once( '../../ngg-config.php' );
-require_once( NGGALLERY_ABSPATH . '/lib/image.php' );
 
 if ( ! is_user_logged_in() || ! current_user_can( 'NextGEN Manage gallery' ) ) {
 	wp_die( __( 'Cheatin&#8217; uh?' ) );
@@ -44,15 +44,16 @@ function ngg_rotate( $id ) {
 	include_once( nggGallery::graphic_library() );
 
 	//Get the image data
-	$picture = nggdb::find_image( $id );
-	$thumb   = new ngg_Thumbnail( $picture->imagePath, true );
+	$image = \NextCellent\Models\Image::find($id);
+
+	$thumb   = new ngg_Thumbnail( $image->gallery->image_path($image), true );
 	$thumb->resize( 350, 350 );
 
 	// we need the new dimension
 	$resizedPreviewInfo = $thumb->newDimensions;
 	$thumb->destruct();
 
-	$preview_image = trailingslashit( home_url() ) . 'index.php?callback=image&pid=' . $picture->pid . '&width=500&height=500';
+	$preview_image = trailingslashit( home_url() ) . 'index.php?callback=image&pid=' . $id . '&width=500&height=500';
 
 	?>
 	<p><?php _e( 'Select how you would like to rotate the image on the left.', 'nggallery' ); ?></p>

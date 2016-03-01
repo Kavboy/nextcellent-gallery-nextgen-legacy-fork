@@ -19,7 +19,13 @@ use NextCellent\Database\Not_Found_Exception;
  * @property string $slug The slug.
  * @property int $sort_order The order of the image in the gallery.
  * @property array $meta_data The metadata saved in the database.
+ *
+ * These properties are read-only, but some are marked as normal due to a bug in phpStorm.
  * @property-read string $tags The image tags.
+ * @property string $url The URL.
+ * @property string $path The path.
+ * @property string $thumb_url URL to the thumbnail
+ * @property string $thumb_path Path to the thumbnail
  */
 class Image extends Model {
 
@@ -37,6 +43,17 @@ class Image extends Model {
 	const EXCLUDE = 'exclude';
 	const SORT_ORDER = 'sortorder';
 	const META_DATA = 'meta_data';
+
+	/**
+	 * @var string $path The folder in which this image is present.
+	 * @var string $url The URL to this image.
+	 * @var string $thumb_url The URL to the thumbnail of this image.
+	 * @var string $thumb_path The path to the thumbnail of this image.
+	 */
+	private $path;
+	private $url;
+	private $thumb_url;
+	private $thumb_path;
 
 	/**
 	 * Count all images.
@@ -80,7 +97,7 @@ class Image extends Model {
 		$manager = Manager::get();
 
 		$result = $manager->get_row(
-			'SELECT * FROM ' . $manager->get_image_table() . ' WHERE ' . self::ID . ' = %d',
+			'SELECT * FROM ' . $manager->get_image_table() . ' WHERE ' . self::ID . ' = %d INNER JOIN ' . $manager->get_gallery_table() . ' ON ' . Image::GALLERY_ID . ' = ' . Gallery::ID,
 			$id
 		);
 
@@ -114,6 +131,14 @@ class Image extends Model {
 			'sort_order'  => (bool) $data[ self::EXCLUDE ],
 			'meta_data'   => unserialize( $data[ self::META_DATA ] )
 		) );
+
+		$gallery_path = $data[Gallery::PATH];
+
+
+		$image->path = WINABSPATH . $gallery_path . '/' . $image->filename;
+		$image->url = site_url() . '/' . $gallery_path . '/' . $image->filename;
+		$image->thumb_url = site_url() . '/' . $gallery_path . '/thumbs/thumbs_' . $image->filename;
+		$image->thumb_path = WINABSPATH . $gallery_path . '/thumbs/thumbs_' . $image->filename;
 
 		return $image;
 	}
@@ -169,5 +194,21 @@ class Image extends Model {
 
 	protected function get_tags() {
 		return wp_get_object_terms($this->id, 'ngg_tag', 'fields=all');
+	}
+
+	protected function get_path() {
+		return $this->path;
+	}
+
+	protected function get_url() {
+		return $this->url;
+	}
+
+	protected function get_thumb_url() {
+		return $this->thumb_url;
+	}
+
+	protected function get_thumb_path() {
+		return $this->thumb_path;
 	}
 }

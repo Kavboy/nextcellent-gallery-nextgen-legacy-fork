@@ -5,6 +5,8 @@ if ( !class_exists('nggdb') ) :
  *
  * @author Alex Rabe, Vincent Prat
  *
+ * @deprecated Use the new models instead.
+ *
  * @since 1.0.0
  */
 class nggdb {
@@ -562,6 +564,9 @@ class nggdb {
      * Get an image given its ID
      *
      * @param  int|string The image ID or Slug
+     *
+     * @deprecated Use Image instead.
+     *
      * @return nggImage|bool The image, or false if it wasn't found.
      */
     static function find_image( $id ) {

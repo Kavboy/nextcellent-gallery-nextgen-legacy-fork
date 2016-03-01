@@ -19,20 +19,27 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  */
 class Image_List_Table extends \WP_List_Table {
 
-	private $base;
 	/**
-	 * @var Gallery The gallery.
+	 * @var Gallery $gallery The gallery.
+	 * @var string $base The base.
 	 */
+	private $base;
 	private $gallery;
 
+
+	/**
+	 * Image_List_Table constructor.
+	 *
+	 * @param string $base
+	 * @param Gallery $gallery
+	 * @param null|\WP_Screen $screen
+	 */
 	public function __construct( $base, $gallery, $screen = null ) {
 
 		parent::__construct( array( 'screen' => $screen, 'plural' => 'ngg-manager' ) );
 
 		$this->base = $base;
 		$this->gallery = $gallery;
-
-		add_filter( 'manage_' . $this->screen->id . '_columns', array( $this, 'get_columns' ), 0 );
 	}
 
 	/**
@@ -118,12 +125,12 @@ class Image_List_Table extends \WP_List_Table {
 	/**
 	 * The checkbox column.
 	 *
-	 * @param Image $item
+	 * @param Image $gallery
 	 *
 	 * @return string
 	 */
-	protected function column_cb( $item ) {
-		return '<input name="doaction[]" type="checkbox" value="' . $item->id . '" />';
+	protected function column_cb( $gallery ) {
+		return '<input name="doaction[]" type="checkbox" value="' . $gallery->id . '" />';
 	}
 
 	/**
@@ -132,10 +139,9 @@ class Image_List_Table extends \WP_List_Table {
 	 * @return string
 	 */
 	protected function column_thumbnail( $item ) {
-		$out = '<a href="' . esc_url( add_query_arg( 'i', mt_rand(),
-				$this->gallery->image_url($item) ) ) . '" class="shutter" title="' . esc_attr( $item->filename ) . '">';
-		$out .= '<img class="thumb" src="' . esc_url( add_query_arg( 'i', mt_rand(),
-				$this->gallery->image_url($item ) ) ) . '" id="thumb' . $item->id . '" /></a>';
+
+		$out = '<a href="' . esc_url( $item->url ) . '" class="shutter" title="' . esc_attr( $item->filename ) . '">';
+		$out .= '<img class="thumb" src="' . esc_url( $item->thumb_url ) . '" id="thumb' . $item->id . '" /></a>';
 
 		return $out;
 	}
@@ -149,7 +155,7 @@ class Image_List_Table extends \WP_List_Table {
 		$date = mysql2date( get_option( 'date_format' ), $item->date );
 		ob_start();
 		?>
-		<a href="<?php echo esc_url( $this->gallery->image_url($item) ) ?>" class="thickbox" title="<?php esc_attr_e( $item->filename ) ?>">
+		<a href="<?php echo esc_url( $item->url ) ?>" class="thickbox" title="<?php esc_attr_e( $item->filename ) ?>">
 			<strong>
 				<?php esc_html_e( $item->filename ) ?>
 			</strong>
@@ -203,32 +209,32 @@ class Image_List_Table extends \WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table
 	 *
-	 * @param  Image $item      Data
+	 * @param  Image $gallery      Data
 	 * @param  String $column_name - Current column name
 	 *
 	 * @return Mixed
 	 */
-	protected function column_default( $item, $column_name ) {
+	protected function column_default( $gallery, $column_name ) {
 		switch ( $column_name ) {
 			case 'id':
-				return '<input type="hidden" name="pid[]" value="' . $item->id . '">' . $item->id;
+				return '<input type="hidden" name="pid[]" value="' . $gallery->id . '">' . $gallery->id;
 			case 'tags':
-				$tags = wp_get_object_terms( $item->id, 'ngg_tag', 'fields=names' );
+				$tags = wp_get_object_terms( $gallery->id, 'ngg_tag', 'fields=names' );
 				if ( is_array( $tags ) ) {
-					$tags = implode( ', ', $item->tags );
+					$tags = implode( ', ', $tags );
 				}
 
 				return '<textarea placeholder="' . __( "Separated by commas",
-					'nggallery' ) . '" name="tags[' . $item->id . ']" style="width:95%;" rows="2">' . $tags . '</textarea>';
+					'nggallery' ) . '" name="tags[' . $gallery->id . ']" style="width:95%;" rows="2">' . $tags . '</textarea>';
 			case 'exclude':
-				return '<input name="exclude[' . $item->id . ']" type="checkbox" value="1" ' . checked( $item->exclude, true, false ) . '/>';
+				return '<input name="exclude[' . $gallery->id . ']" type="checkbox" value="1" ' . checked( $gallery->exclude, true, false ) . '/>';
 			default:
 				ob_start();
 				//The old action needs a pid.
-				do_action( 'ngg_manage_image_custom_column', $column_name, $item->id );
+				do_action( 'ngg_manage_image_custom_column', $column_name, $gallery->id );
 
 				//We pass the whole object to new action.
-				do_action( 'ncg_manage_image_custom_column', $column_name, $item );
+				do_action( 'ncg_manage_image_custom_column', $column_name, $gallery );
 
 				return ob_get_clean();
 		}
@@ -280,7 +286,7 @@ class Image_List_Table extends \WP_List_Table {
 		$url = $this->base . '&mode=image&gid=' .  $_GET['gid'] . $paged;
 
 		$actions = array(
-			'view'         => '<a class="shutter" href="' . esc_url( $this->gallery->image_url($item) ) . '" title="' . esc_attr( sprintf( __( 'View "%s"' ),
+			'view'         => '<a class="shutter" href="' . esc_url( $item->url ) . '" title="' . esc_attr( sprintf( __( 'View "%s"' ),
 					sanitize_title( $item->filename ) ) ) . '">' . __( 'View', 'nggallery' ) . '</a>',
 			'meta'         => '<a class="ngg-dialog" data-action="show_meta" data-id="' . $item->id . '" href="#" title="' . __( 'Show Meta data',
 					'nggallery' ) . '">' . __( 'Meta', 'nggallery' ) . '</a>',
@@ -289,7 +295,7 @@ class Image_List_Table extends \WP_List_Table {
 			'rotate'       => '<a class="ngg-dialog" data-action="rotate" data-id="' . $item->id . '" href="#" title="' . __( 'Rotate',
 					'nggallery' ) . '">' . __( 'Rotate', 'nggallery' ) . '</a>',
 		);
-		if ( file_exists( $this->gallery->image_path($item) . '_backup' ) ) {
+		if ( file_exists( $item->path . '_backup' ) ) {
 			$actions['recover'] = '<a class="confirm_recover" href="' . wp_nonce_url( $url . "&action=recover&pid=" . $item->id, 'ngg_row_action' ) .
 			                      '" data-file="' . esc_attr($item->filename) . '">' .
 			                      __( 'Recover', 'nggallery' ) . '</a>';

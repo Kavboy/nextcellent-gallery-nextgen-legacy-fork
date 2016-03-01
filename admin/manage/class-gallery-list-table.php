@@ -2,6 +2,8 @@
 
 namespace NextCellent\Admin\Manage;
 
+use NextCellent\Models\Gallery;
+
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
@@ -32,11 +34,6 @@ class Gallery_List_Table extends \WP_List_Table {
 	 */
 	public function prepare_items() {
 
-		/**
-		 * @global $nggdb \nggdb
-		 */
-		global $nggdb;
-
 		$columns  = $this->get_columns();
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
@@ -65,19 +62,14 @@ class Gallery_List_Table extends \WP_List_Table {
 		}
 
 		$start       = ( $currentPage - 1 ) * $perPage;
-		$this->items = $nggdb->find_all_galleries( $order_by, $order, true, $perPage, $start, true );
+		$this->items = Gallery::all($order_by, $order, $start, $perPage, true);
 
-		$totalItems = (int) $nggdb->count_galleries();
+		$totalItems = Gallery::count();
 
 		$this->set_pagination_args( array(
 			'total_items' => $totalItems,
 			'per_page'    => $perPage
 		) );
-
-		/**
-		 * Sort the items/
-		 */
-		usort( $this->items, array( $this, 'sort' ) );
 	}
 
 	/**
@@ -90,26 +82,33 @@ class Gallery_List_Table extends \WP_List_Table {
 	/**
 	 * The checkbox column.
 	 *
-	 * @param object $item
+	 * @param Gallery $gallery
 	 *
 	 * @return string
 	 */
-	protected function column_cb( $item ) {
-		if ( \nggAdmin::can_manage_this_gallery( $item->author ) ) {
-			return '<input name="doaction[]" type="checkbox" value="' . $item->gid . '" />';
+	protected function column_cb( $gallery ) {
+		if ( \nggAdmin::can_manage_this_gallery( $gallery->author ) ) {
+			return '<input name="doaction[]" type="checkbox" value="' . $gallery->id . '" />';
 		} else {
 			return "";
 		}
 	}
 
-	protected function column_title( $item ) {
-		if ( \nggAdmin::can_manage_this_gallery( $item->author ) ) {
-			$out = '<a href="' . wp_nonce_url( $this->base . '&mode=image&gid=' . $item->gid,
+	/**
+	 * The title column.
+	 *
+	 * @param Gallery $gallery
+	 *
+	 * @return string
+	 */
+	protected function column_title( $gallery ) {
+		if ( \nggAdmin::can_manage_this_gallery( $gallery->author ) ) {
+			$out = '<a href="' . wp_nonce_url( $this->base . '&mode=image&gid=' . $gallery->id,
 					'ngg_editgallery' ) . '" class="edit" title="' . __( 'Edit' ) . '">';
-			$out .= esc_html( $item->title );
+			$out .= esc_html( $gallery->title );
 			$out .= "</a>";
 		} else {
-			$out = esc_html( $item->title );
+			$out = esc_html( $gallery->title );
 		}
 		$out .= '<div class="row-actions"></div>';
 
@@ -119,27 +118,27 @@ class Gallery_List_Table extends \WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table
 	 *
-	 * @param  \nggGallery $item    Data
+	 * @param  Gallery $gallery
 	 * @param  String $column_name - Current column name
 	 *
 	 * @return Mixed
 	 */
-	protected function column_default( $item, $column_name ) {
+	protected function column_default( $gallery, $column_name ) {
 		switch ( $column_name ) {
 			case 'id':
-				return $item->gid;
+				return $gallery->id;
 			case 'description':
-				return $item->galdesc;
+				return $gallery->description;
 			case 'author':
-				$author = get_userdata( (int) $item->author );
+				$author = get_userdata( (int) $gallery->author );
 				return $author->display_name;
 			case 'page_id':
-				return $item->pageid;
+				return $gallery->page_id;
 			case 'quantity':
-				return $item->counter;
+				return $gallery->count_images();
 			default:
 				ob_start();
-				do_action( 'ngg_manage_gallery_custom_column', $column_name, $item->gid );
+				do_action( 'ngg_manage_gallery_custom_column', $column_name, $gallery->id );
 
 				return ob_get_clean();
 		}
@@ -186,26 +185,6 @@ class Gallery_List_Table extends \WP_List_Table {
 			'title'  => array( 'title', false ),
 			'author' => array( 'author', false )
 		);
-	}
-
-	private function sort( $a, $b ) {
-
-		if ( isset( $_GET['orderby'] ) && $_GET['orderby'] === 'title' ) {
-			$result = strnatcmp( $a->title, $b->title );
-		} else {
-			if ( isset( $_GET['orderby'] ) ) {
-				$orderby = $_GET['orderby'];
-			} else {
-				$orderby = 'gid';
-			}
-			$result = $a->{$orderby} - $b->{$orderby};
-		}
-
-		if ( ! isset( $_GET['order'] ) || $_GET['order'] === 'asc' ) {
-			return $result;
-		} else {
-			return - $result;
-		}
 	}
 
 	protected function get_bulk_actions() {

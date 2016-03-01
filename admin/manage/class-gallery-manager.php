@@ -128,8 +128,7 @@ class Gallery_Manager extends Abstract_Manager {
 	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function add_help( $screen ) {
-		add_filter( 'manage_' . $screen->id . '_columns',
-			array( 'Gallery_List_Table', 'get_columns_static' ), 0 );
+		add_filter( 'manage_' . $screen->id . '_columns', array( __NAMESPACE__ . '\\Gallery_List_Table', 'get_columns_static' ), 0 );
 		$args = array(
 			'label'   => __( 'Galleries', 'nggallery' ),
 			'default' => 25,

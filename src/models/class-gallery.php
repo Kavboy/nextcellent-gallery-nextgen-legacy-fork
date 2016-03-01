@@ -40,6 +40,11 @@ class Gallery extends Model {
 	private $image_map = array();
 
 	/**
+	 * @var null|int The total number of images in this gallery.
+	 */
+	private $image_count = null;
+
+	/**
 	 * Count all galleries.
 	 *
 	 * @return int The number of galleries.
@@ -103,34 +108,18 @@ class Gallery extends Model {
 	 * @return int The number of images, inclusive the excluded ones.
 	 */
 	public function count_images() {
-		$manager = Manager::get();
 
-		return $manager->get_int(
-			'SELECT COUNT(*) FROM ' . $manager->get_image_table() . ' WHERE ' . Image::GALLERY_ID . ' = %d',
-			array($this->id)
-		);
-	}
+		if($this->image_count === null) {
+			$manager = Manager::get();
 
-	/**
-	 * Get an URL to an image.
-	 *
-	 * @param Image $image The image.
-	 *
-	 * @return string The URL.
-	 */
-	public function image_url($image) {
-		return site_url() . '/' . $this->path . '/' . $image->filename;
-	}
+			$this->image_count = $manager->get_int(
+				'SELECT COUNT(*) FROM ' . $manager->get_image_table() . ' WHERE ' . Image::GALLERY_ID . ' = %d',
+				array($this->id)
+			);
+		}
 
-	/**
-	 * Get the path to an image.
-	 *
-	 * @param Image $image
-	 *
-	 * @return string The path.
-	 */
-	public function image_path($image) {
-		return WINABSPATH . $this->path . '/' . $image->filename;
+		return $this->image_count;
+
 	}
 
 	/**
@@ -185,8 +174,6 @@ class Gallery extends Model {
 			$exclude_sql = '';
 		}
 
-		//var_dump('SELECT * FROM ' . $this->manager->get_image_table() . ' WHERE ' . Image::GALLERY_ID . ' = %d' . $exclude_sql . $order_by . $limit);
-
 		$manager = Manager::get();
 		$ids = $manager->get_results(
 			'SELECT * FROM ' . $manager->get_image_table() . ' WHERE ' . Image::GALLERY_ID . ' = %d' . $exclude_sql . $order_by . $limit,
@@ -194,9 +181,74 @@ class Gallery extends Model {
 		);
 
 		foreach ( $ids as $id ) {
+			$id[Gallery::PATH] = $this->path;
 			/** @noinspection PhpInternalEntityUsedInspection */
 			$this->image_map[$id[Image::ID]] = Image::to_image($id);
 		}
+	}
+
+	/**
+	 * Get all galleries.
+	 *
+	 * @param string $sort
+	 * @param string $sort_dir
+	 * @param int $start
+	 * @param int $per_page
+	 * @param bool $count_images
+	 *
+	 * @return array
+	 */
+	public static function all($sort = Gallery::ID, $sort_dir = 'ASC', $start = 0, $per_page = 0, $count_images = false ) {
+
+		$sort_orders = array(
+			Gallery::ID,
+			Gallery::TITLE,
+			Gallery::AUTHOR,
+		);
+
+		if(!in_array($sort, $sort_orders)) {
+			$sort = Gallery::ID;
+		}
+
+		$order_dir = ( $sort_dir === 'DESC') ? 'DESC' : 'ASC';
+
+		$order_by = " ORDER BY {$sort} {$order_dir}";
+
+		$start = absint($start);
+
+		if($per_page > 0) {
+			$limit = " LIMIT {$start},{$per_page}";
+		} else {
+			$limit = '';
+		}
+
+		$manager = Manager::get();
+
+		$ids = $manager->get_results( 'SELECT * FROM ' . $manager->get_gallery_table() . $order_by . $limit);
+
+		$galleries = array();
+		$gallery_ids = array();
+
+		foreach ( $ids as $id ) {
+			$galleries[$id[Gallery::ID]] = Gallery::to_gallery($id);
+			array_push($gallery_ids, $id[Gallery::ID]);
+		}
+
+		if($count_images) {
+			$id_string = join(',', $gallery_ids);
+			$results = $manager->get_results(
+				'SELECT COUNT(*) FROM ' . $manager->get_image_table() . ' WHERE '. Image::GALLERY_ID . ' IN (' . $id_string . ') GROUP BY ' . Image::GALLERY_ID
+			);
+
+			$counter = 0;
+
+			foreach($gallery_ids as $gallery_id) {
+				$galleries[$gallery_id]->image_count = (int)$results[$counter]["COUNT(*)"];
+				$counter++;
+			}
+		}
+
+		return $galleries;
 	}
 
 	/**

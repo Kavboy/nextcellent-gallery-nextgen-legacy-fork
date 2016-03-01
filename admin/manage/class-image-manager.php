@@ -72,7 +72,7 @@ class Image_Manager extends Abstract_Image_Manager {
 			</form>
 			<!-- TODO Add a search inside a gallery form -->
 			<form id="update_images" class="nggform" method="post" action="<?php echo $this->get_full_url() . '&mode=image&gid=' . $this->id . '&paged=' . $page; ?>" accept-charset="utf-8">
-				<?php wp_nonce_field( 'ngg-update-images', '_ngg_nonce_images' ); var_dump("OK"); ?>
+				<?php wp_nonce_field( 'ngg-update-images', '_ngg_nonce_images' ); ?>
 				<input type="hidden" id="page_type" name="page_type" value="image">
 				<?php $table->display(); ?>
 			</form>
@@ -407,8 +407,7 @@ class Image_Manager extends Abstract_Image_Manager {
 	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function add_help( $screen ) {
-		add_filter( 'manage_' . $screen->id . '_columns',
-			array( 'Image_List_Table', 'get_columns_static' ), 0 );
+		add_filter( 'manage_' . $screen->id . '_columns', array( __NAMESPACE__ . '\\Image_List_Table', 'get_columns_static' ), 0 );
 		$args = array(
 			'label'   => __( 'Images', 'nggallery' ),
 			'default' => 50,
