@@ -9,9 +9,10 @@ use NextCellent\Admin\Manage\Sort_Manager;
 use NextCellent\Admin\Settings\Settings_Page;
 
 /**
- * Launcher - Admin Section for NextGEN Gallery
- *
- * @since   1.9.30
+ * This is the general manager for admin pages of NextCellent.
+ * This class registers the menu's and loads the correct page.
+ * There are also some helper functions to work with the
+ * NextCellent admin page names.
  */
 class Launcher {
 
@@ -27,11 +28,8 @@ class Launcher {
 	 */
 	private $page;
 
-	/**
-	 * @param string $slug The base slug for the admin pages URL.
-	 */
-	public function __construct($slug) {
-		$this->base_slug = $slug;
+	public function __construct() {
+		$this->base_slug = \NCG::ADMIN_BASE;
 	}
 
 	/**
@@ -116,8 +114,12 @@ class Launcher {
 	 *
 	 * @return string A slug.
 	 */
-	private function sluggify($page) {
-		return $this->base_slug . '-' . $page;
+	public static function sluggify($page) {
+		if($page == '') {
+			return \NCG::ADMIN_BASE;
+		} else {
+			return \NCG::ADMIN_BASE . '-' . $page;
+		}
 	}
 
 	/**
@@ -127,8 +129,32 @@ class Launcher {
 	 *
 	 * @return string Unslugged name.
 	 */
-	private function unslug($page) {
-		return str_replace($this->base_slug . '-', '', $page);
+	public static function unsluggify($page) {
+		return str_replace(\NCG::ADMIN_BASE . '-', '', $page);
+	}
+
+	/**
+	 * Get the relative URL to a page given it's name.
+	 *
+	 * Note: this works with normal admin pages only - not for the WordPress Network setup.
+	 *
+	 * @param string $page_name The name of the page.
+	 *
+	 * @return string The URL.
+	 */
+	public static function get_url($page_name) {
+		return admin_url('admin.php?page=' . self::sluggify($page_name));
+	}
+
+	/**
+	 * Get the escaped relative URL to a page given it's name.
+	 *
+	 * @param string $page_name The name of the page.
+	 *
+	 * @return string The URL.
+	 */
+	public static function esc_get_url($page_name) {
+		return esc_url(self::get_url($page_name));
 	}
 
 	/**
@@ -177,34 +203,34 @@ class Launcher {
 
 		$i18n = strtolower( __( 'Galleries', 'nggallery' ) );
 
-		$slug = $this->unslug(str_replace("{$i18n}_page_" , '', $current_screen->id));
+		$slug = $this->unsluggify(str_replace("{$i18n}_page_" , '', $current_screen->id));
 
 		switch ( $slug ) {
 			case "add-gallery" :
 				require_once( __DIR__ . '/functions.php' );
-				$this->page = new Upload_Page($this->base_slug);
+				$this->page = new Upload_Page();
 				break;
 			case "manage":
 				require_once( __DIR__ . '/functions.php' );
 				$this->page = $this->get_manager();
 				break;
 			case "manage-album" :
-				$this->page = new Album_Manager($this->base_slug);
+				$this->page = new Album_Manager();
 				break;
 			case "options" :
-				$this->page = new Settings_Page($this->base_slug);
+				$this->page = new Settings_Page();
 				break;
 			case "tags" :
-				$this->page = new Tag_Manager($this->base_slug);
+				$this->page = new Tag_Manager();
 				break;
 			case "style" :
-				$this->page = new Style_Page($this->base_slug);
+				$this->page = new Style_Page();
 				break;
 			case "roles" :
-				$this->page = new Roles($this->base_slug);
+				$this->page = new Roles();
 				break;
 			case "toplevel_page_" . $this->base_slug:
-				$this->page = new Overview_Page($this->base_slug);
+				$this->page = new Overview_Page();
 				break;
 			default: //Not our page
 				$this->page = null;

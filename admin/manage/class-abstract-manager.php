@@ -11,6 +11,8 @@ use NextCellent\Admin\Admin_Page;
  */
 abstract class Abstract_Manager extends Admin_Page {
 
+	const NAME = 'manage';
+
 	/**
 	 * Subclasses should override this method, but must call the parent function.
 	 */
@@ -554,6 +556,6 @@ abstract class Abstract_Manager extends Admin_Page {
 	}
 
 	public function get_name() {
-		return 'manage';
+		return self::NAME;
 	}
 }

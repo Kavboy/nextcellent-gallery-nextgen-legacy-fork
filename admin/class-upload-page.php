@@ -11,6 +11,8 @@ namespace NextCellent\Admin;
  */
 class Upload_Page extends Post_Admin_Page {
 
+	const NAME = 'add-gallery';
+
 	/**
 	 * Perform the upload and add a new hook for plugins
 	 *
@@ -651,6 +653,6 @@ class Upload_Page extends Post_Admin_Page {
 	 * @return string The name.
 	 */
 	public function get_name() {
-		return 'add-gallery';
+		return self::NAME;
 	}
 }

@@ -10,14 +10,6 @@ namespace NextCellent\Admin;
 abstract class Post_Admin_Page extends Admin_Page {
 
 	/**
-	 * @param string $slug The slug for this page. It is recommended you pass this parameter.
-	 *                     For example, with slug 'nextcellent', the page is 'nextcellent-[NAME]'.
-	 */
-	public function __construct($slug) {
-		parent::__construct($slug);
-	}
-
-	/**
 	 * Display the page. Child classes should override this method.
 	 */
 	public function display() {

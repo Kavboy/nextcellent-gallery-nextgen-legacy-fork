@@ -4,6 +4,8 @@ namespace NextCellent\Admin;
 
 class Album_Manager extends Admin_Page {
 
+	const NAME = 'manage-album';
+
 	/**
 	 * The selected album ID.
 	 *
@@ -652,6 +654,6 @@ class Album_Manager extends Admin_Page {
 	 * @return string The name.
 	 */
 	public function get_name() {
-		return 'album';
+		return self::NAME;
 	}
 }

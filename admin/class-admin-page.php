@@ -8,26 +8,6 @@ namespace NextCellent\Admin;
 abstract class Admin_Page {
 
 	/**
-	 * @var string The base slug of the admin page.
-	 */
-	protected $slug;
-
-	/**
-	 * @param string $slug The slug for this page. It is recommended you pass this parameter.
-	 *                     For example, with slug 'nextcellent', the page is 'nextcellent-[NAME]'.
-	 */
-	public function __construct($slug = null) {
-
-		//This is only a fallback; you should pass the slug yourself.
-		if($slug == null) {
-			global $ngg;
-			$this->slug = $ngg::ADMIN_BASE;
-		} else {
-			$this->slug = $slug;
-		}
-	}
-
-	/**
 	 * Display the page.
 	 */
 	public abstract function display();
@@ -64,19 +44,21 @@ abstract class Admin_Page {
 
 	/**
 	 * Get the full page name of this page, e.g. 'nextcellent-manage'.
+	 *
+	 * @return string
 	 */
 	public function get_full_name() {
-		return $this->slug . '-' . $this->get_name();
+		return Launcher::sluggify($this->get_name());
 	}
 
 	/**
 	 * Returns a full relative URL to this page. Intended use is for forms and the like.
 	 *
-	 * @example 'admin.php?page=nextcellent-add-gallery'.
-	 *
+	 * @example  'admin.php?page=nextcellent-add-gallery'.
 	 * @return string The URL.
+	 *
 	 */
 	public function get_full_url() {
-		return 'admin.php?page=' . $this->get_full_name();
+		return Launcher::get_url($this->get_name());
 	}
 }

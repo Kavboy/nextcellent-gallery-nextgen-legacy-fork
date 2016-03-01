@@ -280,8 +280,7 @@ add_action('wp_ajax_ngg_dashboard', 'ngg_ajax_dashboard');
 
 function ngg_ajax_dashboard() {
 
-   	require_once( dirname( dirname( __FILE__ ) ) . '/admin/class-launcher.php' );
-	require_once( dirname( dirname( __FILE__ ) ) . '/admin/class-overview-page.php' );
+	require(__DIR__ . '/autoloader.php' );
 
    	if ( !current_user_can('NextGEN Gallery overview') )
 		die('-1');
@@ -290,15 +289,13 @@ function ngg_ajax_dashboard() {
     @header( 'X-Content-Type-Options: nosniff' );
 
     switch ( $_GET['jax'] ) {
+	    case 'ncg_dashboard_primary' :
+		    \NextCellent\Admin\Overview_Page::ngg_overview_news();
+	        break;
 
-    case 'dashboard_primary' :
-    	NGG_Overview::ngg_overview_news();
-    	break;
-
-    case 'dashboard_plugins' :
-    	NGG_Overview::ngg_related_plugins();
-    	break;
-
+	    case 'ncg_dashboard_plugins' :
+	        \NextCellent\Admin\Overview_Page::ngg_related_plugins();
+	        break;
     }
     die();
 }
@@ -474,37 +471,3 @@ function ngg_ajax_image_check() {
 
     die();
 }
-
-add_action('wp_ajax_ngg_test_head_footer', 'ngg_ajax_test_head_footer');
-/**
- * Check for the header / footer, parts taken from Matt Martz (http://sivel.net/)
- *
- * @see https://gist.github.com/378450
- * @since 1.7.3
- * @return result
- */
-function ngg_ajax_test_head_footer() {
-
-	// Build the url to call, NOTE: uses home_url and thus requires WordPress 3.0
-	$url = add_query_arg( array( 'test-head' => '', 'test-footer' => '' ), home_url() );
-	// Perform the HTTP GET ignoring SSL errors
-	$response = wp_remote_get( $url, array( 'sslverify' => false ) );
-	// Grab the response code and make sure the request was sucessful
-	$code = (int) wp_remote_retrieve_response_code( $response );
-	if ( $code == 200 ) {
-		global $head_footer_errors;
-		$head_footer_errors = array();
-
-		// Strip all tabs, line feeds, carriage returns and spaces
-		$html = preg_replace( '/[\t\r\n\s]/', '', wp_remote_retrieve_body( $response ) );
-
-		// Check to see if we found the existence of wp_head
-		if ( ! strstr( $html, '<!--wp_head-->' ) )
-			die('Missing the call to wp_head() in your theme, contact the theme author');
-		// Check to see if we found the existence of wp_footer
-		if ( ! strstr( $html, '<!--wp_footer-->' ) )
-			die('Missing the call to wp_footer() in your theme, contact the theme author');
-	}
-    die('success');
-}
-?>

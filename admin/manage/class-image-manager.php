@@ -23,7 +23,6 @@ class Image_Manager extends Abstract_Image_Manager {
 	 *                     For example, with slug 'nextcellent', the page is 'nextcellent-[NAME]'.
 	 */
 	public function __construct($slug) {
-		parent::__construct($slug);
 		$this->id = (int) $_GET['gid'];
 	}
 

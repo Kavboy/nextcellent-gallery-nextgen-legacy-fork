@@ -2,47 +2,47 @@
 
 namespace NextCellent\Admin;
 
+use NextCellent\Admin\Manage\Abstract_Manager;
+use NextCellent\Models\Gallery;
+use NextCellent\Models\Image;
+
 /**
  * Class to display the overview.
  * @since 1.9.24
  */
 class Overview_Page extends Admin_Page {
 
+	const NAME = "";
+
 	/**
-	 * @param string $slug The slug for this page. It is recommended you pass this parameter.
-	 *                     For example, with slug 'nextcellent', the page is 'nextcellent-[NAME]'.
+	 * Set up the metaboxes.
 	 */
-	public function __construct($slug) {
+	public function __construct() {
 
-		parent::__construct($slug);
+		add_meta_box( 'overview', __( 'At a Glance', 'nggallery' ), array( $this, 'stats' ), 'ngg_overview', 'normal', 'core' );
 
-		add_meta_box( 'overview', __( 'At a Glance', 'nggallery' ), array(
-			$this,
-			'stats'
-		), 'ngg_overview', 'normal', 'core' );
-		add_meta_box( 'ngg_meta_box', __( 'Help me help YOU!', 'nggallery' ), array(
-			$this,
-			'like_this'
-		), 'ngg_overview', 'side', 'core' );
-		add_meta_box( 'dashboard_primary', __( 'Latest News', 'nggallery' ), array(
-			$this,
-			'js_loading'
-		), 'ngg_overview', 'normal', 'core' );
+		add_meta_box( 'ngg_meta_box', __( 'Help me help YOU!', 'nggallery' ), array( $this, 'like_this' ), 'ngg_overview', 'side', 'core' );
+
+		add_meta_box( 'ncg_dashboard_primary', __( 'Latest News', 'nggallery' ), array( $this, 'js_loading' ), 'ngg_overview', 'normal', 'core' );
+
 		if ( ! is_multisite() || is_super_admin() ) {
-			add_meta_box( 'ngg_plugin_check', __( 'Plugin Check', 'nggallery' ), array(
+			add_meta_box( 'ngg_plugin_check', __( 'Image test', 'nggallery' ), array(
 				$this,
 				'ngg_plugin_check'
 			), 'ngg_overview', 'side', 'core' );
+
 			add_meta_box( 'ngg_server', __( 'Server Settings', 'nggallery' ), array(
 				$this,
 				'ngg_overview_server'
 			), 'ngg_overview', 'side', 'core' );
-			add_meta_box( 'dashboard_plugins', __( 'Related plugins', 'nggallery' ), array(
+
+			add_meta_box( 'ncg_dashboard_plugins', __( 'Related plugins', 'nggallery' ), array(
 				$this,
 				'js_loading'
 			), 'ngg_overview', 'normal', 'core' );
 		}
-		add_meta_box( 'dashboard_contributors', __( 'Contributors', 'nggallery' ), array( $this, 'contributors' ), 'ngg_overview', 'normal', 'core' );
+
+		add_meta_box( 'ncg_dashboard_contributors', __( 'Contributors', 'nggallery' ), array( $this, 'contributors' ), 'ngg_overview', 'normal', 'core' );
 	}
 
 
@@ -62,43 +62,48 @@ class Overview_Page extends Admin_Page {
 	public function stats() {
 		global $wpdb;
 		//TODO: Move to database.
-		$images    = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->nggpictures" ) );
-		$galleries = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->nggallery" ) );
+		$images    = Image::count();
+		$image_url = Launcher::esc_get_url(Upload_Page::NAME);
+
+		$galleries = Gallery::count();
+		$manage_url = Launcher::esc_get_url(Abstract_Manager::NAME);
+
 		$albums    = intval( $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->nggalbum" ) );
+		$album_url = Launcher::esc_get_url(Album_Manager::NAME);
 		?>
 		<div id="overview_right_now" class="main">
 			<p><?php _e( 'Here you can control your images, galleries and albums.', 'nggallery' ) ?></p>
 			<ul>
-				<li class="image-count"><a href="admin.php?page=nggallery-add-gallery">
+				<li class="image-count"><a href="<?php echo $image_url ?>">
 					<?php echo $images . ' ' . _n( 'Image', 'Images', $images, 'nggallery' ); ?></a>
 				</li>
-				<li class="gallery-count"><a href="admin.php?page=nggallery-manage">
+				<li class="gallery-count"><a href="<?php echo $manage_url ?>">
 					<?php echo $galleries . ' ' . _n( 'Gallery', 'Galleries', $galleries, 'nggallery' ); ?></a>
 				</li>
-				<li class="album-count"><a href="admin.php?page=nggallery-manage-album">
+				<li class="album-count"><a href="<?php echo $album_url ?>">
 					<?php echo $albums . ' ' . _n( 'Album', 'Albums', $albums, 'nggallery' ); ?></a>
 				</li>
 			</ul>
 		</div>
 		<?php if ( current_user_can( 'NextGEN Upload images' ) ) {
-			echo '<a class="button button-primary" href="admin.php?page=nggallery-add-gallery">' . __( 'Add new pictures', 'nggallery' ) . '</a>';
+			echo '<a class="button button-primary" href="' . $image_url . '">' . __( 'Add new pictures', 'nggallery' ) . '</a>';
 		}
 		if ( is_multisite() ) {
-			$this->ngg_dashboard_quota();
+			$this->ngg_dashboard_quota($manage_url);
 		}
 	}
 
 	/**
 	 * Output the quote used.
 	 */
-	private function ngg_dashboard_quota() {
+	private function ngg_dashboard_quota($url) {
 
 		if ( get_site_option( 'upload_space_check_disabled' || ! wpmu_enable_function( 'wpmuQuotaCheck' ) ) ) {
 			return;
 		}
 
 		$quota = get_space_allowed();
-		$used  = get_dirsize( BLOGUPLOADDIR ) / 1024 / 1024;
+		$used  = get_space_used();
 
 		if ( $used > $quota ) {
 			$percent_used = '100';
@@ -122,11 +127,11 @@ class Overview_Page extends Admin_Page {
 		<table>
 			<tr>
 				<td><?php _e( 'Allowed' ); ?></td>
-				<td><?php printf( __( '<a href="%1$s" title="Manage Uploads">%2$s MB</a>' ), esc_url( admin_url( 'admin.php?page=nggallery-manage' ) ), $quota ); ?></td>
+				<td><?php printf( __( '<a href="%1$s" title="Manage Uploads">%2$s MB</a>' ), $url, $quota ); ?></td>
 			</tr>
 			<tr>
 				<td class="<?php echo $used_color; ?>"><?php _e( 'Used' ); ?></td>
-				<td><?php printf( __( '<a href="%1$s" title="Manage Uploads">%2$s MB (%3$s%%)</a>' ), esc_url( admin_url( 'admin.php?page=nggallery-manage' ) ), $used, $percent_used ); ?></td>
+				<td><?php printf( __( '<a href="%1$s" title="Manage Uploads">%2$s MB (%3$s%%)</a>' ), $url, $used, $percent_used ); ?></td>
 			</tr>
 		</table>
 	<?php
@@ -196,65 +201,27 @@ class Overview_Page extends Admin_Page {
 	 */
 	public function ngg_plugin_check() {
 
-		global $ngg;
 		?>
 		<script type="text/javascript">
 			(function ($) {
 				nggPluginCheck = {
 
 					settings: {
-						img_run:  '<img src="<?php echo esc_url( admin_url( 'images/spinner.gif' ) ); ?>" class="icon" alt="started"/>',
 						img_ok: '<img src="<?php echo esc_url( admin_url( 'images/yes.png' ) ); ?>" class="icon" alt="ok"/>',
 						img_fail: '<img src="<?php echo esc_url( admin_url( 'images/no.png' ) ); ?>" class="icon" alt="failed" />',
-						domain: '<?php echo esc_url( home_url('index.php', is_ssl() ? 'https' : 'http') ); ?>'
+						domain: '<?php echo esc_url( home_url('index.php') ); ?>'
 					},
 
-					run: function (index, state) {
-						ul = $('#plugin_check');
+					run: function() {
+						field = '#check';
+						spinner = $('#check').find('.spinner');
 						s = this.settings;
-						var step = 1;
-						switch (index) {
-							case 1:
-								this.check1();
-								break;
-							case 2:
-								this.check2(step);
-								break;
-							case 3:
-								this.check3();
-								break;
-						}
-					},
-
-					// this function check if the json API will work with your theme & plugins
-					check1: function () {
-						this.start(1);
-						var req = $.ajax({
-							dataType: 'json',
-							url: s.domain,
-							data: 'callback=json&format=json&method=version',
-							cache: false,
-							timeout: 10000,
-							success: function (msg) {
-								if (msg.version == '<?php echo $ngg::VERSION; ?>')
-									nggPluginCheck.success(1);
-								else
-									nggPluginCheck.failed(1);
-							},
-							error: function (msg) {
-								nggPluginCheck.failed(1);
-							},
-							complete: function () {
-								nggPluginCheck.run(2);
-							}
-						});
-
+						nggPluginCheck.start();
+						this.check(1);
 					},
 
 					// this function check if GD lib can create images & thumbnails
-					check2: function (step) {
-						if (step == 1) this.start(2);
-						var stop = false;
+					check: function (step) {
 						var req = $.ajax({
 							type: "POST",
 							url: ajaxurl,
@@ -263,126 +230,71 @@ class Overview_Page extends Admin_Page {
 							timeout: 10000,
 							success: function (msg) {
 								if (msg.stat == 'ok') {
-									nggPluginCheck.success(2, msg.message);
+									nggPluginCheck.successMessage(msg.message);
+									step++;
+									if (step <= 11) {
+										nggPluginCheck.check(step);
+									} else {
+										nggPluginCheck.success();
+									}
 								} else {
-									if (step == 1)
-										nggPluginCheck.failed(2);
-									stop = true;
+									nggPluginCheck.failed();
 								}
 
 							},
-							error: function (msg) {
-								if (step == 1)
-									nggPluginCheck.failed(2);
-								stop = true;
-							},
-							complete: function () {
-								step++;
-								if (step <= 11 && stop == false)
-									nggPluginCheck.check2(step);
-								else
-									nggPluginCheck.run(3);
+							error: function(msg) {
+								nggPluginCheck.failed(msg);
 							}
 						});
 					},
 
-					// this function check if wp_head / wp_footer is avaiable
-					check3: function () {
-						this.start(3);
-						var req = $.ajax({
-							type: "POST",
-							url: ajaxurl,
-							data: "action=ngg_test_head_footer",
-							cache: false,
-							timeout: 10000,
-							success: function (msg) {
-								if (msg == 'success')
-									nggPluginCheck.success(3);
-								else
-									nggPluginCheck.failed(3, msg);
-							},
-							error: function (msg) {
-								nggPluginCheck.failed(3);
-							}
-						});
-					},
-
-					start: function (id) {
+					start: function() {
 
 						s = this.settings;
-						var field = "#check" + id;
 
-						if (ul.find(field + " img").length == 0)
-							$(field).prepend(s.img_run);
-						else
-							$(field + " img").replaceWith(s.img_run);
+						spinner.addClass('is-active');
 
-						$(field + " .success").hide();
-						$(field + " .failed").hide();
-						$(field + " .default").replaceWith('<p class="default message"><?php echo esc_js( __('Running...', 'nggallery') ); ?></p> ');
+						$(field + " .general").html('<?php echo esc_js( __('Running...', 'nggallery') ); ?>');
 					},
 
-					success: function (id, msg) {
-
+					success: function() {
 						s = this.settings;
-						var field = "#check" + id;
 
-						if (ul.find(field + " img").length == 0)
-							$(field).prepend(s.img_ok);
-						else
-							$(field + " img").replaceWith(s.img_ok);
+						spinner.removeClass('is-active');
+						$(field).prepend(s.img_ok);
 
-						$(field + " .default").hide();
-						if (msg)
-							$(field + " .success").replaceWith('<p class="success message">' + msg + ' </p> ');
-						else
-							$(field + " .success").show();
-
+						nggPluginCheck.successMessage("Test passed.");
 					},
 
-					failed: function (id, msg) {
+					successMessage: function(msg) {
+						$(field + " .general").html(msg);
+					},
+
+					failed: function(msg) {
 
 						s = this.settings;
-						var field = "#check" + id;
 
-						if (ul.find(field + " img").length == 0)
-							$(field).prepend(s.img_fail);
-						else
-							$(field + " img").replaceWith(s.img_fail);
+						$(field).prepend(s.img_fail);
+						spinner.removeClass('is-active');
 
-						$(field + " .default").hide();
-						if (msg)
-							$(field + " .failed").replaceWith('<p class="failed message">' + msg + ' </p> ');
-						else
-							$(field + " .failed").show();
+						$(field + " .general").hide();
+						$(field + " .failed").show();
 
+						if (msg) {
+							$(field + " .failed").html(msg);
+						}
 					}
-
 				};
 			})(jQuery);
 		</script>
-		<ul id="plugin_check" class="settings">
-			<li id="check1">
-				<strong><?php _e( 'Check plugin/theme conflict', 'nggallery' ); ?></strong>
-				<p class="default message"><?php _e( 'Not tested', 'nggallery' ); ?></p>
-				<p class="success message" style="display: none;"><?php _e( 'No conflict could be detected', 'nggallery' ); ?></p>
-				<p class="failed message"  style="display: none;"><?php _e( 'Test failed, disable other plugins & switch to default theme', 'nggallery' ); ?></p>
-			</li>
-			<li id="check2">
-				<strong><?php _e( 'Test image function', 'nggallery' ); ?></strong>
-				<p class="default message"><?php _e( 'Not tested', 'nggallery' ); ?></p>
-				<p class="success message" style="display: none;"><?php _e( 'The plugin could create images.', 'nggallery' ); ?></p>
-				<p class="failed message" style="display: none;"><?php _e( 'Could not create image, check your memory limit.', 'nggallery' ); ?></p>
-			</li>
-			<li id="check3">
-				<strong><?php _e( 'Check theme compatibility', 'nggallery' ); ?></strong>
-				<p class="default message"><?php _e( 'Not tested', 'nggallery' ); ?></p>
-				<p class="success message" style="display: none;"><?php _e( 'Your theme should work fine with NextCellent Gallery', 'nggallery' ); ?></p>
-				<p class="failed message" style="display: none;"><?php _e( 'wp_head()/wp_footer() is missing, contact the theme author', 'nggallery' ); ?></p>
-			</li>
-		</ul>
+		<p><?php _e('Test if it can handle images of different sizes.', 'nggallery'); ?></p>
+		<div id="check">
+			<span class="spinner"></span>
+			<p class="general message"><?php _e( 'Not tested', 'nggallery' ); ?></p>
+			<p class="failed message" style="display: none;"><?php _e( 'Could not create image, check your memory limit.', 'nggallery' ); ?></p>
+		</div>
 		<p class="textright">
-			<input type="button" name="update" value="<?php _e( 'Check plugin', 'nggallery' ); ?>" onclick="nggPluginCheck.run(1);" class="button-secondary"/>
+			<input type="button" name="update" value="<?php _e( 'Check plugin', 'nggallery' ); ?>" onclick="nggPluginCheck.run();" class="button-secondary"/>
 		</p>
 	<?php
 	}
@@ -546,7 +458,7 @@ class Overview_Page extends Admin_Page {
 	 * Show the JS loading spinner.
 	 */
 	public function js_loading() {
-		echo '<p class="widget-loading hide-if-no-js"><img style="vertical-align:middle; margin: 5px 10px 5px 5px;" src="' . admin_url( "images/spinner.gif" ) . '"/><span>' . __( 'Loading&#8230;' ) . '</span></p><p class="describe hide-if-js">' . __('This widget requires JavaScript.') . '</p>';
+		echo '<p class="widget-loading hide-if-no-js"><span class="spinner is-active"></span>' . __( 'Loading&#8230;' ) . '</p><p class="describe hide-if-js">' . __('This widget requires JavaScript.') . '</p>';
 	}
 
 	/**
@@ -657,18 +569,17 @@ class Overview_Page extends Admin_Page {
 				$action_links[] = '<a href="' . esc_url( $details_link ) . '" class="thickbox" aria-label="' . esc_attr( sprintf( __( 'More information about %s' ), $name ) ) . '" data-title="' . esc_attr( $name ) . '">' . __( 'More Details' ) . '</a>';
 			}
 
-
 			?>
 			<div class="plugin-card">
 				<div class="plugin-card-top">
 					<div class="name column-name">
-						<h4>
+						<h3>
 						<?php if( is_multisite() ) {
 							echo("<a href='" . esc_url( $details_link ) . "' target='_blank'>" . $title . "</a>");
 						} else {
 							echo("<a href='" . esc_url( $details_link ) . "' class='thickbox'>" . $title . "</a>");
 						} ?>
-						</h4>
+						</h3>
 					</div>
 					<div class="action-links">
 						<?php
@@ -745,7 +656,7 @@ class Overview_Page extends Admin_Page {
 				});
 
 				jQuery( '.install-now' ).click( function() {
-					return confirm( '" . __( "Are you sure you want to install this?", "nggallery" ) . "' );
+					return confirm( '" . <?php echo esc_js(__( "Are you sure you want to install this?", "nggallery" )) ?> . "' );
 				});
 			});
 
@@ -804,22 +715,22 @@ class Overview_Page extends Admin_Page {
 			jQuery(document).ready(function ($) {
 				// These widgets are sometimes populated via ajax
 				ajaxWidgets = [
-					'dashboard_primary',
-					'dashboard_plugins'
+					'ncg_dashboard_primary',
+					'ncg_dashboard_plugins'
 				];
 
 				ajaxPopulateWidgets = function (el) {
 					show = function (id, i) {
-						var p, e = $('#' + id + ' div.inside:visible').find('.widget-loading');
+						var p, e = $('#' + id + ' div.inside').find('.widget-loading');
+						console.log(e);
 						if (e.length) {
 							p = e.parent();
 							setTimeout(function () {
 								p.load('admin-ajax.php?action=ngg_dashboard&jax=' + id, '', function () {
 									p.hide().slideDown('normal', function () {
 										$(this).css('display', '');
-										if ('dashboard_plugins' == id && $.isFunction(tb_init))
-											tb_init('#dashboard_plugins a.thickbox');
 									});
+									console.log('DONE');
 								});
 							}, i * 500);
 						}
@@ -968,6 +879,6 @@ class Overview_Page extends Admin_Page {
 	 * @return string The name.
 	 */
 	public function get_name() {
-		return "";
+		return self::NAME;
 	}
 }
