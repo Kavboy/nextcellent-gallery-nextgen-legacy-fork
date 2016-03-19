@@ -61,6 +61,14 @@
 	margin-top: 0;
 }
 
+/* Postbox submit */
+#normal-sortables .postbox .normal-submit .submit {
+	background: inherit;
+	border: inherit;
+	float: none;
+	padding: 10px;
+}
+
 .ngg-list {
 	margin-left: 30px;
 	list-style: disc outside;
@@ -403,36 +411,26 @@ div .innerhandle {
 }
 
 .groupItem .item_top {
-	background-color: #2683ae;
-	color: #ffffff;
-	font-weight: bold;
-	line-height: 28px;
-	height: 28px;
-	padding: 0 5px;
-	-moz-border-radius: 3px;
-	-khtml-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
+	line-height: 2.5;
+	padding: 0 10px;
 }
 
-.groupItem .album_obj {
+.groupItem .album_top {
 	background-color: #d54e21;
 }
 
-.groupItem .item_top a {
-	color: #ffffff;
+.groupItem .icon {
+	font-family: dashicons;
 	float: right;
-	text-decoration: none;
-}
-
-.groupItem .item_top a:hover {
-	color: #ffffff;
+	cursor: pointer;
 }
 
 .itemContent {
 	border: 1px solid #dfdfdf;
 	border-top: 0 none;
 	padding: 10px;
+	overflow: auto;
+	cursor: default;
 }
 
 .itemContent p {
@@ -475,9 +473,8 @@ div .innerhandle {
 	width: 315px;
 }
 
-.widget-holder {
-	min-height: 400px;
-	padding-top: 1px;
+.widget-right .groupItem {
+	margin: auto;
 }
 
 .target {

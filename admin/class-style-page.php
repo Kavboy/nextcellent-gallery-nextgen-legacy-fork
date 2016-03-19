@@ -2,7 +2,15 @@
 
 namespace NextCellent\Admin;
 
+/**
+* Class Style_Page
+ * @package NextCellent\Admin
+ *          
+ * @todo Rewrite this to a proper page.
+ */
 class Style_Page extends Post_Admin_Page {
+
+	const NAME = 'style';
 	
 	/**
 	 * Find stylesheets.
@@ -358,6 +366,6 @@ class Style_Page extends Post_Admin_Page {
 	 *
 	 * @return string The name.
 	 */public function get_name() {
-		 return 'style';
+		 return self::NAME;
 	 }
 }

@@ -109,6 +109,13 @@ class nggdb {
         return $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->nggallery" );
     }
 
+    static function count_albums() {
+
+        global $wpdb;
+
+        return $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->nggalbum" );
+    }
+
     /**
      * @param $id int The gallery ID.
      *

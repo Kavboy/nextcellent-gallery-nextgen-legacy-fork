@@ -144,6 +144,8 @@ class nggGallery {
 	*
 	* @param string $key
 	* @return array $options
+	 *               
+	 * @deprecated Use the options from the global $ncg->options instance.
 	*/
 	static function get_option($key) {
         global $post;
@@ -479,24 +481,21 @@ class nggGallery {
 	 * @since 1.5.0
 	 * @param string $capability
 	 * @return bool $result of capability check
+	 *              
+	 * @deprecated Extended capabilities are no longer supported.
 	 */
 	static function current_user_can( $capability ) {
-
-		global $_ngg_capabilites;
-
-		if ( is_array($_ngg_capabilites) )
-			if ( in_array($capability , $_ngg_capabilites) )
-				return current_user_can( $capability );
-
 		return true;
 	}
 
 	/**
-	 * Check for extended capabilites and echo disabled="disabled" for input form
+	 * Check for extended capabilities and echo disabled="disabled" for input form
 	 *
 	 * @since 1.5.0
 	 * @param string $capability
 	 * @return void
+	 * 
+	 * @deprecated Extended capabilities are no longer supported.
 	 */
 	static function current_user_can_form( $capability ) {
 
@@ -511,6 +510,8 @@ class nggGallery {
 	 * @param string $capability
 	 * @param bool $register the new capability automatic to the admin role
 	 * @return void
+	 * 
+	 * @deprecated Extended capabilities are no longer supported.
 	 */
 	static function add_capabilites( $capability , $register = true ) {
 		global $_ngg_capabilites;
@@ -534,6 +535,8 @@ class nggGallery {
      * @since 1.6.0
      * @author Part taken from WPtouch plugin (http://www.bravenewcode.com)
      * @return bool $result of  check
+     *              
+     * @deprecated This function is out of scope for an image manager.
      */
     static function detect_mobile_phone() {
 
@@ -611,10 +614,12 @@ class nggGallery {
      * @since 1.9.0
      *
      * @return void
+     * 
+     * @deprecated This function doesn't do anything anymore: we do not want to print the NextCellent version.
      */
     static function nextgen_version() {
-        global $ngg;
-        echo apply_filters('show_nextgen_version', '<!-- <meta name="NextGEN" version="'. $ngg->version . '" /> -->' . "\n");
+        //global $ngg;
+        //echo apply_filters('show_nextgen_version', '<!-- <meta name="NextGEN" version="'. $ngg->version . '" /> -->' . "\n");
     }
 
     /**

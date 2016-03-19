@@ -1,8 +1,6 @@
 <?php
 
-namespace NextCellent\Admin\Manage;
-
-use NextCellent\Admin\Manage\Abstract_Manager;
+namespace NextCellent\Admin\Manage\Galleries;
 
 /**
  * Class Abstract_Image_Manager

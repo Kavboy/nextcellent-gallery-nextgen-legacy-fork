@@ -2,7 +2,8 @@
 
 namespace NextCellent\Admin;
 
-use NextCellent\Admin\Manage\Abstract_Manager;
+use NextCellent\Admin\Manage\Albums\Album_Manager;
+use NextCellent\Admin\Manage\Galleries\Abstract_Manager;
 use NextCellent\Models\Gallery;
 use NextCellent\Models\Image;
 
@@ -308,7 +309,7 @@ class Overview_Page extends Admin_Page {
 			<div class="ngg-dashboard-widget">
 				<div class="dashboard-widget-content">
 					<ul class="settings">
-						<?php $this->ngg_get_serverinfo(); ?>
+						<?php $this->get_server_info(); ?>
 					</ul>
 					<p><strong><?php _e( 'Graphic Library', 'nggallery' ); ?></strong></p>
 					<ul class="settings">
@@ -330,7 +331,7 @@ class Overview_Page extends Admin_Page {
 			$keys = array_keys( $info );
 			for ( $i = 0; $i < count( $keys ); $i ++ ) {
 				if ( is_bool( $info[ $keys[ $i ] ] ) ) {
-					echo "<li> " . $keys[ $i ] . ": <span>" . $this->ngg_gd_yesNo( $info[ $keys[ $i ] ] ) . "</span></li>\n";
+					echo "<li> " . $keys[ $i ] . ": <span>" . \NextCellent\bool_to_yes_no( $info[ $keys[ $i ] ] ) . "</span></li>\n";
 				} else {
 					echo "<li> " . $keys[ $i ] . ": <span>" . $info[ $keys[ $i ] ] . "</span></li>\n";
 				}
@@ -341,79 +342,62 @@ class Overview_Page extends Admin_Page {
 	}
 
 	/**
-	 * Return localized Yes or No.
-	 *
-	 * @param bool $bool
-	 *
-	 * @return string 'Yes'|'No'
-	 */
-	private function ngg_gd_yesNo( $bool ) {
-		if ( $bool ) {
-			return __( 'Yes', 'nggallery' );
-		} else {
-			return __( 'No', 'nggallery' );
-		}
-	}
-
-	/**
 	 * Show some server information.
 	 *
 	 * @see GamerZ (http://www.lesterchan.net)
 	 */
-	private function ngg_get_serverinfo() {
+	private function get_server_info() {
 
 		global $wpdb, $ngg;
+
 		// Get MYSQL Version
-		$sqlversion = $wpdb->get_var( "SELECT VERSION() AS version" );
+		$sql_version = $wpdb->get_var( "SELECT VERSION() AS version" );
 		// GET SQL Mode
-		$mysqlinfo = $wpdb->get_results( "SHOW VARIABLES LIKE 'sql_mode'" );
-		if ( is_array( $mysqlinfo ) ) {
-			$sql_mode = $mysqlinfo[0]->Value;
+		$mysql_info = $wpdb->get_results( "SHOW VARIABLES LIKE 'sql_mode'" );
+
+		$na = __( 'N/A', 'nggallery' );
+
+		if ( is_array( $mysql_info ) ) {
+			$sql_mode = $mysql_info[0]->Value;
 		}
 		if ( empty( $sql_mode ) ) {
 			$sql_mode = __( 'Not set', 'nggallery' );
-		}
-		// Get PHP allow_url_fopen
-		if ( ini_get( 'allow_url_fopen' ) ) {
-			$allow_url_fopen = __( 'On', 'nggallery' );
-		} else {
-			$allow_url_fopen = __( 'Off', 'nggallery' );
 		}
 		// Get PHP Max Upload Size
 		if ( ini_get( 'upload_max_filesize' ) ) {
 			$upload_max = ini_get( 'upload_max_filesize' );
 		} else {
-			$upload_max = __( 'N/A', 'nggallery' );
+			$upload_max = $na;
 		}
 		// Get PHP Output buffer Size
 		if ( ini_get( 'pcre.backtrack_limit' ) ) {
 			$backtrack_limit = ini_get( 'pcre.backtrack_limit' );
 		} else {
-			$backtrack_limit = __( 'N/A', 'nggallery' );
+			$backtrack_limit = $na;
 		}
 		// Get PHP Max Post Size
 		if ( ini_get( 'post_max_size' ) ) {
 			$post_max = ini_get( 'post_max_size' );
 		} else {
-			$post_max = __( 'N/A', 'nggallery' );
+			$post_max = $na;
 		}
 		// Get PHP Max execution time
 		if ( ini_get( 'max_execution_time' ) ) {
 			$max_execute = ini_get( 'max_execution_time' );
 		} else {
-			$max_execute = __( 'N/A', 'nggallery' );
+			$max_execute = $na;
 		}
 		// Get PHP Memory Limit
 		if ( ini_get( 'memory_limit' ) ) {
 			$memory_limit = $ngg->memory_limit;
 		} else {
-			$memory_limit = __( 'N/A', 'nggallery' );
+			$memory_limit = $na;
 		}
 		// Get actual memory_get_usage
 		if ( function_exists( 'memory_get_usage' ) ) {
 			$memory_usage = round( memory_get_usage() / 1024 / 1024, 2 ) . __( ' MB', 'nggallery' );
 		} else {
-			$memory_usage = __( 'N/A', 'nggallery' );
+			$memory_usage = $na;
 		}
 		// required for EXIF read
 		if ( is_callable( 'exif_read_data' ) ) {
@@ -421,36 +405,29 @@ class Overview_Page extends Admin_Page {
 		} else {
 			$exif = __( 'No', 'nggallery' );
 		}
+
 		// required for meta data
-		if ( is_callable( 'iptcparse' ) ) {
-			$iptc = __( 'Yes', 'nggallery' );
-		} else {
-			$iptc = __( 'No', 'nggallery' );
-		}
+		$iptc = \NextCellent\bool_to_yes_no( is_callable( 'iptcparse' ) );
+
+
 		// required for meta data
-		if ( is_callable( 'xml_parser_create' ) ) {
-			$xml = __( 'Yes', 'nggallery' );
-		} else {
-			$xml = __( 'No', 'nggallery' );
-		}
+		$xml = \NextCellent\bool_to_yes_no( is_callable( 'xml_parser_create' ) );
 
 		?>
-		<li><?php _e( 'Operating System', 'nggallery' ); ?>: <span><?php echo PHP_OS; ?>
-				(<?php echo( PHP_INT_SIZE * 8 ) ?> Bit)</span></li>
-		<li><?php _e( 'Server', 'nggallery' ); ?>: <span><?php echo $_SERVER["SERVER_SOFTWARE"]; ?></span></li>
-		<li><?php _e( 'Memory Usage', 'nggallery' ); ?>: <span><?php echo $memory_usage; ?></span></li>
-		<li><?php _e( 'MYSQL Version', 'nggallery' ); ?>: <span><?php echo $sqlversion; ?></span></li>
-		<li><?php _e( 'SQL Mode', 'nggallery' ); ?>: <span><?php echo $sql_mode; ?></span></li>
-		<li><?php _e( 'PHP Version', 'nggallery' ); ?>: <span><?php echo PHP_VERSION; ?></span></li>
-		<li><?php _e( 'PHP Allow URL fopen', 'nggallery' ); ?>: <span><?php echo $allow_url_fopen; ?></span></li>
-		<li><?php _e( 'PHP Memory Limit', 'nggallery' ); ?>: <span><?php echo $memory_limit; ?></span></li>
-		<li><?php _e( 'PHP Max Upload Size', 'nggallery' ); ?>: <span><?php echo $upload_max; ?></span></li>
-		<li><?php _e( 'PHP Max Post Size', 'nggallery' ); ?>: <span><?php echo $post_max; ?></span></li>
-		<li><?php _e( 'PCRE Backtracking Limit', 'nggallery' ); ?>: <span><?php echo $backtrack_limit; ?></span></li>
-		<li><?php _e( 'PHP Max Script Execute Time', 'nggallery' ); ?>: <span><?php echo $max_execute; ?>s</span></li>
-		<li><?php _e( 'PHP EXIF Support', 'nggallery' ); ?>: <span><?php echo $exif; ?></span></li>
-		<li><?php _e( 'PHP IPTC Support', 'nggallery' ); ?>: <span><?php echo $iptc; ?></span></li>
-		<li><?php _e( 'PHP XML Support', 'nggallery' ); ?>: <span><?php echo $xml; ?></span></li>
+		<li><?php _e( 'Operating System', 'nggallery' ); ?>: <span><?= PHP_OS ?>(<?= PHP_INT_SIZE * 8 ?> Bit)</span></li>
+		<li><?php _e( 'Server', 'nggallery' ); ?>: <span><?= $_SERVER["SERVER_SOFTWARE"] ?></span></li>
+		<li><?php _e( 'Memory Usage', 'nggallery' ); ?>: <span><?= $memory_usage ?></span></li>
+		<li><?php _e( 'MYSQL Version', 'nggallery' ); ?>: <span><?= $sql_version ?></span></li>
+		<li><?php _e( 'SQL Mode', 'nggallery' ); ?>: <span><?= $sql_mode ?></span></li>
+		<li><?php _e( 'PHP Version', 'nggallery' ); ?>: <span><?= PHP_VERSION ?></span></li>
+		<li><?php _e( 'PHP Memory Limit', 'nggallery' ); ?>: <span><?= $memory_limit ?></span></li>
+		<li><?php _e( 'PHP Max Upload Size', 'nggallery' ); ?>: <span><?= $upload_max ?></span></li>
+		<li><?php _e( 'PHP Max Post Size', 'nggallery' ); ?>: <span><?= $post_max ?></span></li>
+		<li><?php _e( 'PCRE Backtracking Limit', 'nggallery' ); ?>: <span><?= $backtrack_limit ?></span></li>
+		<li><?php _e( 'PHP Max Script Execute Time', 'nggallery' ); ?>: <span><?= $max_execute ?>s</span></li>
+		<li><?php _e( 'PHP EXIF Support', 'nggallery' ); ?>: <span><?= $exif ?></span></li>
+		<li><?php _e( 'PHP IPTC Support', 'nggallery' ); ?>: <span><?= $iptc ?></span></li>
+		<li><?php _e( 'PHP XML Support', 'nggallery' ); ?>: <span><?= $xml ?></span></li>
 	<?php
 	}
 
@@ -466,7 +443,7 @@ class Overview_Page extends Admin_Page {
 	 * Based on class-wp-plugin-install-list-table.php
 	 */
 	static public function ngg_related_plugins() {
-		include( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+		require_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
 
 		//Check for the transient.
 		$plugins = (array) get_transient( 'ngg_related_plugins' );
@@ -476,6 +453,7 @@ class Overview_Page extends Admin_Page {
 			if ( is_wp_error( $api = plugins_api( 'query_plugins', array( 'search' => 'nextgen' ) ) ) ) {
 				return;
 			}
+			
 			$plugins = (array) $api->plugins;
 			shuffle( $plugins );
 			//var_dump("ok");
@@ -668,7 +646,6 @@ class Overview_Page extends Admin_Page {
 	 * Like me!
 	 */
 	public function like_this() {
-
 		?>
 		<p>
 			<?php _e( 'This plugin is a branch from NextGen Gallery, version 1.9.13.', 'nggallery' ); ?><br>
@@ -796,7 +773,7 @@ class Overview_Page extends Admin_Page {
 			} else {
 				echo $name;
 			}
-			$i --;
+			$i--;
 			if ( $i == 1 ) {
 				echo " & ";
 			} elseif ( $i ) {

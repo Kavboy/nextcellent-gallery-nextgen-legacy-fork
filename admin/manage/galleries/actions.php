@@ -6,7 +6,7 @@
  */
 
 //Load WordPress if needed.
-require_once( '../../ngg-config.php' );
+require_once( '../../../ngg-config.php' );
 
 if ( ! is_user_logged_in() || ! current_user_can( 'NextGEN Manage gallery' ) ) {
 	wp_die( __( 'Cheatin&#8217; uh?' ) );

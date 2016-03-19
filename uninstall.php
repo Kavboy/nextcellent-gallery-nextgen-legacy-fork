@@ -9,8 +9,8 @@
  * uses to save these hooks.
  *
  * This is usually relatively cheap considering the option is cached once
- * called it is called at least one time (and since most installs have multiple
- * plugins that use this).
+ * it is called at least once (and since most installs have multiple plugins
+ * that use this).
  *
  * However, if we can avoid it by putting the code here, this is a small fix.
  */
@@ -26,5 +26,5 @@ NCG::remove_transients();
 
 
 //Run the uninstaller.
-include_once( dirname( __FILE__ ) . '/admin/class-installer.php' );
-NGG_Installer::uninstall();
+require_once( dirname( __FILE__ ) . '/admin/class-installer.php' );
+\NextCellent\Admin\Installer::uninstall();

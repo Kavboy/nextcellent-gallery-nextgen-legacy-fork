@@ -1,6 +1,6 @@
 <?php
 
-namespace NextCellent\Admin\Manage;
+namespace NextCellent\Admin\Manage\Galleries;
 
 use NextCellent\Admin\Admin_Page;
 

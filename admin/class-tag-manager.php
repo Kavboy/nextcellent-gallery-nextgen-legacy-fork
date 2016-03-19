@@ -9,6 +9,8 @@ namespace NextCellent\Admin;
  * @todo Rewrite this into a decent class
  */
 class Tag_Manager extends Admin_Page {
+	
+	const NAME = 'manage-tags';
 
 	public function display() {
 		$action_status = array('message' => '', 'status' => 'ok');
@@ -331,6 +333,6 @@ class Tag_Manager extends Admin_Page {
 	 * @return string The name.
 	 */
 	public function get_name() {
-		return 'tags';
+		return self::NAME;
 	}
 }

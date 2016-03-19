@@ -2,10 +2,12 @@
 
 namespace NextCellent\Admin;
 
-use NextCellent\Admin\Manage\Gallery_Manager;
-use NextCellent\Admin\Manage\Image_Manager;
-use NextCellent\Admin\Manage\Search_Manager;
-use NextCellent\Admin\Manage\Sort_Manager;
+use NextCellent\Admin\Manage\Albums\Album_Editor;
+use NextCellent\Admin\Manage\Albums\Album_Manager;
+use NextCellent\Admin\Manage\Galleries\Gallery_Manager;
+use NextCellent\Admin\Manage\Galleries\Image_Manager;
+use NextCellent\Admin\Manage\Galleries\Search_Manager;
+use NextCellent\Admin\Manage\Galleries\Sort_Manager;
 use NextCellent\Admin\Settings\Settings_Page;
 
 /**
@@ -39,9 +41,6 @@ class Launcher {
 	 * @link https://codex.wordpress.org/Plugin_API/Action_Reference#Actions_Run_During_an_Admin_Page_Request
 	 */
 	public function register() {
-		//Register the settings we need.
-		add_action( 'admin_init', array($this, 'register_settings'));
-
 		//Create the screen object.
 		add_action( 'current_screen', array($this, 'make_page'));
 
@@ -68,41 +67,40 @@ class Launcher {
 	 * @since 1.9.31 All menu's have the same base slug.
 	 */
 	public function add_menu() {
-		add_menu_page( __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ),
-			'NextGEN Gallery overview', $this->base_slug, array( $this, 'show_menu' ), 'dashicons-format-gallery' );
+		add_menu_page( __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ), Roles::VIEW_ADMIN_PAGES, $this->base_slug, array( $this, 'show_menu' ), 'dashicons-format-gallery' );
 
 		add_submenu_page( $this->base_slug, __( 'Overview', 'nggallery' ), __( 'Overview', 'nggallery' ),
-			'NextGEN Gallery overview',
+			Roles::VIEW_ADMIN_PAGES,
 			$this->base_slug, array( $this, 'show_menu' ) );
 
 		add_submenu_page( $this->base_slug, __( 'Add Gallery / Images', 'nggallery' ),
-			__( 'Add Gallery / Images', 'nggallery' ), 'NextGEN Upload images', $this->sluggify( 'add-gallery' ),
+			__( 'Add Gallery / Images', 'nggallery' ), Roles::UPLOAD_IMAGES, $this->sluggify( Upload_Page::NAME ),
 			array( $this, 'show_menu' ) );
 
 		add_submenu_page( $this->base_slug, __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ),
-			'NextGEN Manage gallery', $this->sluggify( 'manage' ),
+			Roles::MANAGE_GALLERIES, $this->sluggify( Gallery_Manager::NAME ),
 			array( $this, 'show_menu' ) );
 
-		add_submenu_page( $this->base_slug, __( 'Albums', 'nggallery' ), __( 'Albums', 'nggallery' ), 'NextGEN Edit album',
-			$this->sluggify( 'manage-album' ),
+		add_submenu_page( $this->base_slug, __( 'Albums', 'nggallery' ), __( 'Albums', 'nggallery' ), Roles::MANAGE_ALBUMS,
+			$this->sluggify( Album_Manager::NAME ),
 			array( $this, 'show_menu' ) );
 
-		add_submenu_page( $this->base_slug, __( 'Tags', 'nggallery' ), __( 'Tags', 'nggallery' ), 'NextGEN Manage tags',
-			$this->sluggify('tags'),
+		add_submenu_page( $this->base_slug, __( 'Tags', 'nggallery' ), __( 'Tags', 'nggallery' ), Roles::MANAGE_TAGS,
+			$this->sluggify( Tag_Manager::NAME ),
 			array( $this, 'show_menu' ) );
 
 		add_submenu_page( $this->base_slug, __( 'Settings', 'nggallery' ), __( 'Settings', 'nggallery' ),
-			'NextGEN Change options', $this->sluggify('options'),
+			Roles::MANAGE_OPTIONS, $this->sluggify( Settings_Page::NAME),
 			array( $this, 'show_menu' ) );
 
-		if ( wpmu_enable_function( 'wpmuStyle' ) ) {
-			add_submenu_page( $this->base_slug, __( 'Style', 'nggallery' ), __( 'Style', 'nggallery' ), 'NextGEN Change style',
-				$this->sluggify('style'),
+		if ( wpmu_enable_function( 'wpmuStyle' ) || is_super_admin() ) {
+			add_submenu_page( $this->base_slug, __( 'Style', 'nggallery' ), __( 'Style', 'nggallery' ), Roles::MANAGE_STYLE,
+				$this->sluggify(Style_Page::NAME),
 				array( $this, 'show_menu' ) );
 		}
 		if ( wpmu_enable_function( 'wpmuRoles' ) || is_super_admin() ) {
-			add_submenu_page( $this->base_slug, __( 'Roles', 'nggallery' ), __( 'Roles', 'nggallery' ), 'activate_plugins',
-				$this->sluggify('roles'),
+			add_submenu_page( $this->base_slug, __( 'Capabilities', 'nggallery' ), __( 'Capabilities', 'nggallery' ), Roles::MANAGE_OPTIONS,
+				$this->sluggify( Roles::NAME ),
 				array( $this, 'show_menu' ) );
 		}
 	}
@@ -161,11 +159,11 @@ class Launcher {
 	 * Add the network pages to the network menu.
 	 */
 	public function add_network_admin_menu() {
-		add_menu_page( __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ), 'nggallery-wpmu',
+		add_menu_page( __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ), Roles::MANAGE_NETWORK_OPTIONS,
 			$this->base_slug, array( $this, 'show_network_settings' ), 'dashicons-format-gallery' );
 
 		add_submenu_page( $this->base_slug, __( 'Network settings', 'nggallery' ), __( 'Network settings', 'nggallery' ),
-			'nggallery-wpmu',
+			Roles::MANAGE_NETWORK_OPTIONS,
 			$this->base_slug, array( $this, 'show_network_settings' ) );
 	}
 
@@ -206,27 +204,27 @@ class Launcher {
 		$slug = $this->unsluggify(str_replace("{$i18n}_page_" , '', $current_screen->id));
 
 		switch ( $slug ) {
-			case "add-gallery" :
+			case Upload_Page::NAME :
 				require_once( __DIR__ . '/functions.php' );
 				$this->page = new Upload_Page();
 				break;
-			case "manage":
+			case Gallery_Manager::NAME:
 				require_once( __DIR__ . '/functions.php' );
 				$this->page = $this->get_manager();
 				break;
-			case "manage-album" :
-				$this->page = new Album_Manager();
+			case Album_Manager::NAME :
+				$this->page = $this->get_album_manager();
 				break;
-			case "options" :
+			case Settings_Page::NAME :
 				$this->page = new Settings_Page();
 				break;
-			case "tags" :
+			case Tag_Manager::NAME :
 				$this->page = new Tag_Manager();
 				break;
-			case "style" :
+			case Style_Page::NAME :
 				$this->page = new Style_Page();
 				break;
-			case "roles" :
+			case Roles::NAME :
 				$this->page = new Roles();
 				break;
 			case "toplevel_page_" . $this->base_slug:
@@ -235,21 +233,6 @@ class Launcher {
 			default: //Not our page
 				$this->page = null;
 		}
-	}
-
-	/**
-	 * Show the menu.
-	 */
-	public function show_menu() {
-
-		//Show the upgrade page if needed.
-		$this->show_upgrade_page();
-
-		//Display the page
-		if ( $this->page != null ) { //This should never be null
-			$this->page->display();
-		}
-
 	}
 
 	/**
@@ -271,7 +254,7 @@ class Launcher {
 		} elseif ( $_GET['mode'] == 'image' ) {
 
 			//Display overview of a gallery.
-			return new Image_Manager($this->base_slug);
+			return new Image_Manager();
 
 		} elseif ( $_GET['mode'] == 'sort' ) {
 
@@ -284,6 +267,105 @@ class Launcher {
 			return new Search_Manager($this->base_slug);
 		} else {
 			return null;
+		}
+	}
+	
+	private function get_album_manager() {
+		if( isset($_GET['mode']) && $_GET['mode'] == 'edit') {
+			return new Album_Editor();
+		} else {
+			return new Album_Manager();
+		}
+	}
+
+	/**
+	 * Show the menu.
+	 */
+	public function show_menu() {
+
+		//Show the upgrade page if needed.
+		$this->show_upgrade_page();
+
+		//Display the page
+		if ( $this->page != null ) { //This should never be null
+			$this->page->display();
+		}
+	}
+
+	/**
+	 * Register the pages in the admin bar menu.
+	 * 
+	 * This function is static, since it is called from the main plugin file,
+	 * as this also needs to be done on the front-end of the site.
+	 */
+	public static function admin_bar_menu() {
+		// If the current user can't write posts, this is all of no use, so let's not output an admin menu
+		if ( !current_user_can( Roles::VIEW_ADMIN_PAGES ) ) {
+			return;
+		}
+
+		/**
+		 * @global  \WP_Admin_Bar $wp_admin_bar
+		 */
+		global $wp_admin_bar;
+
+		if ( current_user_can( 'NextGEN Upload images' ) ) {
+			$wp_admin_bar->add_node( array(
+				'parent' => 'new-content',
+				'id'     => 'ngg-menu-add-gallery',
+				'title'  => __( 'NextCellent Media', 'nggallery' ),
+				'href'   => self::get_url(Upload_Page::NAME)
+			) );
+		}
+
+		//If the user is in the admin screen, there is no need to display this.
+		if ( !is_admin() ) {
+			$wp_admin_bar->add_node( array(
+				'parent' => 'site-name',
+				'id'     => 'ngg-menu-overview',
+				'title'  => __( 'NextCellent', 'nggallery' ),
+				'href'   => self::get_url(Overview_Page::NAME)
+			) );
+			if ( current_user_can( Roles::MANAGE_GALLERIES ) ) {
+				$wp_admin_bar->add_node( array(
+					'parent' => 'ngg-menu-overview',
+					'id'     => 'ngg-menu-manage-gallery',
+					'title'  => __( 'Gallery', 'nggallery' ),
+					'href'   => self::get_url(Gallery_Manager::NAME)
+				) );
+			}
+			if ( current_user_can( Roles::MANAGE_ALBUMS ) ) {
+				$wp_admin_bar->add_node( array(
+					'parent' => 'ngg-menu-overview',
+					'id'     => 'ngg-menu-manage-album',
+					'title'  => __( 'Albums', 'nggallery' ),
+					'href'   => self::get_url(Album_Editor::NAME)
+				) );
+			}
+			if ( current_user_can( Roles::MANAGE_TAGS ) ) {
+				$wp_admin_bar->add_node( array(
+					'parent' => 'ngg-menu-overview',
+					'id'     => 'ngg-menu-tags',
+					'title'  => __( 'Tags', 'nggallery' ),
+					'href'   => self::get_url(Tag_Manager::NAME)
+				) );
+			}
+			if ( current_user_can( 'NextGEN Change options' ) ) {
+				$wp_admin_bar->add_node( array(
+					'parent' => 'ngg-menu-overview',
+					'id'     => 'ngg-menu-options',
+					'title'  => __( 'Settings', 'nggallery' ),
+					'href'   => self::get_url(Settings_Page::NAME)
+				) );
+			}
+			if ( current_user_can( 'NextGEN Change style' ) ) {
+				$wp_admin_bar->add_node( array(
+					'parent' => 'ngg-menu-overview',
+					'id'     => 'ngg-menu-style',
+					'title'  => __( 'Style', 'nggallery' ),
+					'href'   => self::get_url(Style_Page::NAME)
+				) );
+			}
 		}
 	}
 
@@ -405,19 +487,6 @@ class Launcher {
 				'nggallery' ) . '</a></p>'
 		);
 	}
-
-	public function register_settings() {
-		// First, we register a section. This is necessary since all future options must belong to one.
-		register_setting( 'ngg_options2', 'ngg_options2', function($arg) {
-			return $arg;
-		} );
-		add_settings_section('plugin_main', 'Main Settings', function() {
-			echo "Nice function here!";
-		}, 'plugin');
-		add_settings_field('plugin_text_string', 'Plugin Text Input', function() {
-			echo "<input id='plugin_text_string' name='plugin_options[text_string]' size='40' type='text' value='ok' />";
-		}, 'plugin', 'plugin_main');
-	}
 }
 
 /**
@@ -428,6 +497,8 @@ class Launcher {
  * @todo Move from here
  *
  * @return bool If it's enabled or not.
+ *
+ * @deprecated Use the function in NextCellent\Utils
  */
 function wpmu_enable_function( $value ) {
 	if ( is_multisite() ) {

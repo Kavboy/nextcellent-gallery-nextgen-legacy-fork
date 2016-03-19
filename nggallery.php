@@ -155,7 +155,7 @@ if (!class_exists('NCG')) {
 		    });
 
 		    // Add to the toolbar
-		    add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu' ) );
+		    add_action( 'admin_bar_menu', array( '\\NextCellent\\Admin\\Launcher', 'admin_bar_menu' ) );
 
 		    //Register the taxonomy. This MUST be in the init hook.
 		    add_action( 'init', array($this, 'register_taxonomy') );
@@ -178,6 +178,19 @@ if (!class_exists('NCG')) {
 			    $admin = new NextCellent\Admin\Launcher(self::ADMIN_BASE);
 			    $admin->register();
 		    }
+
+		    //Register the widgets
+		    add_action( 'widgets_init', function() {
+			    $namespace = 'NextCellent\Widgets';
+			    register_widget("$namespace\\Gallery_Widget");
+			    register_widget("$namespace\\Media_RSS_Widget");
+			    register_widget("$namespace\\Slideshow_Widget");
+		    });
+
+		    //Add our admin endpoint
+		    add_action( 'init', function() {
+
+		    });
 	    }
 
 	    public function show_upgrade_message() {
@@ -387,8 +400,10 @@ if (!class_exists('NCG')) {
 	     */
 	    private function load_dependencies() {
 
-		    //Include the autloader
+		    //Include the auto loader
 		    require( __DIR__ . '/src/autoloader.php' );
+		    //Require the admin auto loader.
+		    require( __DIR__ . '/admin/autoloader.php' );
 
 		    //Include utils
 		    require_once( __DIR__ . '/src/ncg-utils.php' );
@@ -401,11 +416,6 @@ if (!class_exists('NCG')) {
 		    require_once( __DIR__ . '/lib/post-thumbnail.php' );
 		    require_once( __DIR__ . '/lib/multisite.php' );
 		    require_once( __DIR__ . '/lib/sitemap.php' );
-
-		    //Load the widgets
-		    require_once( __DIR__ . '/widgets/class-ngg-slideshow-widget.php' );
-		    require_once( __DIR__ . '/widgets/class-ngg-media-rss-widget.php' );
-		    require_once( __DIR__ . '/widgets/class-ngg-gallery-widget.php' );
 
 		    // Load frontend libraries
 		    require_once( __DIR__ . '/lib/navigation.php' );
@@ -426,87 +436,11 @@ if (!class_exists('NCG')) {
 			    require_once( __DIR__ . '/lib/rewrite.php' );
 			    require_once( __DIR__ . '/admin/tinymce/tinymce.php' );
 			    if(is_admin()) {
-				    //Require the admin auto loader.
-				    require(__DIR__ . '/admin/autoloader.php' );
 				    //require_once( __DIR__ . '/admin/class-launcher.php' );
 				    require_once( __DIR__ . '/admin/media-upload.php' );
 			    }
 		    }
 	    }
-
-		/**
-		 * Add NextCellent to the WordPress toolbar.
-		 */
-		public function admin_bar_menu() {
-			// If the current user can't write posts, this is all of no use, so let's not output an admin menu
-			if ( ! current_user_can( 'NextGEN Gallery overview' ) ) {
-				return;
-			}
-
-			/**
-			 * @global WP_Admin_Bar $wp_admin_bar
-			 */
-			global $wp_admin_bar;
-
-			if ( current_user_can( 'NextGEN Upload images' ) ) {
-				$wp_admin_bar->add_node( array(
-					'parent' => 'new-content',
-					'id'     => 'ngg-menu-add-gallery',
-					'title'  => __( 'NextCellent Gallery / Images', 'nggallery' ),
-					'href'   => admin_url( 'admin.php?page=nggallery-add-gallery' )
-				) );
-			}
-
-			//If the user is in the admin screen, there is no need to display this.
-			if ( !is_admin() ) {
-				$wp_admin_bar->add_node( array(
-					'parent' => 'site-name',
-					'id'     => 'ngg-menu-overview',
-					'title'  => __( 'NextCellent', 'nggallery' ),
-					'href'   => admin_url( 'admin.php?page=' . NCG_FOLDER )
-				) );
-				if ( current_user_can( 'NextGEN Manage gallery' ) ) {
-					$wp_admin_bar->add_node( array(
-						'parent' => 'ngg-menu-overview',
-						'id'     => 'ngg-menu-manage-gallery',
-						'title'  => __( 'Gallery', 'nggallery' ),
-						'href'   => admin_url( 'admin.php?page=nggallery-manage' )
-					) );
-				}
-				if ( current_user_can( 'NextGEN Edit album' ) ) {
-					$wp_admin_bar->add_node( array(
-						'parent' => 'ngg-menu-overview',
-						'id'     => 'ngg-menu-manage-album',
-						'title'  => __( 'Albums', 'nggallery' ),
-						'href'   => admin_url( 'admin.php?page=nggallery-manage-album' )
-					) );
-				}
-				if ( current_user_can( 'NextGEN Manage tags' ) ) {
-					$wp_admin_bar->add_node( array(
-						'parent' => 'ngg-menu-overview',
-						'id'     => 'ngg-menu-tags',
-						'title'  => __( 'Tags', 'nggallery' ),
-						'href'   => admin_url( 'admin.php?page=nggallery-tags' )
-					) );
-				}
-				if ( current_user_can( 'NextGEN Change options' ) ) {
-					$wp_admin_bar->add_node( array(
-						'parent' => 'ngg-menu-overview',
-						'id'     => 'ngg-menu-options',
-						'title'  => __( 'Settings', 'nggallery' ),
-						'href'   => admin_url( 'admin.php?page=nggallery-options' )
-					) );
-				}
-				if ( current_user_can( 'NextGEN Change style' ) ) {
-					$wp_admin_bar->add_node( array(
-						'parent' => 'ngg-menu-overview',
-						'id'     => 'ngg-menu-style',
-						'title'  => __( 'Style', 'nggallery' ),
-						'href'   => admin_url( 'admin.php?page=nggallery-style' )
-					) );
-				}
-			}
-		}
 
 	    /**
 	     * Load the scripts NextCellent needs (for the frontend).

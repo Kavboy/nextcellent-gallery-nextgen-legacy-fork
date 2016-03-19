@@ -1,9 +1,11 @@
 <?php
 
+namespace NextCellent\Widgets;
+
 /**
  * The NextCellent Gallery Widget
  */
-class NGG_Gallery_Widget extends WP_Widget {
+class Gallery_Widget extends \WP_Widget {
 
 	/**
 	 * Register the widget.
@@ -219,14 +221,14 @@ class NGG_Gallery_Widget extends WP_Widget {
 		if ( is_array( $imageList ) ) {
 			foreach ( $imageList as $image ) {
 				// get the URL constructor
-				$image = new nggImage( $image );
+				$image = new \nggImage( $image );
 
 				// get the effect code
 				$thumbcode = $image->get_thumbcode( $args['widget_id'] );
 
 				// enable i18n support for alttext and description
-				$alttext     = htmlspecialchars( stripslashes( nggGallery::i18n( $image->alttext, 'pic_' . $image->pid . '_alttext' ) ) );
-				$description = htmlspecialchars( stripslashes( nggGallery::i18n( $image->description, 'pic_' . $image->pid . '_description' ) ) );
+				$alttext     = htmlspecialchars( stripslashes( \nggGallery::i18n( $image->alttext, 'pic_' . $image->pid . '_alttext' ) ) );
+				$description = htmlspecialchars( stripslashes( \nggGallery::i18n( $image->description, 'pic_' . $image->pid . '_description' ) ) );
 
 				//TODO:For mixed portrait/landscape it's better to use only the height setting, if widht is 0 or vice versa
 				$out = '<a href="' . $image->imageURL . '" title="' . $description . '" ' . $thumbcode . '>';
@@ -247,7 +249,3 @@ class NGG_Gallery_Widget extends WP_Widget {
 
 	}
 }
-
-add_action('widgets_init',
-	create_function('', 'return register_widget("NGG_Gallery_Widget");')
-);

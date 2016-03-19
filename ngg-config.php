@@ -1,7 +1,7 @@
 <?php
 /**
  * Bootstrap file for getting the ABSPATH constant to wp-load.php
- * This is requried when a plugin requires access not via the admin screen.
+ * This is required when a plugin requires access not via the admin screen.
  *
  * If the wp-load.php file is not found, then an error will be displayed
  *

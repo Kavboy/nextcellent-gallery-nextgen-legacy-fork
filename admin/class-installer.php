@@ -24,26 +24,10 @@ class Installer {
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
 		}
-
-		// Set the capabilities for the administrator
-		$role = get_role( 'administrator' );
-		// We need this role, no other chance
-		if ( empty( $role ) ) {
-			update_option( "ngg_init_check",
-				__( 'Sorry, NextCellent Gallery works only with a role called administrator', "nggallery" ) );
-
-			return;
-		}
-
-		$role->add_cap( 'NextGEN Gallery overview' );
-		$role->add_cap( 'NextGEN Use TinyMCE' );
-		$role->add_cap( 'NextGEN Upload images' );
-		$role->add_cap( 'NextGEN Manage gallery' );
-		$role->add_cap( 'NextGEN Manage tags' );
-		$role->add_cap( 'NextGEN Manage others gallery' );
-		$role->add_cap( 'NextGEN Edit album' );
-		$role->add_cap( 'NextGEN Change style' );
-		$role->add_cap( 'NextGEN Change options' );
+		
+		//Install the roles
+		require_once 'class-roles.php';
+		Roles::install_roles();
 
 		// upgrade function changed in WordPress 2.3
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );

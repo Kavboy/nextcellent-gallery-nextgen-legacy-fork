@@ -1,6 +1,6 @@
 <?php
 
-namespace NextCellent\Admin\Manage;
+namespace NextCellent\Admin\Manage\Galleries;
 
 /**
  * Class Gallery_Manager

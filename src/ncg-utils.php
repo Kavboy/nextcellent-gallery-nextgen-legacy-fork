@@ -70,3 +70,14 @@ function show_notice( $class, $message, $dismissible ) {
 function convert_to_bool($string) {
 	return trim($string) == 'true';
 }
+
+/**
+ * Convert a boolean to a 'Yes' or 'No' string.
+ *
+ * @param bool $bool The boolean.
+ *
+ * @return string Yes or No.
+ */
+function bool_to_yes_no( $bool ) {
+	return $bool ? __( 'Yes', 'nggallery' ) : __( 'No', 'nggallery' );
+}

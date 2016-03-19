@@ -1,9 +1,11 @@
 <?php
 
+namespace NextCellent\Widgets;
+
 /**
  * The NextCellent Media RSS widget.
  */
-class NGG_Media_RSS_Widget extends WP_Widget {
+class Media_RSS_Widget extends \WP_Widget {
 
 	/**
 	 * Register the widget.
@@ -30,7 +32,7 @@ class NGG_Media_RSS_Widget extends WP_Widget {
 		$out = $args['before_widget'];
 		$out .= $args['before_title'] . $title . $args['after_title'];
 		$out .= "<div class='ngg-media-rss-widget'>";
-		$out .= "<a href='" . nggMediaRss::get_mrss_url() . "' title='" . $instance['mrss_title'] . "' class='ngg-media-rss-link'>";
+		$out .= "<a href='" . \nggMediaRss::get_mrss_url() . "' title='" . $instance['mrss_title'] . "' class='ngg-media-rss-link'>";
 		if ( $instance['show_icon'] ) {
 			$out .= '<span class="dashicons dashicons-rss" style="padding-right: 1.5em"></span>';
 		}
@@ -128,7 +130,3 @@ class NGG_Media_RSS_Widget extends WP_Widget {
 	<?php
 	}
 }
-
-add_action('widgets_init',
-	create_function('', 'return register_widget("NGG_Media_RSS_Widget");')
-);

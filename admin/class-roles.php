@@ -4,148 +4,57 @@ namespace NextCellent\Admin;
 
 
 /**
- * The roles admin screen
+ * The roles admin screen. This is also the class that generally manages the roles and capabilities.
  */
-class Roles extends Post_Admin_Page {
+class Roles extends Admin_Page {
+	
+	const NAME = 'roles';
+
+	//View the admin dashboard.
+	const VIEW_ADMIN_PAGES = 'NextGEN Gallery overview';
+	/**
+	 * @deprecated This role is no longer used.
+	 */
+	const USE_NEXTCELLENT_IMAGES = 'NextGEN Use TinyMCE';
+	//Upload new images.
+	//Note that this does not mean you can create new galleries.
+	const UPLOAD_IMAGES = 'NextGEN Upload images';
+	//Create and manage your own galleries.
+	const MANAGE_GALLERIES = 'NextGEN Manage gallery';
+	//Create and manage tags.
+	const MANAGE_TAGS = 'NextGEN Manage tags';
+	//Manage other's galleries.
+	const MANAGE_ALL_GALLERIES = 'NextGEN Manage others gallery';
+	//Create and manage albums.
+	const MANAGE_ALBUMS = 'NextGEN Edit album';
+	//Manage the style option for NextCellent.
+	const MANAGE_STYLE = 'NextGEN Change style';
+	//Manage the NextCellent options.
+	const MANAGE_OPTIONS = 'NextGEN Change options';
+	//Network options. This currently not assigned, since super users always have access.
+	const MANAGE_NETWORK_OPTIONS = 'nggallery-wpmu';
 
 	public function display() {
-		parent::display();
 
 		?>
 		<div class="wrap">
-			<h2><?php _e('Roles / capabilities', 'nggallery') ;?></h2>
-			<p><?php _e('Select the lowest role which should be able to access the following capabilities. NextCellent Gallery supports the standard roles from WordPress.', 'nggallery') ?> <br />
-				<?php _e('For a more flexible user management you can use the', 'nggallery') ?> <a href="http://wordpress.org/extend/plugins/capsman/" target="_blank">Capability Manager</a>.</p>
-			<form name="addroles" id="addroles" method="POST" accept-charset="utf-8" action="<?php echo $this->get_full_url() ?>">
-				<?php wp_nonce_field('ngg_addroles') ?>
-				<table class="form-table">
-					<tr valign="top">
-						<th scope="row"><label for="general"><?php _e('NextCellent Gallery overview', 'nggallery') ;?></label></th>
-						<td><select name="general" id="general"><?php wp_dropdown_roles( $this->ngg_get_role('NextGEN Gallery overview') ); ?></select></td>
-					</tr>
-					<tr valign="top">
-						<th scope="row"><label for="tinymce"><?php _e('Use TinyMCE Button / Add Media', 'nggallery') ;?></label></th>
-						<td><select name="tinymce" id="tinymce"><?php wp_dropdown_roles( $this->ngg_get_role('NextGEN Use TinyMCE') ); ?></select></td>
-					</tr>
-					<tr valign="top">
-						<th scope="row"><label for="add_gallery"><?php _e('Add gallery / Upload images', 'nggallery') ;?></label></th>
-						<td><select name="add_gallery" id="add_gallery"><?php wp_dropdown_roles( $this->ngg_get_role('NextGEN Upload images') ); ?></select></td>
-					</tr>
-					<tr valign="top">
-						<th scope="row"><label for="manage_gallery"><?php _e('Manage gallery', 'nggallery') ;?></label></th>
-						<td><select name="manage_gallery" id="manage_gallery"><?php wp_dropdown_roles( $this->ngg_get_role('NextGEN Manage gallery') ); ?></select></td>
-					</tr>
-					<tr valign="top">
-						<th scope="row"><label for="manage_others"><?php _e('Manage others gallery', 'nggallery') ;?></label></th>
-						<td><select name="manage_others" id="manage_others"><?php wp_dropdown_roles( $this->ngg_get_role('NextGEN Manage others gallery') ); ?></select></td>
-					</tr>
-					<tr valign="top">
-						<th scope="row"><label for="manage_tags"><?php _e('Manage tags', 'nggallery') ;?></label></th>
-						<td><select name="manage_tags" id="manage_tags"><?php wp_dropdown_roles( $this->ngg_get_role('NextGEN Manage tags') ); ?></select></td>
-					</tr>
-					<tr valign="top">
-						<th scope="row"><label for="edit_album"><?php _e('Edit Album', 'nggallery') ;?></label></th>
-						<td><select name="edit_album" id="edit_album"><?php wp_dropdown_roles( $this->ngg_get_role('NextGEN Edit album') ); ?></select></td>
-					</tr>
-					<tr valign="top">
-						<th scope="row"><label for="change_style"><?php _e('Change style', 'nggallery') ;?></label></th>
-						<td><select name="change_style" id="change_style"><?php wp_dropdown_roles( $this->ngg_get_role('NextGEN Change style') ); ?></select></td>
-					</tr>
-					<tr valign="top">
-						<th scope="row"><label for="change_options"><?php _e('Change options', 'nggallery') ;?></label></th>
-						<td><select name="change_options" id="change_options"><?php wp_dropdown_roles( $this->ngg_get_role('NextGEN Change options') ); ?></select></td>
-					</tr>
-				</table>
-				<div class="submit"><input type="submit" class="button-primary" name= "update_cap" value="<?php _e('Update capabilities', 'nggallery') ;?>"/></div>
-			</form>
+			<h1><?php _e('Capabilities', 'nggallery') ;?></h1>
+			<p class="wp-ui-text-notification">
+				<?php _e('Warning: this page is deprecated and will be removed in a future version of NextCellent.', 'nggallery') ?>
+			</p>
+			<p>
+				<?php _e('Maintaining our own system to manage the capabilities is now something we will not do anymore.', 'nggallery') ?> <br>
+				<?php _e('While this is not something we are happy about, it was necessary: the old system did not work well, and rewriting it correctly is a lot of work.', 'nggallery') ?><br>
+				<?php _e("This way, we can concentrate on what's important: the rest of the plugin.", 'nggallery') ?>
+			</p>
+			<p>
+				<?php printf( __('We recommend using <a href="%s">this plugin</a> to edit roles, but other plugins work just as well.', 'nggallery'), 'https://wordpress.org/plugins/wpfront-user-role-editor/') ?>
+			</p>
 		</div>
 		<?php
 	}
 
-
-	protected function processor() {
-		if ( isset($_POST['update_cap']) ) {
-
-			check_admin_referer('ngg_addroles');
-
-			// now set or remove the capability
-			$this->ngg_set_capability($_POST['general'],"NextGEN Gallery overview");
-			$this->ngg_set_capability($_POST['tinymce'],"NextGEN Use TinyMCE");
-			$this->ngg_set_capability($_POST['add_gallery'],"NextGEN Upload images");
-			$this->ngg_set_capability($_POST['manage_gallery'],"NextGEN Manage gallery");
-			$this->ngg_set_capability($_POST['manage_others'],"NextGEN Manage others gallery");
-			$this->ngg_set_capability($_POST['manage_tags'],"NextGEN Manage tags");
-			$this->ngg_set_capability($_POST['edit_album'],"NextGEN Edit album");
-			$this->ngg_set_capability($_POST['change_style'],"NextGEN Change style");
-			$this->ngg_set_capability($_POST['change_options'],"NextGEN Change options");
-
-			\nggGallery::show_message(__('Updated capabilities',"nggallery"));
-		}
-	}
-
-	private function ngg_get_sorted_roles() {
-		// This function returns all roles, sorted by user level (lowest to highest)
-		global $wp_roles;
-		$roles = $wp_roles->role_objects;
-		$sorted = array();
-
-		if( class_exists('RoleManager') ) {
-			foreach( $roles as $role_key => $role_name ) {
-				$role = get_role($role_key);
-				if( empty($role) ) continue;
-				$role_user_level = array_reduce(array_keys($role->capabilities), array('WP_User', 'level_reduction'), 0);
-				$sorted[$role_user_level] = $role;
-			}
-			$sorted = array_values($sorted);
-		} else {
-			$role_order = array("subscriber", "contributor", "author", "editor", "administrator");
-			foreach($role_order as $role_key) {
-				$sorted[$role_key] = get_role($role_key);
-			}
-		}
-		return $sorted;
-	}
-
-	private function ngg_get_role($capability){
-		// This function return the lowest roles which has the capabilities
-		$check_order = $this->ngg_get_sorted_roles();
-
-		$args = array_slice(func_get_args(), 1);
-		$args = array_merge(array($capability), $args);
-
-		foreach ($check_order as $check_role) {
-			if ( empty($check_role) )
-				return false;
-
-			if (call_user_func_array(array(&$check_role, 'has_cap'), $args))
-				return $check_role->name;
-		}
-		return false;
-	}
-
-	private function ngg_set_capability($lowest_role, $capability){
-		// This function set or remove the $capability
-		$check_order = $this->ngg_get_sorted_roles();
-
-		$add_capability = false;
-
-		foreach ($check_order as $the_role) {
-			$role = $the_role->name;
-
-			if ( $lowest_role == $role )
-				$add_capability = true;
-
-			// If you rename the roles, then please use a role manager plugin
-
-			if ( empty($the_role) )
-				continue;
-
-			$add_capability ? $the_role->add_cap($capability) : $the_role->remove_cap($capability) ;
-		}
-	}
-
 	function register_styles() {
-		wp_enqueue_style( 'ngg-jqueryui' );
 		wp_enqueue_style( 'nggadmin' );
 	}
 
@@ -159,9 +68,7 @@ class Roles extends Post_Admin_Page {
 	 * @param \WP_Screen $screen The current screen.
 	 */
 	public function add_help( $screen ) {
-		$help = '<p>' . __( 'You can assign the lowest user role that has access to a certain feature. Needless to say, all greater user roles will also have access to that feature.',
-				'nggallery' ) . '</p>';
-		$help .= '<p>' . __( 'NextCellent also works with various plugins that extend the default roles capabilities.',
+		$help = '<p>' . __( 'This page is deprecated and will be removed in the future. Please use another plugin to manage the roles.',
 				'nggallery' ) . '</p>';
 
 		$screen->add_help_tab( array(
@@ -183,6 +90,52 @@ class Roles extends Post_Admin_Page {
 	 * @return string The name.
 	 */
 	public function get_name() {
-		return 'roles';
+		return self::NAME;
+	}
+
+	/**
+	 * This function will add all NextCellent capabilities to a role.
+	 */
+	public static function install_roles() {
+
+		/**
+		 * @var \WP_Role $admin
+		 * @var \WP_Role $editor
+		 * @var \WP_Role $author
+		 */
+		$admin = get_role( 'administrator' );
+		$editor = get_role( 'editor' );
+		$author = get_role( 'author' );
+
+		if ( is_null( $admin ) ) {
+			update_option( "ngg_init_check", __( 'Sorry, NextCellent requires a role called administrator.', "nggallery" ) );
+			return;
+		}
+
+		//The admin can do anything.
+		$admin->add_cap( self::VIEW_ADMIN_PAGES );
+		$admin->add_cap( self::UPLOAD_IMAGES );
+		$admin->add_cap( self::MANAGE_GALLERIES );
+		$admin->add_cap( self::MANAGE_ALL_GALLERIES );
+		$admin->add_cap( self::MANAGE_TAGS );
+		$admin->add_cap( self::MANAGE_ALBUMS );
+		$admin->add_cap( self::MANAGE_STYLE );
+		$admin->add_cap( self::MANAGE_OPTIONS );
+
+		//The editor can manage all content and use content.
+		if ( $editor != null ) {
+			$editor->add_cap( self::VIEW_ADMIN_PAGES );
+			$editor->add_cap( self::UPLOAD_IMAGES );
+			$editor->add_cap( self::MANAGE_GALLERIES );
+			$editor->add_cap( self::MANAGE_ALL_GALLERIES );
+			$editor->add_cap( self::MANAGE_TAGS );
+			$editor->add_cap( self::MANAGE_ALBUMS );
+		}
+
+		//The author and contributor can manage his own content and use content.
+		if ( $author != null ) {
+			$author->add_cap( self::UPLOAD_IMAGES );
+			$author->add_cap( self::MANAGE_GALLERIES );
+		}
 	}
 }

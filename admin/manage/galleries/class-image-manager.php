@@ -1,6 +1,6 @@
 <?php
 
-namespace NextCellent\Admin\Manage;
+namespace NextCellent\Admin\Manage\Galleries;
 
 use NextCellent\Models\Gallery;
 use NextCellent\Models\Image;
@@ -17,12 +17,8 @@ class Image_Manager extends Abstract_Image_Manager {
 	 */
 	private $gallery;
 	private $id;
-
-	/**
-	 * @param string $slug The slug for this page. It is recommended you pass this parameter.
-	 *                     For example, with slug 'nextcellent', the page is 'nextcellent-[NAME]'.
-	 */
-	public function __construct($slug) {
+	
+	public function __construct() {
 		$this->id = (int) $_GET['gid'];
 	}
 

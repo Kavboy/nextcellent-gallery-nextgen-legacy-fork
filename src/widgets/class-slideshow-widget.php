@@ -1,9 +1,11 @@
 <?php
 
+namespace NextCellent\Widgets;
+
 /**
  * The NextCellent Slideshow widget.
  */
-class NGG_Slideshow_Widget extends WP_Widget {
+class Slideshow_Widget extends \WP_Widget {
 
 	/**
 	 * Register the widget.
@@ -29,7 +31,7 @@ class NGG_Slideshow_Widget extends WP_Widget {
 
 		try {
 			$out = nggShowSlideshow( $instance['galleryid'], $instance );
-		} catch ( NGG_Not_Found $e ) {
+		} catch ( \NGG_Not_Found $e ) {
 			$out = $e->getMessage();
 		}
 
@@ -170,7 +172,3 @@ class NGG_Slideshow_Widget extends WP_Widget {
 	}
 
 }
-
-add_action('widgets_init',
-	create_function('', 'return register_widget("NGG_Slideshow_Widget");')
-);

@@ -31,6 +31,8 @@ use WP_Screen;
  * add_hook( 'ngg_tab_content_my_plugin', 'display_settings');
  */
 class Settings_Page extends Post_Admin_Page {
+	
+	const NAME = 'options';
 
 	/**
 	 * @var Settings_Page $options The options.
@@ -42,13 +44,7 @@ class Settings_Page extends Post_Admin_Page {
 	 */
 	private $current;
 
-	/**
-	 * Settings_Page constructor.
-	 *
-	 * @param string $slug The base slug for the page.
-	 */
-	public function __construct($slug) {
-		parent::__construct($slug);
+	public function __construct() {
 
 		global $ngg;
 
@@ -95,6 +91,12 @@ class Settings_Page extends Post_Admin_Page {
 				$this->current = new Tab_Advanced($this->options, $this->get_full_url(), $tabs);
 				break;
 			default:
+				/**
+				 * Load a settings page.
+				 *
+				 * @var string $name The name of the settings page to load.
+				 */
+				$name = do_action( 'ncg_load_settings_page', $name);
 				$this->current = $name;
 		}
 	}
@@ -104,13 +106,13 @@ class Settings_Page extends Post_Admin_Page {
 	 */
 	protected function processor() {
 
+		//For legacy pages, we do the old processing.
 		if(is_string($this->current)) {
 			$this->old_processor();
 		} else {
 
 			//Check the referrer.
 			check_admin_referer( 'ncg_settings_' . $this->current->get_name() );
-
 
 			$this->current->processor();
 
@@ -123,6 +125,9 @@ class Settings_Page extends Post_Admin_Page {
 			do_action( 'ncg_settings_updated_' . $this->current->get_name(), $_POST);
 		}
 
+		/**
+		 * @deprecated Please use the appropriate 'ncg_settings_update_[PAGE]' action.
+		 */
 		do_action( 'ngg_update_options_page' );
 	}
 
@@ -332,6 +337,6 @@ class Settings_Page extends Post_Admin_Page {
 	 * @return string The name.
 	 */
 	public function get_name() {
-		return 'options';
+		return self::NAME;
 	}
 }

@@ -267,7 +267,7 @@ class Gallery extends Model {
 			'path'    => $data[ self::PATH ],
 			'title' => $data[ self::TITLE ],
 			'description'        => $data[ self::DESCRIPTION ],
-			'page_id'     => (bool) $data[ self::PAGE_ID ],
+			'page_id'     => (int) $data[ self::PAGE_ID ],
 			'preview'  => (bool) $data[ self::PREVIEW ],
 			'author'   => (int) $data[ self::AUTHOR ]
 		) );
