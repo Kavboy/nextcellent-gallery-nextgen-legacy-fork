@@ -2,6 +2,8 @@
 
 namespace NextCellent\Admin\Manage\Albums;
 
+use NextCellent\Models\Album;
+
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
@@ -41,8 +43,8 @@ class Album_List_Table extends \WP_List_Table {
 		/**
 		 * Do the pagination.
 		 */
-		$currentPage = $this->get_pagenum();
-		$perPage     = $this->get_items_per_page('ngg_albums_per_page', 25);
+		$current_page = $this->get_pagenum();
+		$per_page     = $this->get_items_per_page('ngg_albums_per_page', 25);
 
 		/**
 		 * Sorting
@@ -59,19 +61,14 @@ class Album_List_Table extends \WP_List_Table {
 			$order_by = 'id';
 		}
 
-		/**
-		 * @global \nggdb $nggdb
-		 */
-		global $nggdb;
+		$start       = ( $current_page - 1 ) * $per_page;
+		$this->items = Album::all($order_by, $order, $start, $per_page);
 
-		$start       = ( $currentPage - 1 ) * $perPage;
-		$this->items = $nggdb->find_all_album($order_by, $order, $perPage, $start);
-
-		$totalItems = $nggdb->count_albums();
+		$total_items = Album::count();
 
 		$this->set_pagination_args( array(
-			'total_items' => $totalItems,
-			'per_page'    => $perPage
+			'total_items' => $total_items,
+			'per_page'    => $per_page
 		) );
 	}
 
@@ -85,7 +82,7 @@ class Album_List_Table extends \WP_List_Table {
 	/**
 	 * The checkbox column.
 	 *
-	 * @param \stdClass $album
+	 * @param Album $album
 	 *
 	 * @return string
 	 */
@@ -96,7 +93,7 @@ class Album_List_Table extends \WP_List_Table {
 	/**
 	 * The title column.
 	 *
-	 * @param \stdClass $album
+	 * @param Album $album
 	 *
 	 * @return string
 	 */
@@ -113,8 +110,8 @@ class Album_List_Table extends \WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table
 	 *
-	 * @param  \stdClass $album
-	 * @param  String $column_name - Current column name
+	 * @param Album $album The album
+	 * @param string $column_name Current column name
 	 *
 	 * @return Mixed
 	 */
@@ -126,14 +123,17 @@ class Album_List_Table extends \WP_List_Table {
 			case 'id':
 				return $album->id;
 			case 'description':
-				return $album->albumdesc;
+				return $album->description;
 			case 'previewpic':
-				return $album->previewpic;
+				return $album->preview_image;
 			case 'page_id':
-				return $album->pageid;
+				return $album->page_id;
 			default:
 				ob_start();
+
 				do_action( 'ngg_manage_album_custom_column', $column_name, $album->id );
+				//We pass the whole object to new action.
+				do_action( 'ncg_manage_album_custom_column', $column_name, $album );
 
 				return ob_get_clean();
 		}

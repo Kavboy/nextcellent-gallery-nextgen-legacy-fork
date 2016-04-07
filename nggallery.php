@@ -625,7 +625,7 @@ if (!class_exists('NCG')) {
 				    $blogids  = $wpdb->get_col( $wpdb->prepare( "SELECT blog_id FROM $wpdb->blogs", null ) );
 				    foreach ( $blogids as $blog_id ) {
 					    switch_to_blog( $blog_id );
-					    NGG_Installer::install();
+					    NextCellent\Admin\Installer::install();
 				    }
 				    switch_to_blog( $old_blog );
 
@@ -634,7 +634,7 @@ if (!class_exists('NCG')) {
 		    }
 
 		    // check for tables
-		    NGG_Installer::install();
+		    NextCellent\Admin\Installer::install();
 	    }
 
         /**

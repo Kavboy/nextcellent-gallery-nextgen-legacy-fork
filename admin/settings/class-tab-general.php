@@ -48,29 +48,35 @@ class Tab_General extends Settings_Tab {
 		<form method="post" action="<?php echo $this->page; ?>">
 			<?php $this->nonce(); ?>
 			<table class="form-table ngg-options">
+				<?php if(!is_multisite()): ?>
 				<tr>
 					<th><label for="gallerypath"><?php _e('Gallery path','nggallery'); ?></label></th>
 					<td>
-						<input <?php $this->readonly(is_multisite()); ?> type="text" class="regular-text code" name="gallerypath" id="gallerypath" value="<?php echo $this->options['gallerypath']; ?>" />
-						<p class="description"><?php esc_html_e('This is the default path for all galleries','nggallery') ?></p>
+						<input type="text" class="regular-text code" name="gallerypath" id="gallerypath" value="<?php echo $this->options['gallerypath']; ?>" />
+						<p class="description"><?php _e('This is the default path for all galleries.','nggallery') ?></p>
 					</td>
 				</tr>
 				<tr>
 					<th><?php _e('Silent database upgrade','nggallery'); ?></th>
 					<td>
-						<input <?php disabled(is_multisite()); ?> type="checkbox" name="silentUpgrade" id="silentUpgrade" value="true" <?php $this->options->checked('silentUpgrade'); ?> />
+						<input type="checkbox" name="silentUpgrade" id="silentUpgrade" value="true" <?php $this->options->checked('silentUpgrade'); ?> />
 						<label for="silentUpgrade"><?php _e('Update the database without notice.','nggallery') ?></label>
 					</td>
 				</tr>
 				<tr>
 					<th><?php _e('Image files','nggallery'); ?></th>
 					<td>
-						<input <?php disabled(is_multisite()); ?> type="checkbox" name="deleteImg" id="deleteImg" value="true" <?php $this->options->checked('deleteImg'); ?>>
+						<input type="checkbox" name="deleteImg" id="deleteImg" value="true" <?php $this->options->checked('deleteImg'); ?>>
 						<label for="deleteImg">
 							<?php _e("Delete files when removing a gallery from the database",'nggallery'); ?>
 						</label>
 					</td>
 				</tr>
+				<?php else: ?>
+				<tr>
+					<td colspan="2"><p class="description"><?php _e('Some options are only available in the network settings.', 'nggallery') ?></p></td>
+				</tr>
+				<?php endif; ?>
 				<tr>
 					<th><?php _e('Select graphic library','nggallery'); ?></th>
 					<td>
@@ -187,7 +193,7 @@ class Tab_General extends Settings_Tab {
 			'appendType'        => array_keys($this->related_match)
 		));
 
-		if(!is_multisite() && isset($_POST['gallerypath'])) {
+		if(!is_multisite() && isset($_POST['gallerypath']) && trim($_POST['gallerypath']) !== '') {
 			$this->options->set_option('gallerypath', trailingslashit($_POST['gallerypath']));
 		}
 

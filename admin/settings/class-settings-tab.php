@@ -2,22 +2,13 @@
 
 namespace NextCellent\Admin\Settings;
 
+use NextCellent\Admin\Abstract_Tab;
 use NextCellent\Options\Options;
 
 /**
  * A tab in the options screen.
  */
-abstract class Settings_Tab {
-
-	/**
-	 * @var Options $options The options.
-	 */
-	protected $options;
-
-	/**
-	 * @var string The relative URL to the current page, e.g. admin.php?page=nextcellent-options&tab=images
-	 */
-	protected $page;
+abstract class Settings_Tab extends Abstract_Tab {
 
 	/**
 	 * @var array All tab slugs mapped to their name.
@@ -25,17 +16,9 @@ abstract class Settings_Tab {
 	private $tabs;
 
 	public function __construct($options, $page, $tabs) {
-		$this->options = $options;
-		$this->page = $page . '&tab=' . $this->get_name();
+		parent::__construct($options, $page);
 		$this->tabs = $tabs;
 	}
-
-	/**
-	 * Render the content that should be displayed in the tab.
-	 *
-	 * @return null
-	 */
-	public abstract function render();
 
 	/**
 	 * Get the name of this tab.
@@ -45,12 +28,6 @@ abstract class Settings_Tab {
 	public function get_name() {
 		return isset( $_GET['tab'] ) ? $_GET['tab'] : 'general';
 	}
-
-	/**
-	 * Handle saving the settings. The referrer is already checked at this
-	 * point, so you do not need to do that.
-	 */
-	public abstract function processor();
 
 	/**
 	 * Compare two values and echo readonly if they are.
@@ -154,18 +131,12 @@ abstract class Settings_Tab {
 		$out .= '</fieldset>';
 		echo $out;
 	}
-
-	/**
-	 * Do the WordPress nonce for this page.
-	 */
-	protected function nonce() {
-		wp_nonce_field( 'ncg_settings_' . $this->get_name() );
+	
+	public function register_scripts() {
+		// TODO: Implement register_scripts() method.
 	}
-
-	/**
-	 * Print the JavaScript to the page.
-	 */
-	public function print_scripts() {
-		//No JavaScript
+	
+	public function register_styles() {
+		// TODO: Implement register_styles() method.
 	}
 }

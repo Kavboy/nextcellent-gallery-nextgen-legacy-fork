@@ -9,6 +9,7 @@ use NextCellent\Admin\Manage\Galleries\Image_Manager;
 use NextCellent\Admin\Manage\Galleries\Search_Manager;
 use NextCellent\Admin\Manage\Galleries\Sort_Manager;
 use NextCellent\Admin\Settings\Settings_Page;
+use NextCellent\Admin\Upload\Upload_Page;
 
 /**
  * This is the general manager for admin pages of NextCellent.
@@ -93,16 +94,19 @@ class Launcher {
 			Roles::MANAGE_OPTIONS, $this->sluggify( Settings_Page::NAME),
 			array( $this, 'show_menu' ) );
 
-		if ( wpmu_enable_function( 'wpmuStyle' ) || is_super_admin() ) {
+		global $ngg;
+		$options = $ngg->options;
+
+		if ( $options->get_mu_option( 'wpmuStyle' ) || is_super_admin() ) {
 			add_submenu_page( $this->base_slug, __( 'Style', 'nggallery' ), __( 'Style', 'nggallery' ), Roles::MANAGE_STYLE,
 				$this->sluggify(Style_Page::NAME),
 				array( $this, 'show_menu' ) );
 		}
-		if ( wpmu_enable_function( 'wpmuRoles' ) || is_super_admin() ) {
-			add_submenu_page( $this->base_slug, __( 'Capabilities', 'nggallery' ), __( 'Capabilities', 'nggallery' ), Roles::MANAGE_OPTIONS,
-				$this->sluggify( Roles::NAME ),
-				array( $this, 'show_menu' ) );
-		}
+
+		add_submenu_page( $this->base_slug, __( 'Capabilities', 'nggallery' ), __( 'Capabilities', 'nggallery' ), Roles::MANAGE_OPTIONS,
+			$this->sluggify( Roles::NAME ),
+			array( $this, 'show_menu' ) );
+
 	}
 
 	/**
@@ -157,14 +161,13 @@ class Launcher {
 
 	/**
 	 * Add the network pages to the network menu.
+	 *
+	 * The page with settings is added as a sub-page of the general settings.
 	 */
 	public function add_network_admin_menu() {
-		add_menu_page( __( 'Galleries', 'nggallery' ), __( 'Galleries', 'nggallery' ), Roles::MANAGE_NETWORK_OPTIONS,
-			$this->base_slug, array( $this, 'show_network_settings' ), 'dashicons-format-gallery' );
-
-		add_submenu_page( $this->base_slug, __( 'Network settings', 'nggallery' ), __( 'Network settings', 'nggallery' ),
+		add_submenu_page( 'settings.php' , __( 'NextCellent settings', 'nggallery' ), __( 'NextCellent', 'nggallery' ),
 			Roles::MANAGE_NETWORK_OPTIONS,
-			$this->base_slug, array( $this, 'show_network_settings' ) );
+			self::sluggify(WPMU_Settings::NAME), array( $this, 'show_menu' ) );
 	}
 
 	/**
@@ -184,27 +187,24 @@ class Launcher {
 	}
 
 	/**
-	 * Show the network pages.
-	 */
-	public function show_network_settings() {
-		$this->show_upgrade_page();
-		include_once( __DIR__ . '/wpmu.php' );
-		nggallery_wpmu_setup();
-	}
-
-	/**
 	 * Make the screen object for the screen we want to display.
 	 *
 	 * @param \WP_Screen $current_screen The current screen.
 	 */
 	public function make_page($current_screen) {
 
-		$i18n = strtolower( __( 'Galleries', 'nggallery' ) );
+		//If we are on the network admin site, the page is under the network settings.
+		if(is_network_admin()) {
+			$slug = str_replace('-network', '', str_replace("settings_page_" , '', $current_screen->id));
+		} else {
+			$i18n = strtolower( __( 'Galleries', 'nggallery' ) );
+			$slug = str_replace("{$i18n}_page_" , '', $current_screen->id);
+		}
 
-		$slug = $this->unsluggify(str_replace("{$i18n}_page_" , '', $current_screen->id));
+		$slug = self::unsluggify($slug);
 
 		switch ( $slug ) {
-			case Upload_Page::NAME :
+			case Upload_Page::NAME:
 				require_once( __DIR__ . '/functions.php' );
 				$this->page = new Upload_Page();
 				break;
@@ -212,23 +212,27 @@ class Launcher {
 				require_once( __DIR__ . '/functions.php' );
 				$this->page = $this->get_manager();
 				break;
-			case Album_Manager::NAME :
+			case Album_Manager::NAME:
 				$this->page = $this->get_album_manager();
 				break;
-			case Settings_Page::NAME :
+			case Settings_Page::NAME:
 				$this->page = new Settings_Page();
 				break;
-			case Tag_Manager::NAME :
+			case Tag_Manager::NAME:
 				$this->page = new Tag_Manager();
 				break;
-			case Style_Page::NAME :
+			case Style_Page::NAME:
 				$this->page = new Style_Page();
 				break;
-			case Roles::NAME :
+			case Roles::NAME:
 				$this->page = new Roles();
 				break;
 			case "toplevel_page_" . $this->base_slug:
 				$this->page = new Overview_Page();
+				break;
+			//Network settings
+			case WPMU_Settings::NAME:
+				$this->page = new WPMU_Settings();
 				break;
 			default: //Not our page
 				$this->page = null;

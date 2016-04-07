@@ -27,7 +27,7 @@ use NextCellent\Database\Not_Found_Exception;
  * @property string $thumb_url URL to the thumbnail
  * @property string $thumb_path Path to the thumbnail
  */
-class Image extends Model {
+class Image extends Abstract_Model {
 
 	/**
 	 * Define the database column names.
@@ -67,8 +67,6 @@ class Image extends Model {
 	/**
 	 * Get an image from the database. This will throw an exception
 	 * if the image is not found.
-	 *
-	 * @see Image_Factory::get_image_or_null()
 	 *
 	 * @param int $id The ID of the image.
 	 *

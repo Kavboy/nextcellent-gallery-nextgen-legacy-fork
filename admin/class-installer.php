@@ -117,12 +117,17 @@ class Installer {
 	/**
 	 * Setup the default option array for NextCellent.
 	 * When adding new options, an upgrade should be made for existing users as well.
+	 * 
+	 * IMPORTANT: if an option is not set, the default value will be used. Therefor, if a
+	 * default value is changed, it is very important to consider existing sites.
+	 * 
 	 * @see NGG_Upgrader
 	 */
 	public static function set_default_options() {
 
 		global $blog_id;
-
+		
+		//This is the default
 		$ngg_options['gallerypath']    = 'wp-content/gallery/';        // set default path to the gallery
 		$ngg_options['deleteImg']      = true;                            // delete Images
 		$ngg_options['swfUpload']      = true;                            // activate the batch upload

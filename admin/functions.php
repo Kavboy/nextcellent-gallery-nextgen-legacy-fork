@@ -61,7 +61,7 @@ class nggAdmin{
 		}
 		
 		// 1. Check for existing folder, if it already exists, create new one with suffix
-		if ( is_dir($nggRoot . $name ) && !(SAFE_MODE) ) {
+		if ( is_dir($nggRoot . $name ) ) {
 			$suffix = 1;
 			do {
 				$alt_name = substr ($name, 0, 200 - ( strlen( $suffix ) + 1 ) ) . "_$suffix";
@@ -88,20 +88,8 @@ class nggAdmin{
 				$txt .= __('Unable to create directory ', 'nggallery').' <strong>' . esc_html( $nggpath ) . '/thumbs !</strong>';
 		}
 		
-		if (SAFE_MODE) {
-			$help  = __('The server setting Safe-Mode is on !', 'nggallery');	
-			$help .= '<br />'.__('If you have problems, please create directory', 'nggallery').' <strong>' . esc_html( $nggpath ) . '</strong> ';	
-			$help .= __('and the thumbnails directory', 'nggallery').' <strong>' . esc_html( $nggpath ) . '/thumbs</strong> '.__('with permission 777 manually !', 'nggallery');
-			if ($output) nggGallery::show_message($help);
-		}
-		
 		// show a error message			
 		if ( !empty($txt) ) {
-			if (SAFE_MODE) {
-			// for safe_mode , better delete folder, both folder must be created manually
-				@rmdir($win_nggpath . '/thumbs');
-				@rmdir($win_nggpath);
-			}
 			if ($output) nggGallery::show_error($txt);
 			return false;
 		}
@@ -119,7 +107,7 @@ class nggAdmin{
 		if ($galleryID != false) {
 			$message  = __('Gallery ID %1$s successfully created. You can show this gallery in your post or page with the shortcode %2$s.<br/>','nggallery');
 			$message  = sprintf($message, $galleryID, '<strong>[nggallery id=' . $galleryID . ']</strong>');
-			$message .= '<a href="' . admin_url() . 'admin.php?page=nggallery-manage&mode=image&gid=' . $galleryID . '" >';
+			$message .= '<a href="' . \NextCellent\Admin\Launcher::get_url(\NextCellent\Admin\Manage\Galleries\Image_Manager::NAME) . '&mode=image&gid=' . $galleryID . '" >';
 			$message .= __('Edit gallery','nggallery');
 			$message .= '</a>';
 			
@@ -1368,7 +1356,7 @@ class nggAdmin{
 	static function can_manage_this_gallery($check_ID) {
 		
 		global $user_ID, $wp_roles;
-		
+
 		if ( !current_user_can('NextGEN Manage others gallery') ) {
 			// get the current user ID
 			get_currentuserinfo();

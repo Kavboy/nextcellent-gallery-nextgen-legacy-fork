@@ -8,7 +8,7 @@ use NextCellent\Database\Manager;
  * @author  Niko Strijbol
  * @version 23/02/2016
  */
-abstract class Model {
+abstract class Abstract_Model {
 
 	protected $properties = array();
 
@@ -45,11 +45,13 @@ abstract class Model {
 		}
 	}
 
-	public function save_model($table, $column, $id) {
+	protected function save_model($table, $column, $id) {
 		return Manager::get()->update($table, $this->to_array(), array(
 			$column => $id
 		));
 	}
+	
+	public abstract function save();
 
 	/**
 	 * Convert to model to an array of data.

@@ -121,8 +121,8 @@ class nggMeta{
 
                 if (!empty($exif['FNumber']))
                     $meta['aperture'] = 'F ' . round( $this->exif_frac2dec( $exif['FNumber'] ), 2 );
-                if (!empty($exif['Model']))
-                    $meta['camera'] = trim( $exif['Model'] );
+                if (!empty($exif['Abstract_Model']))
+                    $meta['camera'] = trim( $exif['Abstract_Model'] );
                 if (!empty($exif['DateTimeDigitized']))
                     $meta['created_timestamp'] = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $this->exif_date2ts($exif['DateTimeDigitized']));
                 else if (!empty($exif['DateTimeOriginal']))
@@ -145,8 +145,8 @@ class nggMeta{
             if ( isset($this->exif_data['IFD0']) ) {
                 $exif = $this->exif_data['IFD0'];
 
-                if (!empty($exif['Model']))
-                    $meta['camera'] = $exif['Model'];
+                if (!empty($exif['Abstract_Model']))
+                    $meta['camera'] = $exif['Abstract_Model'];
                 if (!empty($exif['Make']))
                     $meta['make'] = $exif['Make'];
                 if (!empty($exif['ImageDescription']))

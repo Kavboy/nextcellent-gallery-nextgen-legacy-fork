@@ -33,6 +33,9 @@ class Options implements \ArrayAccess {
 	 */
 	const GALLERY_PATH = 'gallerypath';
 	const DELETE_IMAGES_FROM_DISK = 'deleteImg';
+	/**
+	 * @deprecated This option is permanently on.
+	 */
 	const USE_ADVANCED_UPLOADER = 'swfUpload';
 	const USE_PERMALINKS = 'usePermalinks';
 	//This should not be changed for backwards compatibility.
@@ -41,7 +44,7 @@ class Options implements \ArrayAccess {
 	const IMAGE_MAGIC_PATH = 'imageMagickDir';
 	const USE_MEDIA_RSS = 'useMediaRSS';
 	const USE_PICLENS = 'usePicLens';
-	const DO_SILENT_DB_UPDATE = 'silentUpdate';
+	const SILENT_DB_UPDATE = 'silentUpdate';
 
 	const USE_RELATED_IMAGES = 'activateTags';
 	const RELATED_IMAGES_SOURCE = 'appendType';
@@ -103,9 +106,13 @@ class Options implements \ArrayAccess {
 	const STYLE_USE_CSS = 'activateCSS';
 	const STYLE_CSS_FILE = 'CSSfile';
 
-	const MU_GALLERY_PATH = 'gallerypath';
-	const MU_CSS_FILE = 'wpmuCSSfile';
-	const MU_DO_SILENT_DB_UPDATE = 'silentUpdate';
+	const MU_GALLERY_PATH           = 'gallerypath';
+	const MU_CSS_FILE               = 'wpmuCSSfile';
+	const MU_SILENT_DB_UPDATE    = 'silentUpdate';
+	const MU_QUOTA_CHECK            = 'wpmuQuotaCheck';
+	const MU_ALLOW_UPLOAD_ZIP       = 'wpmuZipUpload';
+	const MU_ALLOW_IMPORT_FOLDER    = 'wpmuImportFolder';
+	const MU_ALLOW_CHOICE_STYLE     = 'wpmuStyle';
 
 	/**
 	 * @var array $options The options.
@@ -130,6 +137,9 @@ class Options implements \ArrayAccess {
 	/**
 	 * The constructor is private to prevent new instances.
 	 *
+	 * IMPORTANT: if an option is not set, the default value will be used. Therefor, if a
+	 * default value is changed, it is very important to consider existing sites.
+	 *
 	 * @internal See the class description. You should almost never make an instance of this class.
 	 */
 	public function __construct() {
@@ -137,7 +147,6 @@ class Options implements \ArrayAccess {
 			//General stuff
 			'gallerypath'       => 'wp-content/gallery/',   //Set the default path to the gallery.
 			'deleteImg'         => true,                    //Delete images from disk?
-			'swfUpload'         => true,                    //Activate the batch upload?
 			'usePermalinks'     => false,                   //Use permalinks for parameters?
 			'permalinkSlug'     => 'nggallery',             //The default slug for permalinks.
 			'graphicLibrary'    => 'gd',                    //The default graphic library.
@@ -216,9 +225,13 @@ class Options implements \ArrayAccess {
 		);
 
 		$mu_defaults = array(
-			'gallerypath'  => 'wp-content/blogs.dir/%BLOG_ID%/files/',
-			'wpmuCSSfile'  => 'nggallery.css',
-			'silentUpdate' => false,
+			'gallerypath'       => 'wp-content/sites/%BLOG_ID%/gallery/',
+			'wpmuCSSfile'       => 'nggallery.css',
+			'silentUpdate'      => false,
+			'wpmuQuotaCheck'    => true,
+			'wpmuZipUpload'     => true,
+			'wpmuImportFolder'  => true,
+			'wpmuStyle'         => false,
 		);
 
 		if ( is_multisite() ) {
@@ -462,9 +475,9 @@ class Options implements \ArrayAccess {
 	}
 
 	/**
-	 * Output the HTML checked attribute if the given option is true.
+	 * Output the HTML checked attribute if the given (normal) option is true.
 	 *
-	 * @param string $option The name of the option.
+	 * @param string $option The name of the option. Does not work with network options.
 	 * @param bool $compare  The value to compare to.
 	 * @param bool $echo     Whether to echo or return the string.
 	 *
@@ -475,7 +488,20 @@ class Options implements \ArrayAccess {
 	}
 
 	/**
-	 * Output the HTML selected attribute if the given option is true.
+	 * Output the HTML checked attribute if the given (network) option is true.
+	 *
+	 * @param string $option The name of the option. Only works with network options.
+	 * @param bool $compare  The value to compare to.
+	 * @param bool $echo     Whether to echo or return the string.
+	 *
+	 * @return null|string The checked attribute if true, else an empty string. If echo is set, nothing is returned.
+	 */
+	public function mu_checked( $option, $compare = true, $echo = true ) {
+		return checked( $this->get_mu_option( $option ), $compare, $echo );
+	}
+
+	/**
+	 * Output the HTML selected attribute if the given (normal) option is true.
 	 *
 	 * @param string $option The name of the option.
 	 * @param bool $compare  The value to compare to.
@@ -488,7 +514,20 @@ class Options implements \ArrayAccess {
 	}
 
 	/**
-	 * Output the HTML disabled attribute if the given option is true.
+	 * Output the HTML selected attribute if the given (network) option is true.
+	 *
+	 * @param string $option The name of the option. Only works with network options.
+	 * @param bool $compare  The value to compare to.
+	 * @param bool $echo     Whether to echo or return the string.
+	 *
+	 * @return null|string The selected attribute if true, else an empty string. If echo is set, nothing is returned.
+	 */
+	public function mu_selected( $option, $compare = true, $echo = true ) {
+		return selected( $this->get_mu_option( $option ), $compare, $echo );
+	}
+
+	/**
+	 * Output the HTML disabled attribute if the given (normal) option is true.
 	 *
 	 * @param string $option The name of the option.
 	 * @param bool $compare  The value to compare to.
@@ -498,6 +537,19 @@ class Options implements \ArrayAccess {
 	 */
 	public function disabled( $option, $compare = true, $echo = true ) {
 		return disabled( $this->get( $option ), $compare, $echo );
+	}
+
+	/**
+	 * Output the HTML disabled attribute if the given (network) option is true.
+	 *
+	 * @param string $option The name of the option. Only works with network options.
+	 * @param bool $compare  The value to compare to.
+	 * @param bool $echo     Whether to echo or return the string.
+	 *
+	 * @return null|string The disabled attribute if true, else an empty string. If echo is set, nothing is returned.
+	 */
+	public function mu_disabled( $option, $compare = true, $echo = true ) {
+		return disabled( $this->get_mu_option($option ), $compare, $echo );
 	}
 
 	/**

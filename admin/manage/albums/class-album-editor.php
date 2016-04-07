@@ -3,18 +3,20 @@
 namespace NextCellent\Admin\Manage\Albums;
 
 use NextCellent\Admin\Admin_Page;
+use NextCellent\Models\Album;
+use NextCellent\Models\Gallery;
 
 class Album_Editor extends Admin_Page {
 
 	const NAME = 'manage-album';
 
 	/**
-	 * @var array All galleries
+	 * @var Gallery[] All galleries
 	 */
 	private $galleries;
 
 	/**
-	 * @var array All albums
+	 * @var Album[] All albums
 	 */
 	private $albums;
 

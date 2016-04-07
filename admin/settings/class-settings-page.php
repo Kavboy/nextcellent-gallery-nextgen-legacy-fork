@@ -2,7 +2,8 @@
 
 namespace NextCellent\Admin\Settings;
 
-use NextCellent\Admin\Post_Admin_Page;
+use NextCellent\Admin\Abstract_Tab_Page;
+use NextCellent\Options\Options;
 use WP_Screen;
 
 /**
@@ -30,19 +31,14 @@ use WP_Screen;
  *
  * add_hook( 'ngg_tab_content_my_plugin', 'display_settings');
  */
-class Settings_Page extends Post_Admin_Page {
+class Settings_Page extends Abstract_Tab_Page {
 	
 	const NAME = 'options';
 
 	/**
-	 * @var Settings_Page $options The options.
+	 * @var Options $options The options.
 	 */
 	private $options;
-
-	/**
-	 * @var string|Settings_Tab $current The current page or the name of the current page.
-	 */
-	private $current;
 
 	public function __construct() {
 
@@ -50,11 +46,7 @@ class Settings_Page extends Post_Admin_Page {
 
 		$this->options = $ngg->options;
 
-		$tab = 'general';
-		if(isset($_GET['tab'])) {
-			$tab = $_GET['tab'];
-		}
-		$this->load_page($tab);
+		parent::__construct();
 	}
 
 	/**
@@ -64,7 +56,7 @@ class Settings_Page extends Post_Admin_Page {
 	 *
 	 * @see NGG_Options::current
 	 */
-	private function load_page( $name ) {
+	protected function load_page( $name ) {
 
 		$tabs = $this->get_tabs();
 
@@ -95,8 +87,10 @@ class Settings_Page extends Post_Admin_Page {
 				 * Load a settings page.
 				 *
 				 * @var string $name The name of the settings page to load.
+				 *                   
+				 * @return Settings_Tab The settings tab.
 				 */
-				$name = do_action( 'ncg_load_settings_page', $name);
+				$name = apply_filters( 'ncg_load_settings_page', $name);
 				$this->current = $name;
 		}
 	}
@@ -105,30 +99,7 @@ class Settings_Page extends Post_Admin_Page {
 	 * Save/Load options and add a new hook for plugins
 	 */
 	protected function processor() {
-
-		//For legacy pages, we do the old processing.
-		if(is_string($this->current)) {
-			$this->old_processor();
-		} else {
-
-			//Check the referrer.
-			check_admin_referer( 'ncg_settings_' . $this->current->get_name() );
-
-			$this->current->processor();
-
-			/**
-			 * Fires when settings are updated on a settings page.
-			 *
-			 * @param array $_POST The post variables. Use this, and not $_POST, as $_POST might
-			 *                     be empty in the future.
-			 */
-			do_action( 'ncg_settings_updated_' . $this->current->get_name(), $_POST);
-		}
-
-		/**
-		 * @deprecated Please use the appropriate 'ncg_settings_update_[PAGE]' action.
-		 */
-		do_action( 'ngg_update_options_page' );
+		$this->process('ncg_settings_updated', 'ngg_update_options_page');
 	}
 
 	/**
@@ -137,7 +108,7 @@ class Settings_Page extends Post_Admin_Page {
 	 *
 	 * @deprecated Please update your plugin to manage your own settings.
 	 */
-	private function old_processor() {
+	protected function old_processor() {
 		global $nggRewrite;
 
 		$old_state = $this->options['usePermalinks'];
@@ -194,54 +165,13 @@ class Settings_Page extends Post_Admin_Page {
 	}
 
 	/**
-	 * Render the page content
-	 */
-	public function display() {
-
-		parent::display();
-
-		// get list of tabs
-		$tabs = $this->get_tabs();
-
-		?>
-		<div class="wrap">
-			<h1><?php _e('Settings', 'nggallery') ?></h1>
-			<h2 class="nav-tab-wrapper">
-				<?php
-				foreach($tabs as $tab => $name) {
-					$class =  $this->is_active($tab) ? 'nav-tab-active' : '';
-					echo "<a class='nav-tab $class' href='?page=nextcellent-options&tab=$tab'>$name</a>";
-				}
-				?>
-			</h2>
-			<?php
-			//If the current page is a string, we need a third party tab.
-			if (is_string($this->current)) {
-				if ( method_exists( $this, "tab_$this->current" )) {
-					call_user_func( array( $this , "tab_$this->current"));
-				} else {
-					do_action( 'ngg_tab_content_' . $this->current);
-				}
-			} else {
-				//Display the page.
-				$this->current->render();
-			}
-			?>
-		</div>
-		<?php
-		if(!is_string($this->current)) {
-			$this->current->print_scripts();
-		}
-	}
-
-	/**
 	 * Check if a tab is active or not.
 	 *
 	 * @param string $tab The name of the tab.
 	 *
 	 * @return bool True if active, otherwise false.
 	 */
-	private function is_active($tab) {
+	protected function is_active($tab) {
 		return $this->current == $tab || (!is_string($this->current) && $this->current->get_name() == $tab);
 	}
 
@@ -250,7 +180,7 @@ class Settings_Page extends Post_Admin_Page {
 	 *
 	 * @return array $tabs
 	 */
-	private function get_tabs() {
+	protected function get_tabs() {
 
 		$tabs = array();
 
@@ -275,18 +205,14 @@ class Settings_Page extends Post_Admin_Page {
 		$tabs = apply_filters('ngg_settings_tabs', $tabs);
 
 		return $tabs;
-
 	}
 
 	public function register_styles() {
-		wp_enqueue_style( 'nggtabs');
 		wp_enqueue_style( 'nggadmin' );
 		wp_enqueue_style( 'ngg-jqueryui' );
-		wp_enqueue_style( 'jqueryFileTree');
 	}
 
 	public function register_scripts() {
-		wp_enqueue_script( 'jquery-ui-tabs' );
 		wp_enqueue_script( 'ngg-autocomplete' );
 	}
 
@@ -338,5 +264,16 @@ class Settings_Page extends Post_Admin_Page {
 	 */
 	public function get_name() {
 		return self::NAME;
+	}
+
+	protected function page_title() {
+		return __('Settings', 'nggallery');
+	}
+
+	/**
+	 * @return string The name of the default tab.
+	 */
+	protected function default_tab() {
+		return 'general';
 	}
 }

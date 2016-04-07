@@ -2,6 +2,7 @@
 
 namespace NextCellent\Models;
 
+use NextCellent\Admin\Roles;
 use NextCellent\Database\Database_Exception;
 use NextCellent\Database\Manager;
 use NextCellent\Database\Not_Found_Exception;
@@ -19,7 +20,7 @@ use NextCellent\Database\Not_Found_Exception;
  * @property-read Image[] $images The images in this gallery.
  * @property-read Image $preview_image The preview image.
  */
-class Gallery extends Model {
+class Gallery extends Abstract_Model {
 
 	/**
 	 * Define the database tables.
@@ -198,16 +199,16 @@ class Gallery extends Model {
 	 *
 	 * @return array
 	 */
-	public static function all($sort = Gallery::ID, $sort_dir = 'ASC', $start = 0, $per_page = 0, $count_images = false ) {
+	public static function all($sort = self::ID, $sort_dir = 'ASC', $start = 0, $per_page = 0, $count_images = false ) {
 
 		$sort_orders = array(
-			Gallery::ID,
-			Gallery::TITLE,
-			Gallery::AUTHOR,
+			self::ID,
+			self::TITLE,
+			self::AUTHOR,
 		);
 
 		if(!in_array($sort, $sort_orders)) {
-			$sort = Gallery::ID;
+			$sort = self::ID;
 		}
 
 		$order_dir = ( $sort_dir === 'DESC') ? 'DESC' : 'ASC';
@@ -230,8 +231,8 @@ class Gallery extends Model {
 		$gallery_ids = array();
 
 		foreach ( $ids as $id ) {
-			$galleries[$id[Gallery::ID]] = Gallery::to_gallery($id);
-			array_push($gallery_ids, $id[Gallery::ID]);
+			$galleries[$id[self::ID]] = self::to_gallery($id);
+			array_push($gallery_ids, $id[self::ID]);
 		}
 
 		if($count_images) {
@@ -321,5 +322,18 @@ class Gallery extends Model {
 		if($result < 1) {
 			throw new Not_Found_Exception(__('Cannot delete non-existing image.', 'nggallery'));
 		}
+	}
+
+	public function save() {
+		return parent::save_model( Manager::get()->get_gallery_table(), self::ID, $this->id );
+	}
+
+	public function can_manage($user = null) {
+		
+		if($user === null) {
+			$user = get_current_user_id();
+		}
+		
+		return user_can($user, Roles::MANAGE_ALL_GALLERIES) || (user_can($user, Roles::MANAGE_GALLERIES) && $this->author == get_current_user_id());
 	}
 }
