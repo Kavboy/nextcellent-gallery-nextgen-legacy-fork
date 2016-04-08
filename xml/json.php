@@ -10,6 +10,10 @@
 * 
 */
 
+/**
+ * @TODO Is this actually used somewhere? If not, we might replace it.
+ */
+
 class nggAPI {
 
 	/**

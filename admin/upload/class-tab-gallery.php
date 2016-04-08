@@ -73,7 +73,7 @@ class Tab_Gallery extends Upload_Tab {
 	}
 
 	public function register_scripts() {
-		// TODO: Implement register_scripts() method.
+
 	}
 
 	public function register_styles() {

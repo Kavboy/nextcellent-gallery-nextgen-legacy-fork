@@ -392,7 +392,7 @@ class Launcher {
 			'error'      => __( 'Unexpected Error', 'nggallery' ),
 			'failure'    => __( 'A failure occurred', 'nggallery' )
 		) );
-		wp_register_script( 'ngg-plupload-handler', plugins_url( 'js/plupload.handler.js', __FILE__), array( 'plupload-all' ), '0.0.1' );
+		wp_register_script( 'ngg-plupload-handler', plugins_url( 'js/plupload.handler.js', __FILE__), array( 'plupload-all' ), '2.0.0' );
 		wp_localize_script( 'ngg-plupload-handler', 'pluploadL10n', array(
 			'queue_limit_exceeded'      => __( 'You have attempted to queue too many files.' ),
 			'file_exceeds_size_limit'   => __( 'This file exceeds the maximum upload size for this site.' ),
@@ -416,8 +416,7 @@ class Launcher {
 			'error_uploading'           => __( '&#8220;%s&#8221; has failed to upload due to an error' ),
 			'no_gallery'                => __( 'You didn\'t select a gallery!', 'nggallery' )
 		) );
-		wp_register_script( 'ngg-progressbar', plugins_url( 'js/ngg.progressbar.js', __FILE__), array( 'jquery' ),
-			'2.0.1' );
+		wp_register_script( 'ngg-progressbar', plugins_url( 'js/ngg.progressbar.js', __FILE__), array( 'jquery-ui-dialog' ) );
 		wp_register_script( 'ngg-autocomplete', plugins_url( 'js/ngg.autocomplete.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.1' );
 
 		wp_register_script( 'jqueryFileTree', plugins_url( 'js/jqueryFileTree/jqueryFileTree.js', __FILE__), array( 'jquery' ), '1.0.1' );

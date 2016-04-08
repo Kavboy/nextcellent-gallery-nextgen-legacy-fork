@@ -4,6 +4,7 @@ namespace NextCellent\Admin;
 
 use NextCellent\Admin\Manage\Albums\Album_Manager;
 use NextCellent\Admin\Manage\Galleries\Abstract_Manager;
+use NextCellent\Admin\Upload\Upload_Page;
 use NextCellent\Models\Gallery;
 use NextCellent\Models\Image;
 

@@ -16,7 +16,7 @@ abstract class Settings_Tab extends Abstract_Tab {
 	private $tabs;
 
 	public function __construct($options, $page, $tabs) {
-		parent::__construct($options, $page);
+		parent::__construct($options, $page, 'general');
 		$this->tabs = $tabs;
 	}
 

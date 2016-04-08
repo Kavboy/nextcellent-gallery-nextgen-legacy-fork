@@ -6,6 +6,8 @@
 +	by Alex Rabe
 +   	required for NextGEN Gallery
 +----------------------------------------------------------------+
+
+@todo What does this even do?
 */
 
 // look up for the path

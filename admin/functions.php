@@ -1327,6 +1327,7 @@ class nggAdmin{
 	 * @class nggAdmin
 	 * @param string $foldername
 	 * @return bool $result
+	 * @deprecated Safe Mode is dead!
 	 */
 	static function check_safemode($foldername) {
 
@@ -1352,6 +1353,8 @@ class nggAdmin{
 	 * @class nggAdmin
 	 * @param int $check_ID is the user_id
 	 * @return bool $result
+	 *              
+	 * @deprecated No longer used.
 	 */
 	static function can_manage_this_gallery($check_ID) {
 		
@@ -1647,6 +1650,7 @@ class nggAdmin{
 	 * @access internal
 	 * @param int $code php upload error code
 	 * @return string message
+	 * @deprecated No longer in use.
 	 */
 	
 	static function decode_upload_error( $code ) {

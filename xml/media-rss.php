@@ -21,6 +21,9 @@
 * Parameters for mode = album
 * 
 * 	@param aid The album ID to show
+ *                
+ *                
+ * @todo Clean up this mess.
 */
 
 // Load required files and set some useful variables

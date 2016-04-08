@@ -19,9 +19,19 @@ abstract class Abstract_Tab {
 	 * @var string The relative URL to the current page, e.g. admin.php?page=nextcellent-options&tab=images
 	 */
 	protected $page;
+	
+	private $default_name;
 
-	public function __construct($options, $page) {
+	/**
+	 * Abstract_Tab constructor.
+	 *
+	 * @param Options $options The options.
+	 * @param string $page The page name.
+	 * @param string $default_name The name of the tab if the URL contains no tab.
+	 */
+	public function __construct($options, $page, $default_name) {
 		$this->options = $options;
+		$this->default_name = $default_name;
 		$this->page = $page . '&tab=' . $this->get_name();
 	}
 
@@ -33,12 +43,12 @@ abstract class Abstract_Tab {
 	public abstract function render();
 
 	/**
-	 * Get the name of this tab.
+	 * Get the name of this tab (as it appears in the URL).
 	 *
 	 * @return string The name of this tab.
 	 */
 	public function get_name() {
-		return isset( $_GET['tab'] ) ? $_GET['tab'] : 'general';
+		return isset( $_GET['tab'] ) ? $_GET['tab'] : $this->default_name;
 	}
 
 	/**

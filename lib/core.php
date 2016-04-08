@@ -408,6 +408,8 @@ class nggGallery {
 	 *
 	 * @since V1.2.0
 	 * @return string message about recommended image size
+	 *                
+	 * @deprecated This is not true anymore. Just delete this message.
 	 */
 	static function check_memory_limit() {
 
@@ -440,7 +442,7 @@ class nggGallery {
 				}
 			}
 		}
-		return;
+		return "";
 	}
 
 	/**

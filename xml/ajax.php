@@ -1,6 +1,8 @@
 <?php
 // see http://codex.wordpress.org/AJAX_in_Plugins
 
+//TODO: what does this do?
+
 // check if we have all needed parameter
 if ( !defined('ABSPATH') || (!isset($_GET['galleryid']) || !is_numeric($_GET['galleryid'])) || (!isset($_GET['p']) || !is_numeric($_GET['p'])) || !isset($_GET['type'])){
     // if it's not ajax request, back to main page

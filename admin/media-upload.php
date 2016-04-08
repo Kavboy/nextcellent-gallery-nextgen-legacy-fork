@@ -6,6 +6,8 @@
  * 
  */
 
+//TODO: load this in the main NextCellent class
+
 function ngg_wp_upload_tabs ($tabs) {
 
 	$newtab = array('nextgen' => __('NextCellent Gallery','nggallery'));

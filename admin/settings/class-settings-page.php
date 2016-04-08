@@ -165,17 +165,6 @@ class Settings_Page extends Abstract_Tab_Page {
 	}
 
 	/**
-	 * Check if a tab is active or not.
-	 *
-	 * @param string $tab The name of the tab.
-	 *
-	 * @return bool True if active, otherwise false.
-	 */
-	protected function is_active($tab) {
-		return $this->current == $tab || (!is_string($this->current) && $this->current->get_name() == $tab);
-	}
-
-	/**
 	 * Create array for tabs and add a filter for other plugins to inject more tabs
 	 *
 	 * @return array $tabs
