@@ -7,44 +7,64 @@
  *
  * This is based on http://www.php-fig.org/psr/psr-4/examples/
  */
-spl_autoload_register(function ($class) {
+class Autoloader {
 
-	// project-specific namespace prefix
-	$prefix = 'NextCellent\\';
+	/**
+	 * @var string
+	 */
+	private $prefix;
+	/**
+	 * @var string
+	 */
+	private $base_dir;
 
-	// base directory for the namespace prefix
-	$base_dir = __DIR__ . '/';
-
-	// does the class use the namespace prefix?
-	$len = strlen($prefix);
-	if (strncmp($prefix, $class, $len) !== 0) {
-		// no, move to the next registered autoloader
-		return;
+	/**
+	 * Autoloader constructor.
+	 *
+	 * @param string $prefix The namespace prefix.
+	 * @param string $base_dir The base directory that corresponds with the prefix.
+	 */
+	public function __construct($prefix, $base_dir) {
+		$this->prefix = $prefix;
+		$this->base_dir = $base_dir;
 	}
 
-	$class = strtolower($class);
-
-	// get the relative class name
-	$relative_class = substr($class, $len);
-
-	//Do the WordPress stuff
-	$relative_class = str_replace('_', '-', $relative_class);
-	$pos = strrpos($relative_class, '\\');
-
-	if($pos) {
-		$relative_class = substr_replace($relative_class, '\class-', $pos, 1);
-	} else {
-		$relative_class = 'class-' .  $relative_class;
+	/**
+	 * Register loader with SPL autoloader stack.
+	 */
+	public function register() {
+		spl_autoload_register(array($this, 'loadClass'));
 	}
 
+	/**
+	 * Loads the class file for a given class name.
+	 *
+	 * @param string $class The fully-qualified class name.
+	 */
+	public function loadClass($class) {
+		// does the class use the namespace prefix?
+		$len = strlen($this->prefix);
+		if (strncmp($this->prefix, $class, $len) !== 0) {
+			// no, move to the next registered autoloader
+			return;
+		}
 
-	// replace the namespace prefix with the base directory, replace namespace
-	// separators with directory separators in the relative class name, append
-	// with .php
-	$file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+		$class = strtolower($class);
 
-	// if the file exists, require it
-	if (file_exists($file)) {
-		require $file;
+		// get the relative class name
+		$relative_class = substr($class, $len);
+
+		//Do the WordPress stuff
+		$relative_class = str_replace('_', '-', $relative_class);
+
+		// replace the namespace prefix with the base directory, replace namespace
+		// separators with directory separators in the relative class name, append
+		// with .php
+		$file = $this->base_dir . str_replace('\\', '/', $relative_class) . '.php';
+
+		// if the file exists, require it
+		if (file_exists($file)) {
+			require $file;
+		}
 	}
-});
+}

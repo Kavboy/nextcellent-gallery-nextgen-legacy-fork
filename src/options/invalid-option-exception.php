@@ -9,7 +9,7 @@ use NextCellent\Exception;
  *
  * @package NextCellent\Lib\Exceptions
  */
-class InvalidOptionException extends Exception {
+class Invalid_Option_Exception extends Exception {
 
 	private $option;
 

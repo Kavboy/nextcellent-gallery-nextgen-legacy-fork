@@ -8,6 +8,8 @@ if ( !class_exists('ngg_locale') ) :
  * 
  * @package NextGEN Gallery
  * @since 1.5.0
+ *        
+ * @deprecated This will be removed in the future, as 1) it is no longer used, and 2) it is built in now.
  */
 
 class ngg_locale {

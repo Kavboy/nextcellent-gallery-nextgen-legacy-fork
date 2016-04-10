@@ -4,6 +4,8 @@
 * 
 * @author 		Vincent Prat
 * @copyright 	Copyright 2008-2011
+ *
+ * @deprecated
 */
 class nggMediaRss {
 	
@@ -15,7 +17,9 @@ class nggMediaRss {
 	}
 	
 	/**
-	 * Add the javascript required to enable PicLens/CoolIris support 
+	 * Add the javascript required to enable PicLens/CoolIris support
+	 * 
+	 * @deprecated
 	 */
 	static function add_piclens_javascript() {
         if (is_ssl())
@@ -26,6 +30,8 @@ class nggMediaRss {
 	
 	/**
 	 * Get the URL of the general media RSS
+	 * 
+	 * @deprecated
 	 */
 	static function get_mrss_url() {
 		return NGGALLERY_URLPATH . 'xml/media-rss.php';

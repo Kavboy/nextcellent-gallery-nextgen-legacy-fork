@@ -26,5 +26,5 @@ NCG::remove_transients();
 
 
 //Run the uninstaller.
-require_once( dirname( __FILE__ ) . '/admin/class-installer.php' );
+require_once( dirname( __FILE__ ) . '/admin/installer.php' );
 \NextCellent\Admin\Installer::uninstall();

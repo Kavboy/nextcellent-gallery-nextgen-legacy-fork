@@ -7,7 +7,7 @@ namespace NextCellent;
  *
  * @since 1.9.31
  */
-class NCG_Registry {
+class Registry {
 	/**
 	 * @var array $storage The storage of the classes.
 	 */

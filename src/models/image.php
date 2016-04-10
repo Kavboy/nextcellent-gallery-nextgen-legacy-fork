@@ -95,7 +95,7 @@ class Image extends Abstract_Model {
 		$manager = Manager::get();
 
 		$result = $manager->get_row(
-			'SELECT * FROM ' . $manager->get_image_table() . ' WHERE ' . self::ID . ' = %d INNER JOIN ' . $manager->get_gallery_table() . ' ON ' . Image::GALLERY_ID . ' = ' . Gallery::ID,
+			'SELECT * FROM ' . $manager->get_image_table() . ' INNER JOIN ' . $manager->get_gallery_table() . ' ON ' . Image::GALLERY_ID . ' = ' . Gallery::ID . ' WHERE ' . self::ID . ' = %d',
 			$id
 		);
 
@@ -104,6 +104,60 @@ class Image extends Abstract_Model {
 		} else {
 			return Image::to_image($result);
 		}
+	}
+
+	/**
+	 * Get all images.
+	 *
+	 * @param string $sort
+	 * @param string $sort_dir
+	 * @param int $start
+	 * @param int $per_page
+	 * @param bool $count_images
+	 *
+	 * @return array
+	 */
+	public static function all($sort = self::ID, $sort_dir = 'ASC', $start = 0, $per_page = 0, $exclude = true ) {
+
+		$sort_orders = array(
+			self::ID,
+			self::DATE,
+			self::GALLERY_ID,
+		);
+
+		if(!in_array($sort, $sort_orders)) {
+			$sort = self::ID;
+		}
+
+		$order_dir = ( $sort_dir === 'DESC') ? 'DESC' : 'ASC';
+
+		$order_by = " ORDER BY {$sort} {$order_dir}";
+
+		$start = absint($start);
+
+		if($per_page > 0) {
+			$limit = " LIMIT {$start},{$per_page}";
+		} else {
+			$limit = '';
+		}
+		
+		if($exclude) {
+			$excluding = ' WHERE ' . self::EXCLUDE . ' = 0';
+		} else {
+			$excluding = '';
+		}
+
+		$manager = Manager::get();
+
+		$ids = $manager->get_results( 'SELECT * FROM ' . $manager->get_image_table() . $excluding . $order_by . $limit);
+
+		$images = array();
+
+		foreach ( $ids as $id ) {
+			$images[$id[self::ID]] = self::to_image($id);
+		}
+
+		return $images;
 	}
 
 	/**

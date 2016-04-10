@@ -280,7 +280,7 @@ add_action('wp_ajax_ngg_dashboard', 'ngg_ajax_dashboard');
 
 function ngg_ajax_dashboard() {
 
-	require(__DIR__ . '/autoloader.php' );
+	NCG::admin_autoloader();
 
    	if ( !current_user_can('NextGEN Gallery overview') )
 		die('-1');

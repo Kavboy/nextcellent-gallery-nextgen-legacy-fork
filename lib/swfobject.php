@@ -9,6 +9,8 @@ if ( !class_exists('swfobject') ) :
  * 
  * @access public
  * @example http://code.google.com/p/swfobject/
+ *          
+ * @deprecated No longer used.
  */
 class swfobject {
 	/**

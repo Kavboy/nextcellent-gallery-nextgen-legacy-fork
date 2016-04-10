@@ -3,7 +3,9 @@ if ( !class_exists('nggImage') ) :
 /**
 * Image PHP class for the WordPress plugin NextGEN Gallery
 * 
-* @author Alex Rabe 
+* @author Alex Rabe
+ *         
+ * @deprecated Use Image instead.
 *  
 */
 class nggImage{

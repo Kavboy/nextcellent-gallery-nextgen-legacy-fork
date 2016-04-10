@@ -56,8 +56,11 @@ if (!class_exists('NCG')) {
 	    //The base for our admin pages. A page will be 'admin.php?page=nextcellent-[NAME]
 	    const ADMIN_BASE = 'nextcellent';
 
+	    //The endpoint for NextCellent
+	    const ENDPOINT = 'nextcellent';
+
 	    /**
-	     * @var NextCellent\NCG_Registry $registry The registry for dependencies.
+	     * @var NextCellent\Registry $registry The registry for dependencies.
 	     */
 	    private $registry;
 
@@ -75,7 +78,7 @@ if (!class_exists('NCG')) {
 	        $this->load_dependencies();
 
 	        //Make the registry.
-	        $this->registry = new \NextCellent\NCG_Registry();
+	        $this->registry = new \NextCellent\Registry();
 
 	        //Add the options to the registry.
 	        /** @noinspection PhpInternalEntityUsedInspection */
@@ -187,10 +190,40 @@ if (!class_exists('NCG')) {
 			    register_widget("$namespace\\Slideshow_Widget");
 		    });
 
-		    //Add our admin endpoint
+		    //Add our endpoint
 		    add_action( 'init', function() {
-
+				add_rewrite_endpoint( NCG::ENDPOINT, EP_ROOT);
 		    });
+
+		    //Add our router
+		    add_action( 'parse_query', array($this, 'router'));
+	    }
+
+	    /**
+	     * Handle NextCellent routes. This function is called in the 'parse_query' action.
+	     *
+	     * @param WP_Query $query The query.
+	     */
+	    public function router( $query ) {
+			if( isset($query->query_vars[self::ENDPOINT])) {
+				$path = explode('/', $query->query_vars[self::ENDPOINT]);
+
+				if(count($path) < 1) {
+					return;
+				}
+				
+				if($path[0] === \NextCellent\RSS\Generator::ENDPOINT) {
+					
+					$feed = isset($path[1]) ? $path[1] : '';
+					$args = array_slice($path, 2);
+
+					if(\NextCellent\RSS\Generator::doFeed($feed, $args)) {
+						exit();
+					} else {
+						$query->set_404();
+					}
+				}
+			}
 	    }
 
 	    public function show_upgrade_message() {
@@ -402,8 +435,12 @@ if (!class_exists('NCG')) {
 
 		    //Include the auto loader
 		    require( __DIR__ . '/src/autoloader.php' );
-		    //Require the admin auto loader.
-		    require( __DIR__ . '/admin/autoloader.php' );
+
+		    //Include the autoloader for the src folder.
+		    self::normal_autoloader();
+
+			//Include the autoloader for the admin folder.
+		    self::admin_autoloader();
 
 		    //Include utils
 		    require_once( __DIR__ . '/src/ncg-utils.php' );
@@ -440,6 +477,22 @@ if (!class_exists('NCG')) {
 				    require_once( __DIR__ . '/admin/media-upload.php' );
 			    }
 		    }
+	    }
+
+	    /**
+	     * Register the normal autoloader.
+	     */
+	    public static function normal_autoloader() {
+		    $autoloader = new Autoloader('NextCellent\\',  __DIR__ . '/src/' );
+		    $autoloader->register();
+	    }
+
+	    /**
+	     * Register the autoloader for the admin part.
+	     */
+	    public static function admin_autoloader() {
+		    $admin_loader = new Autoloader('NextCellent\\Admin', __DIR__ . '/admin/' );
+		    $admin_loader->register();
 	    }
 
 	    /**
@@ -560,12 +613,12 @@ if (!class_exists('NCG')) {
 		public function multisite_new_blog( $blog_id ) {
 			global $wpdb;
 
-			include_once( dirname( __FILE__ ) . '/admin/class-installer.php' );
+			include_once( dirname( __FILE__ ) . '/admin/installer.php' );
 
 			if (is_plugin_active_for_network( NCG_BASENAME )) {
 				$current_blog = $wpdb->blogid;
 				switch_to_blog($blog_id);
-				NGG_Installer::install();
+				NextCellent\Admin\Installer::install();
 				switch_to_blog($current_blog);
 			}
 		}
@@ -612,7 +665,7 @@ if (!class_exists('NCG')) {
 		    // Clean up transients
 		    self::remove_transients();
 
-		    require_once( __DIR__ . '/admin/class-installer.php' );
+		    require_once( __DIR__ . '/admin/installer.php' );
 
 		    if ( is_multisite() ) {
 			    $network       = isset( $_SERVER['SCRIPT_NAME'] ) ? $_SERVER['SCRIPT_NAME'] : "";
@@ -635,6 +688,9 @@ if (!class_exists('NCG')) {
 
 		    // check for tables
 		    NextCellent\Admin\Installer::install();
+
+		    //Flush the rewrite rules
+		    flush_rewrite_rules();
 	    }
 
         /**

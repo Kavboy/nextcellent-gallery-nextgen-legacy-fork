@@ -5,6 +5,7 @@
  * @package NextGEN Gallery
  * @author Alex Rabe
  *
+ *         
  */
 class nggXMLRPC{
 
