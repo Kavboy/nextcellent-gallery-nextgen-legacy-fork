@@ -111,9 +111,9 @@ class Image extends Abstract_Model {
 	 *
 	 * @param string $sort
 	 * @param string $sort_dir
-	 * @param int $start
-	 * @param int $per_page
-	 * @param bool $count_images
+	 * @param int    $start
+	 * @param int    $per_page
+	 * @param bool   $exclude
 	 *
 	 * @return array
 	 */
