@@ -211,17 +211,23 @@ if (!class_exists('NCG')) {
 				if(count($path) < 1) {
 					return;
 				}
-				
-				if($path[0] === \NextCellent\RSS\Generator::ENDPOINT) {
-					
-					$feed = isset($path[1]) ? $path[1] : '';
-					$args = array_slice($path, 2);
 
-					if(\NextCellent\RSS\Generator::doFeed($feed, $args)) {
-						exit();
-					} else {
-						$query->set_404();
-					}
+				switch ($path[0]) {
+					case \NextCellent\RSS\Generator::ENDPOINT:
+						$feed = isset($path[1]) ? $path[1] : '';
+						$args = array_slice($path, 2);
+
+						if(\NextCellent\RSS\Generator::doFeed($feed, $args)) {
+							exit();
+						} else {
+							$query->set_404();
+						}
+						break;
+					case \NextCellent\Upload_Handler::ENDPOINT:
+						\NextCellent\Upload_Handler::handle_upload();
+						break;
+
+
 				}
 			}
 	    }
@@ -396,6 +402,8 @@ if (!class_exists('NCG')) {
 	        define('NCG_URL', plugins_url('', __FILE__));
 	        //The basename for this pluing, e.g. 'nextcellent/nggallery.php'
 	        define('NCG_BASENAME', plugin_basename(__FILE__));
+            //The absolute path to the wordpress install.
+            define('NCG_ABSPATH', str_replace("\\", "/", ABSPATH));
 
 	        /**
 	         * The other constants are kept for compatibility reasons.
@@ -408,10 +416,6 @@ if (!class_exists('NCG')) {
 	         * @deprecated
 	         */
 			define('WINABSPATH', str_replace("\\", "/", ABSPATH) );
-	        /**
-	         * @deprecated
-	         */
-			define('NGG_CONTENT_DIR', str_replace("\\","/", WP_CONTENT_DIR) );
 	        /**
 	         * @deprecated
 	         */
@@ -444,6 +448,9 @@ if (!class_exists('NCG')) {
 
 		    //Include utils
 		    require_once( __DIR__ . '/src/ncg-utils.php' );
+		    
+		    //Include file utils
+            require_once(__DIR__ . '/src/file-utils.php');
 
 		    // Load global libraries
 		    require_once( __DIR__ . '/lib/core.php' );

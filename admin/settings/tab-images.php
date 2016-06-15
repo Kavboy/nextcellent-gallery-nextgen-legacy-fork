@@ -51,7 +51,7 @@ class Tab_Images extends Settings_Tab {
 					<th><?php _e('Automatically resize','nggallery'); ?></th>
 					<td>
 						<label>
-							<input type="checkbox" name="imgAutoResize" value="1" <?php $this->options->checked( 'imgAutoResize'); ?>>
+							<input type="checkbox" name="imgAutoResize" value="true" <?php $this->options->checked( 'imgAutoResize'); ?>>
 							<?php _e('Automatically resize images on upload.','nggallery') ?>
 						</label>
 					</td>

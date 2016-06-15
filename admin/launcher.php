@@ -428,8 +428,10 @@ class Launcher {
 			'imageCount' => '1'
 		) );
 
-		wp_register_script( 'ngg-cropper', plugins_url('js/cropper/cropper.min.js', __FILE__), '2.2.5' );
+		wp_register_script( 'ngg-cropper', plugins_url('js/cropper/cropper.min.js', __FILE__), false, '2.2.5' );
 
+		wp_register_script('fine-uploader', plugins_url('plugins/fine-uploader/fine-uploader.min.js', __FILE__), false, '1.0.5' );
+        
 		//Enqueue scripts.
 		$this->page->register_scripts();
 	}
@@ -451,6 +453,8 @@ class Launcher {
 		wp_register_style( 'ngg-cropper', plugins_url( 'js/cropper/cropper.min.css', __FILE__), '2.2.5' );
 		wp_register_style( 'shutter', plugins_url('shutter/shutter-reloaded.css', __DIR__), false, '1.3.2', 'screen' );
 		wp_register_style( 'datepicker', plugins_url('css/jquery.ui.datepicker.css', __FILE__), false, '1.8.2', 'screen' );
+
+        wp_register_style('fine-uploader', plugins_url('plugins/fine-uploader/fine-uploader-new.min.css', __FILE__), false, '1.0.5' );
 
 		//Enqueue styles.
 		$this->page->register_styles();

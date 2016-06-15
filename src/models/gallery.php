@@ -336,4 +336,16 @@ class Gallery extends Abstract_Model {
 		
 		return user_can($user, Roles::MANAGE_ALL_GALLERIES) || (user_can($user, Roles::MANAGE_GALLERIES) && $this->author == get_current_user_id());
 	}
+
+	/**
+	 * Get the absolute path to an image. This is useful when you have the filename, but the image is not yet
+	 * in the gallery. If it is in the gallery, it is recommended to use the {@link Image#path} property.
+	 *
+	 * @param string $image_name Name of the image.
+	 *
+	 * @return string The absolute path.
+	 */
+	public function path_to_image($image_name) {
+		return NCG_ABSPATH . $this->path . '/' . $image_name;
+	}
 }
