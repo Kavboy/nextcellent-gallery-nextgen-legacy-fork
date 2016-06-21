@@ -7,6 +7,8 @@
  * 
  * @version 1.0.1
  * @access public
+ *         
+ * @deprecated Use the Pagination class instead.
  */
 class nggNavigation {
 

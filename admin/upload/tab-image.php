@@ -2,6 +2,7 @@
 
 namespace NextCellent\Admin\Upload;
 
+use NextCellent\Ajax_Handler;
 use NextCellent\Database\Not_Found_Exception;
 use NextCellent\Models\Gallery;
 use NextCellent\Options\Options;
@@ -22,7 +23,7 @@ class Tab_Image extends Upload_Tab {
 		
 		$galleries = Gallery::all();
 
-        $upload_url = site_url(\NCG::ENDPOINT . '/' . Upload_Handler::ENDPOINT);
+        $upload_url = admin_url( 'admin-ajax.php' );
 		
 		?>
 		<!-- upload images -->
@@ -144,15 +145,14 @@ class Tab_Image extends Upload_Tab {
 
 	public function print_scripts()
 	{
-		// Url to upload to
-		$upload_url = site_url(\NCG::ENDPOINT . '/' . Upload_Handler::ENDPOINT);
-
 		// Allowed file types
 		$file_types = apply_filters('ngg_allowed_file_types', array('jpg', 'png', 'gif') );
 		$json_file_types = json_encode($file_types);
 
 		//Get the max size of an image.
 		$max_size = max($this->options->get(Options::IMG_MAX_HEIGHT), $this->options->get(Options::IMG_MAX_WIDTH));
+
+		$action = Ajax_Handler::UPLOAD_ACTION;
 
 		?>
 		<script type="text/javascript">
@@ -169,7 +169,10 @@ class Tab_Image extends Upload_Tab {
                     debug: true,
                     element: document.getElementById('fine-uploader'),
                     request: {
-                        endpoint: '<?= esc_js($upload_url) ?>'
+                        //endpoint: ajaxurl,
+	                    params: {
+		                    action: '<?= $action ?>'
+	                    }
                     },
                     validation: {
                         allowedExtensions: <?= $json_file_types ?>
@@ -214,6 +217,6 @@ class Tab_Image extends Upload_Tab {
 
 	public function register_styles() {
 		wp_enqueue_style( 'ngg-jqueryui' );
-        wp_enqueue_style('fine-uploader');
+        wp_enqueue_style( 'fine-uploader');
 	}
 }

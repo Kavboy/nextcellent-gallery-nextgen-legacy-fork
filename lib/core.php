@@ -4,8 +4,8 @@
 *
 * @author Alex Rabe
 *
-*
-*/
+* @deprecated
+ */
 class nggGallery {
 
 	/**
@@ -28,6 +28,8 @@ class nggGallery {
 
 	/**
 	* get the thumbnail url to the image
+	 *
+	 * @deprecated
 	*/
 	static function get_thumbnail_url($imageID, $picturepath = '', $fileName = ''){
 
@@ -263,6 +265,8 @@ class nggGallery {
 	* @param string $vars Array of variable name=>value that is available to the display code (optional)
 	* @param bool $callback In case we check we didn't find template we tested it one time more (optional)
 	* @return void
+	 * 
+	 * @deprecated Use the Renderer class instead.
 	**/
 	static function render($template_name, $vars = array (), $callback = false) {
 		foreach ($vars AS $key => $val) {
@@ -301,6 +305,8 @@ class nggGallery {
 	* @param string $template_name Name of the template file (without extension)
 	* @param string $vars Array of variable name=>value that is available to the display code (optional)
 	* @return string
+	 * 
+	 * @deprecated Use the Renderer class instead.
 	**/
 	static function capture ($template_name, $vars = array ()) {
 		ob_start ();

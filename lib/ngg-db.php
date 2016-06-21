@@ -254,9 +254,7 @@ class nggdb {
         // Should we limit this query ?
         $limit_by  = ( $limit > 0 ) ? 'LIMIT ' . intval($start) . ',' . intval($limit) : '';
 
-
-        var_dump("SELECT SQL_CALC_FOUND_ROWS tt.*, t.* FROM $wpdb->nggallery AS t INNER JOIN $wpdb->nggpictures AS tt ON t.gid = tt.galleryid WHERE t.gid = {$id} {$exclude_clause} ORDER BY {$order_clause} {$limit_by}");
-
+        
         // Query database
         if( is_numeric($id) )
             $result = $wpdb->get_results( $wpdb->prepare( "SELECT SQL_CALC_FOUND_ROWS tt.*, t.* FROM $wpdb->nggallery AS t INNER JOIN $wpdb->nggpictures AS tt ON t.gid = tt.galleryid WHERE t.gid = %d {$exclude_clause} ORDER BY {$order_clause} {$limit_by}", $id ), OBJECT_K );

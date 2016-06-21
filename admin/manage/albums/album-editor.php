@@ -324,7 +324,6 @@ class Album_Editor extends Admin_Page {
 			$id = (int) $id;
 
 			if ( ! array_key_exists($id, $this->galleries)) {
-				var_dump($this->galleries);
 				return;
 			}
 

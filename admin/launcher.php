@@ -56,9 +56,6 @@ class Launcher {
 
 		add_action( 'current_screen', array( $this, 'edit_current_screen' ) );
 
-		// Add WPML hook to register description / alt text for translation
-		add_action( 'ngg_image_updated', array( 'nggGallery', 'RegisterString' ) );
-
 		add_filter( 'set-screen-option', array( $this, 'save_options' ), 10, 3 );
 	}
 
@@ -392,30 +389,7 @@ class Launcher {
 			'error'      => __( 'Unexpected Error', 'nggallery' ),
 			'failure'    => __( 'A failure occurred', 'nggallery' )
 		) );
-		wp_register_script( 'ngg-plupload-handler', plugins_url( 'js/plupload.handler.js', __FILE__), array( 'plupload-all' ), '2.0.0' );
-		wp_localize_script( 'ngg-plupload-handler', 'pluploadL10n', array(
-			'queue_limit_exceeded'      => __( 'You have attempted to queue too many files.' ),
-			'file_exceeds_size_limit'   => __( 'This file exceeds the maximum upload size for this site.' ),
-			'zero_byte_file'            => __( 'This file is empty. Please try another.' ),
-			'invalid_filetype'          => __( 'This file type is not allowed. Please try another.' ),
-			'not_an_image'              => __( 'This file is not an image. Please try another.' ),
-			'image_memory_exceeded'     => __( 'Memory exceeded. Please try another smaller file.' ),
-			'image_dimensions_exceeded' => __( 'This is larger than the maximum size. Please try another.' ),
-			'default_error'             => __( 'An error occurred in the upload. Please try again later.' ),
-			'missing_upload_url'        => __( 'There was a configuration error. Please contact the server administrator.' ),
-			'upload_limit_exceeded'     => __( 'You may only upload 1 file.' ),
-			'http_error'                => __( 'HTTP error.' ),
-			'upload_failed'             => __( 'Upload failed.' ),
-			'io_error'                  => __( 'IO error.' ),
-			'security_error'            => __( 'Security error.' ),
-			'file_cancelled'            => __( 'File canceled.' ),
-			'upload_stopped'            => __( 'Upload stopped.' ),
-			'dismiss'                   => __( 'Dismiss' ),
-			'crunching'                 => __( 'Crunching&hellip;' ),
-			'deleted'                   => __( 'moved to the trash.' ),
-			'error_uploading'           => __( '&#8220;%s&#8221; has failed to upload due to an error' ),
-			'no_gallery'                => __( 'You didn\'t select a gallery!', 'nggallery' )
-		) );
+		
 		wp_register_script( 'ngg-progressbar', plugins_url( 'js/ngg.progressbar.js', __FILE__), array( 'jquery-ui-dialog' ) );
 		wp_register_script( 'ngg-autocomplete', plugins_url( 'js/ngg.autocomplete.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.1' );
 

@@ -23,42 +23,33 @@ use NextCellent\RSS\Writer\Media\Optional\MediaTitle;
  * @see https://github.com/suin/php-rss-writer
  */
 class Generator {
-	
-	const ENDPOINT = 'feed';
+
+	//This one only works on pretty urls.
+	const IMAGE_FEED_PRETTY = 'nextcellent/image';
+
+	const IMAGE_FEED = 'nextcellent-image';
 
 	/**
-	 * @return string The URL to the media feed.
+	 * Register the feeds with WordPress.
 	 */
-	public static function get_feed_base_url() {
-		return network_site_url(\NCG::ENDPOINT . '/' . self::ENDPOINT);
+	public static function registerFeeds() {
+		add_action('init', function() {
+			add_feed( self::IMAGE_FEED, [ self::class, 'doImageFeed' ] );
+			add_feed( self::IMAGE_FEED_PRETTY, [ self::class, 'doImageFeed' ] );
+		});
 	}
 
-	public static function get_feed_image_url() {
-		return self::get_feed_base_url() . '/image';
+	public static function imageFeedUrl() {
+		return get_feed_link(self::IMAGE_FEED);
 	}
 
-	/**
-	 * @param $feed
-	 * @param $args
-	 *
-	 * @return bool If the feed was successfully made or not.
-	 */
-	public static function doFeed($feed, $args)
-	{
-		switch ($feed) {
-			case 'image':
-			case '':
-				$feed = self::imageRSS();
-				break;
-			default:
-				return false;
-		}
+	public static function doImageFeed() {
 
 		header("content-type:text/xml;charset=utf-8");
 
+		$feed = self::imageRSS();
+
 		echo $feed->render();
-		
-		return true;
 	}
 
 	/**

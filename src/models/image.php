@@ -2,9 +2,11 @@
 
 namespace NextCellent\Models;
 
+use NextCellent\Api\Image_Viewer;
 use NextCellent\Database\Database_Exception;
 use NextCellent\Database\Manager;
 use NextCellent\Database\Not_Found_Exception;
+use NextCellent\Options\Options;
 
 /**
  * The NextCellent image model.
@@ -26,8 +28,12 @@ use NextCellent\Database\Not_Found_Exception;
  * @property string $path The path.
  * @property string $thumb_url URL to the thumbnail
  * @property string $thumb_path Path to the thumbnail
+ * @property-read int $height The height of the image.
+ * @property-read int $width The width of the image.
  */
 class Image extends Abstract_Model {
+
+	const BETA_LINKS = false;
 
 	/**
 	 * Define the database column names.
@@ -50,9 +56,13 @@ class Image extends Abstract_Model {
 	 * @var string $thumb_url The URL to the thumbnail of this image.
 	 * @var string $thumb_path The path to the thumbnail of this image.
 	 */
-	private $path;
+	
 	private $url;
 	private $thumb_url;
+	private $ugly_url;
+	private $ugly_thumb_url;
+	
+	private $path;
 	private $thumb_path;
 
 	/**
@@ -262,5 +272,30 @@ class Image extends Abstract_Model {
 
 	protected function get_thumb_path() {
 		return $this->thumb_path;
+	}
+
+	protected function get_height() {
+
+		if(!isset( $this->meta_data['height'] )) {
+			$this->save_dimensions();
+		}
+
+		return $this->meta_data['height'];
+	}
+
+	protected function get_width() {
+
+		if(!isset( $this->meta_data['width'] )) {
+			$this->save_dimensions();
+		}
+		
+		return $this->meta_data['width'];
+	}
+	
+	private function save_dimensions() {
+		$data = getimagesize( $this->path );
+		
+		$this->properties['meta_data']['width'] = $data[0];
+		$this->properties['meta_data']['height'] = $data[1];
 	}
 }

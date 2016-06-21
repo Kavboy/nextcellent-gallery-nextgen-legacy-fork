@@ -47,52 +47,52 @@ This object can have the following values:
  You can check the content when you insert the tag <?php var_dump($variable) ?>
  If you would like to show the timestamp of the image ,you can use <?php echo $exif['created_timestamp'] ?>
 **/
+/**
+ * This is the base template for a gallery.
+ *
+ * Note: please edit this file carefully. Syntax errors in this file will cause PHP to stop execution,
+ * and in most cases, fail silently.
+ * 
+ * Following variables are available for use:
+ * @var NextCellent\Models\Gallery $gallery The gallery to display. It contains the images for this page.
+ * @var \NextCellent\Rendering\Pagination $pagination The pagination. It implements toString, so you can just echo it.
+ * @var string $anchor An id for the gallery.
+ */
 ?>
-<?php if (!defined ('ABSPATH')) die ('No direct access allowed'); ?><?php if (!empty ($gallery)) : ?>
 
-<div class="ngg-galleryoverview" id="<?php echo $gallery->anchor ?>">
+<div class="ngg-galleryoverview" id="<?= $anchor ?>">
 
-<?php if ($gallery->show_slideshow) { ?>
-	<!-- Slideshow link -->
-	<div class="slideshowlink">
-		<a class="slideshowlink" href="<?php echo $gallery->slideshow_link ?>">
-			<?php echo $gallery->slideshow_link_text ?>
-		</a>
-	</div>
-<?php } ?>
+	<?php //if ($gallery->show_slideshow) { ?>
+	<!--	<!-- Slideshow link -->-->
+	<!--	<div class="slideshowlink">-->
+	<!--		<a class="slideshowlink" href="--><?php //echo $gallery->slideshow_link ?><!--">-->
+	<!--			--><?php //echo $gallery->slideshow_link_text ?>
+	<!--		</a>-->
+	<!--	</div>-->
+	<?php //} ?>
 
-<?php if ($gallery->show_piclens) { ?>
-	<!-- Piclense link -->
-	<div class="piclenselink">
-		<a class="piclenselink" href="<?php echo $gallery->piclens_link ?>">
-			<?php esc_html_e('[View with PicLens]','nggallery'); ?>
-		</a>
-	</div>
-<?php } ?>
-	
+	<?php //if ($gallery->show_piclens) { ?>
+	<!--	<!-- Piclense link -->-->
+	<!--	<div class="piclenselink">-->
+	<!--		<a class="piclenselink" href="--><?php //echo $gallery->piclens_link ?><!--">-->
+	<!--			--><?php //esc_html_e('[View with PicLens]','nggallery'); ?>
+	<!--		</a>-->
+	<!--	</div>-->
+	<?php //} ?>
+
 	<!-- Thumbnails -->
-	<?php foreach ( $images as $image ) : ?>
-	
-	<div id="ngg-image-<?php echo $image->pid ?>" class="ngg-gallery-thumbnail-box" <?php echo $image->style ?> >
+	<?php foreach ( $gallery->images as $image ) : ?>
+
+	<div id="ngg-image-<?= $image->id ?>" class="ngg-gallery-thumbnail-box">
 		<div class="ngg-gallery-thumbnail" >
-			<a href="<?php echo $image->imageURL ?>" title="<?php echo $image->description ?>" <?php echo $image->thumbcode ?> >
-				<?php if ( !$image->hidden ) { ?>
-				<img title="<?php echo $image->alttext ?>" alt="<?php echo $image->alttext ?>" src="<?php echo $image->thumbnailURL ?>" <?php echo $image->size ?> />
-				<?php } ?>
+			<a href="<?= $image->url ?>" title="<?= $image->description ?>">
+				<img title="<?= $image->alt_text ?>" alt="<?= $image->alt_text ?>" src="<?= $image->thumb_url ?>" />
 			</a>
 		</div>
 	</div>
-	
-	<?php if ( $image->hidden ) continue; ?>
-	<?php if ( $gallery->columns > 0 && ++$i % $gallery->columns == 0 ) { ?>
-		<br style="clear: both" />
-	<?php } ?>
 
- 	<?php endforeach; ?>
- 	
+	<?php endforeach; ?>
+
 	<!-- Pagination -->
- 	<?php echo $pagination ?>
- 	
+	<?= $pagination ?>
 </div>
-
-<?php endif; ?>

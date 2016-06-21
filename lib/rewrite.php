@@ -269,7 +269,8 @@ class nggRewrite {
             $this->slug . '/slideshow/([0-9]+)/?$' => 'index.php?imagerotator=true&gid=$matches[1]'
 		);  
         
-        $rewrite_rules = array_merge($rewrite_rules, $this->generate_rewrite_rules() ); 
+        $rewrite_rules = array_merge($rewrite_rules, $this->generate_rewrite_rules() );
+		var_dump( $rewrite_rules );
 		$wp_rewrite->rules = array_merge($rewrite_rules, $wp_rewrite->rules);		
 	}
 

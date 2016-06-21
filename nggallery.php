@@ -43,21 +43,25 @@ if (!class_exists('NCG')) {
 	/**
 	 * Class NCG
 	 *
-	 * @property-read NextCellent\Options\Options options The options.
-	 * @property-read NextCellent\Database\Manager manager The database manager.
+	 * @property-read NextCellent\Options\Options    options The options.
+	 * @property-read NextCellent\Database\Manager   manager The database manager.
+	 * @property-read NextCellent\Shortcodes\Handler shortcodes The shortcode handler.
      */
     class NCG {
 
 	    const VERSION = '1.9.31';
 	    const DB_VERSION = '1.8.3';
 	    const MINIMUM_WP = '4.0';
-	    const MINIMUM_PHP = '5.3';
+	    const MINIMUM_PHP = '5.4';
 
 	    //The base for our admin pages. A page will be 'admin.php?page=nextcellent-[NAME]
 	    const ADMIN_BASE = 'nextcellent';
 
 	    //The endpoint for NextCellent
 	    const ENDPOINT = 'nextcellent';
+	    
+	    //The name of the folder with custom templates/styles
+	    const NCG_FOLDER = 'ngg_styles';
 
 	    /**
 	     * @var NextCellent\Registry $registry The registry for dependencies.
@@ -80,17 +84,8 @@ if (!class_exists('NCG')) {
 	        //Make the registry.
 	        $this->registry = new \NextCellent\Registry();
 
-	        //Add the options to the registry.
-	        /** @noinspection PhpInternalEntityUsedInspection */
-	        $this->registry->add('options', new \NextCellent\Options\Options());
-
-	        //Add the database manager.
-	        global $wpdb;
-	        /** @noinspection PhpInternalEntityUsedInspection */
-	        $manager = new \NextCellent\Database\Manager($wpdb);
-
-	        //Add image factories.
-	        $this->registry->add('manager', $manager);
+	        //Add things to the registry.
+	        $this->set_up_registry();
 
 			//Define constants.
 			$this->define_constant();
@@ -143,6 +138,27 @@ if (!class_exists('NCG')) {
 	    }
 
 	    /**
+	     * Add stuff to the registry.
+	     */
+	    private function set_up_registry() {
+		    //Add the options to the registry.
+		    /** @noinspection PhpInternalEntityUsedInspection */
+		    $this->registry->add('options', new \NextCellent\Options\Options());
+
+		    //Add the database manager.
+		    global $wpdb;
+		    /** @noinspection PhpInternalEntityUsedInspection */
+		    $manager = new \NextCellent\Database\Manager($wpdb);
+
+		    //Add image factories.
+		    $this->registry->add('manager', $manager);
+
+		    //Add the shortcode manager.
+		    $handler = new \NextCellent\Shortcodes\Handler( $this->options );
+		    $this->registry->add( 'shortcodes', $handler );
+	    }
+
+	    /**
 	     * Register the hooks and actions.
 	     */
 	    private function register_hooks_actions() {
@@ -158,22 +174,19 @@ if (!class_exists('NCG')) {
 		    });
 
 		    // Add to the toolbar
-		    add_action( 'admin_bar_menu', array( '\\NextCellent\\Admin\\Launcher', 'admin_bar_menu' ) );
+		    add_action( 'admin_bar_menu', [\NextCellent\Admin\Launcher::class, 'admin_bar_menu'] );
 
 		    //Register the taxonomy. This MUST be in the init hook.
-		    add_action( 'init', array($this, 'register_taxonomy') );
+		    add_action( 'init', [ $this, 'register_taxonomy' ] );
 
 		    //Register an hook when a new blog is made.
-		    add_action( 'wpmu_new_blog', array($this, 'multisite_new_blog'));
+		    add_action( 'wpmu_new_blog', [ $this, 'multisite_new_blog' ] );
 
 		    //Add some links on the plugin page
-		    add_filter('plugin_row_meta', array($this, 'add_plugin_links'), 10, 2);
-
-		    // Handle upload requests
-		    add_action('init', array($this, 'handle_upload_request'));
+		    add_filter('plugin_row_meta', [ $this, 'add_plugin_links' ], 10, 2);
 
 		    //Actually start the plugin.
-		    add_action( 'init', array($this, 'start_plugin') );
+		    add_action( 'init', [ $this, 'start_plugin' ] );
 
 		    //Register the admin hooks.
 		    if(is_admin() && !defined( 'DOING_AJAX' )) {
@@ -184,52 +197,26 @@ if (!class_exists('NCG')) {
 
 		    //Register the widgets
 		    add_action( 'widgets_init', function() {
-			    $namespace = 'NextCellent\Widgets';
-			    register_widget("$namespace\\Gallery_Widget");
-			    register_widget("$namespace\\Media_RSS_Widget");
-			    register_widget("$namespace\\Slideshow_Widget");
+			    register_widget(\NextCellent\Widgets\Gallery_Widget::class);
+			    register_widget(\NextCellent\Widgets\Media_RSS_Widget::class);
+			    register_widget(\NextCellent\Widgets\Slideshow_Widget::class);
 		    });
 
-		    //Add our endpoint
-		    add_action( 'init', function() {
-				add_rewrite_endpoint( NCG::ENDPOINT, EP_ROOT);
-		    });
+		    //Add the RSS feed
+		    \NextCellent\RSS\Generator::registerFeeds();
 
-		    //Add our router
-		    add_action( 'parse_query', array($this, 'router'));
-	    }
+		    //Register rewrite related things.
+		    \NextCellent\Rendering\Rewrite::register();
 
-	    /**
-	     * Handle NextCellent routes. This function is called in the 'parse_query' action.
-	     *
-	     * @param WP_Query $query The query.
-	     */
-	    public function router( $query ) {
-			if( isset($query->query_vars[self::ENDPOINT])) {
-				$path = explode('/', $query->query_vars[self::ENDPOINT]);
+		    //Register shortcodes
+		    $handler = new \NextCellent\Shortcodes\Handler( $this->options );
+		    $handler->register_shortcodes();
 
-				if(count($path) < 1) {
-					return;
-				}
-
-				switch ($path[0]) {
-					case \NextCellent\RSS\Generator::ENDPOINT:
-						$feed = isset($path[1]) ? $path[1] : '';
-						$args = array_slice($path, 2);
-
-						if(\NextCellent\RSS\Generator::doFeed($feed, $args)) {
-							exit();
-						} else {
-							$query->set_404();
-						}
-						break;
-					case \NextCellent\Upload_Handler::ENDPOINT:
-						\NextCellent\Upload_Handler::handle_upload();
-						break;
-
-
-				}
-			}
+		    //Register ajax
+		    if(is_admin() && defined('DOING_AJAX') && DOING_AJAX) {
+			    $handler = new \NextCellent\Ajax_Handler( $this->options );
+			    $handler->register();
+		    }
 	    }
 
 	    public function show_upgrade_message() {
@@ -249,26 +236,13 @@ if (!class_exists('NCG')) {
          * Main start invoked after all plugins are loaded.
          */
         public function start_plugin() {
-
-			// Content Filters
-			add_filter('ngg_gallery_name', 'sanitize_title');
-
-	        $options = $this->options;
-
+	        
 			// Check if we are in the admin area
 			if ( !is_admin() ) {
 
-				// Add MRSS to wp_head
-				if ( $options['useMediaRSS'] ) {
-					add_action('wp_head', array('nggMediaRss', 'add_mrss_alternate_link'));
-				}
-
-				//Look for an XML-request, before page is rendered.
-				add_action('parse_request',  array($this, 'check_request') );
-
 				// Add the script and style files
-				add_action('wp_enqueue_scripts', array($this, 'load_scripts') );
-				add_action('wp_enqueue_scripts', array($this, 'load_styles') );
+				add_action('wp_enqueue_scripts', [ $this, 'load_scripts' ] );
+				add_action('wp_enqueue_scripts', [ $this, 'load_styles' ] );
 			}
 
 	        //Check for a database upgrade.
@@ -277,7 +251,7 @@ if (!class_exists('NCG')) {
 		        /**
 		         * If the silentUpgrade option is not empty, we try and do the upgrade now.
 		         */
-		        if ( $options['silentUpgrade'] ) {
+		        if ( $this->options->get( \NextCellent\Options\Options::SILENT_DB_UPDATE ) ) {
 			        include_once( dirname( __FILE__ ) . '/admin/functions.php' );
 			        include_once( dirname( __FILE__ ) . '/admin/upgrade.php' );
 			        try {
@@ -288,41 +262,9 @@ if (!class_exists('NCG')) {
 				        });
 			        }
 		        } else {
-			        add_action( 'all_admin_notices', array($this,'show_upgrade_message') );
+			        add_action( 'all_admin_notices', [ $this,'show_upgrade_message' ] );
 		        }
 	        }
-		}
-
-        /**
-         * Look for an XML-request.
-         *
-         * @param $wp
-         */
-        public function check_request( $wp ) {
-
-			if ( !array_key_exists('callback', $wp->query_vars) ) {
-				return;
-			}
-
-			if ( $wp->query_vars['callback'] == 'imagerotator') {
-				require_once (__DIR__ . '/xml/imagerotator.php');
-				exit();
-			}
-
-			if ( $wp->query_vars['callback'] == 'json') {
-				require_once (__DIR__ . '/xml/json.php');
-				exit();
-			}
-
-			if ( $wp->query_vars['callback'] == 'image') {
-				require_once (__DIR__ . '/nggshow.php');
-				exit();
-			}
-
-			if ( $wp->query_vars['callback'] == 'ngg-ajax') {
-				require_once (__DIR__ . '/xml/ajax.php');
-				exit();
-			}
 		}
 
         /**
@@ -404,7 +346,7 @@ if (!class_exists('NCG')) {
 	        define('NCG_BASENAME', plugin_basename(__FILE__));
             //The absolute path to the wordpress install.
             define('NCG_ABSPATH', str_replace("\\", "/", ABSPATH));
-
+	        
 	        /**
 	         * The other constants are kept for compatibility reasons.
 	         */
@@ -463,8 +405,8 @@ if (!class_exists('NCG')) {
 
 		    // Load frontend libraries
 		    require_once( __DIR__ . '/lib/navigation.php' );
+		    require_once(__DIR__ . '/src/rendering/displays.php');
 		    require_once( __DIR__ . '/nggfunctions.php' );
-		    require_once( __DIR__ . '/lib/shortcodes.php' );
 
 		    //Just needed if you access remote to WordPress
 		    if ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) {
@@ -724,17 +666,6 @@ if (!class_exists('NCG')) {
 				$links[] = '<a href="http://wordpress.org/support/plugin/nextcellent-gallery-nextgen-legacy">' . __('Get help', 'nggallery') . '</a>';
 			}
 			return $links;
-		}
-
-	    /**
-	     * Handle upload requests.
-	     */
-		public function handle_upload_request()
-		{
-			if (isset($_GET['nggupload'])) {
-				require_once(__DIR__ . '/admin/upload.php');
-				exit();
-			}
 		}
 	}
 

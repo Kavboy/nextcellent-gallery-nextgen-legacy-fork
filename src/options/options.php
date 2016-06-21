@@ -31,84 +31,89 @@ class Options implements \ArrayAccess {
 	 * If you wish to use one of these options in third party plugins, you must
 	 * always check if the const exists.
 	 */
-	const GALLERY_PATH = 'gallerypath';
-	const DELETE_IMAGES_FROM_DISK = 'deleteImg';
+	const GALLERY_PATH              = 'gallerypath';
+	const DELETE_IMAGES_FROM_DISK   = 'deleteImg';
 	/**
 	 * @deprecated This option is permanently on.
 	 */
-	const USE_ADVANCED_UPLOADER = 'swfUpload';
-	const USE_PERMALINKS = 'usePermalinks';
+	const USE_ADVANCED_UPLOADER     = 'swfUpload';
+	
+	//Whether to convert old shortcodes or not.
+	const LEGACY_SHORTCODES         = 'convertLegacyShortcodes';
+	const OLD_SHORTCODES            = 'convertOldShortcodes';
+	
+	const USE_PERMALINKS            = 'usePermalinks';
 	//This should not be changed for backwards compatibility.
-	const PERMALINK_SLUG = 'nggallery';
-	const GRAPHICS_LIBRARY = 'graphicLibrary';
-	const IMAGE_MAGIC_PATH = 'imageMagickDir';
-	const USE_MEDIA_RSS = 'useMediaRSS';
-	const USE_PICLENS = 'usePicLens';
-	const SILENT_DB_UPDATE = 'silentUpdate';
+	const PERMALINK_SLUG            = 'nggallery';
+	const GRAPHICS_LIBRARY          = 'graphicLibrary';
+	const IMAGE_MAGIC_PATH          = 'imageMagickDir';
+	const USE_MEDIA_RSS             = 'useMediaRSS';
+	const USE_PICLENS               = 'usePicLens';
+	const SILENT_DB_UPDATE          = 'silentUpdate';
 
-	const USE_RELATED_IMAGES = 'activateTags';
-	const RELATED_IMAGES_SOURCE = 'appendType';
-	const MAX_RELATED_IMAGES = 'maxImages';
+	const USE_RELATED_IMAGES        = 'activateTags';
+	const RELATED_IMAGES_SOURCE     = 'appendType';
+	const MAX_RELATED_IMAGES        = 'maxImages';
 
-	const THUMB_WIDTH = 'thumbwidth';
-	const THUMB_HEIGHT = 'thumbheight';
-	const THUMB_USE_FIXED_SIZE = 'thumbfix';
-	const THUMB_QUALITY = 'thumbquality';
+	const THUMB_WIDTH               = 'thumbwidth';
+	const THUMB_HEIGHT              = 'thumbheight';
+	const THUMB_USE_FIXED_SIZE      = 'thumbfix';
+	const THUMB_QUALITY             = 'thumbquality';
 
-	const IMG_MAX_WIDTH = 'imgWidth';
-	const IMG_MAX_HEIGHT = 'imgHeight';
-	const IMG_QUALITY = 'imgQuality';
-	const IMG_USE_BACKUP = 'imgBackup';
-	const IMG_AUTO_RESIZE = 'imgAutoResize';
+	const IMG_MAX_WIDTH             = 'imgWidth';
+	const IMG_MAX_HEIGHT            = 'imgHeight';
+	const IMG_QUALITY               = 'imgQuality';
+	const IMG_USE_BACKUP            = 'imgBackup';
+	const IMG_AUTO_RESIZE           = 'imgAutoResize';
 
-	const GAL_IMAGES_PER_PAGE = 'galImages';
-	const GAL_GALLERIES_PER_PAGE = 'galPagedGalleries';
-	const GAL_NUMBER_OF_COLUMNS = 'galColumns';
-	const GAL_SHOW_SLIDESHOW = 'galShowSlide';
-	const GAL_SLIDESHOW_TEXT = 'galTextSlide';
-	const GAL_GALLERY_TEXT = 'galTextGallery';
-	const GAL_SHOW_ORDER = 'galShowOrder';
-	const GAL_SORT = 'galSort';
-	const GAL_SORT_DIRECTION = 'galSortDir';
-	const GAL_NO_PAGES = 'galNoPages';
-	const GAL_USE_IMAGE_BROWSER = 'galImgBrowser';
-	const GAL_SHOW_ALL_IMAGES = 'galHiddenImg';
-	const GAL_USE_AJAX = 'galAjaxNav';
+	const GAL_IMAGES_PER_PAGE       = 'galImages';
+	const GAL_GALLERIES_PER_PAGE    = 'galPagedGalleries';
+	const GAL_NUMBER_OF_COLUMNS     = 'galColumns';
+	const GAL_SHOW_SLIDESHOW        = 'galShowSlide';
+	const GAL_SLIDESHOW_TEXT        = 'galTextSlide';
+	const GAL_GALLERY_TEXT          = 'galTextGallery';
+	const GAL_SHOW_ORDER            = 'galShowOrder';
+	const GAL_SORT                  = 'galSort';
+	const GAL_SORT_DIRECTION        = 'galSortDir';
+	const GAL_NO_PAGES              = 'galNoPages';
+	const GAL_USE_IMAGE_BROWSER     = 'galImgBrowser';
+	const GAL_SHOW_ALL_IMAGES       = 'galHiddenImg';
+	const GAL_USE_AJAX              = 'galAjaxNav';
 
-	const EFFECT_TYPE = 'thumbEffect';
-	const EFFECT_CODE = 'thumbCode';
+	const EFFECT_TYPE               = 'thumbEffect';
+	const EFFECT_CODE               = 'thumbCode';
 
-	const WM_POSITION = 'wmPos';
-	const WM_X_POSITION = 'wmXpos';
-	const WM_Y_POSITION = 'wmYpos';
-	const WM_TYPE = 'wmType';
-	const WM_IMAGE_PATH = 'wmPath';
-	const WM_FONT = 'wmFont';
-	const WM_FONT_SIZE = 'wmSize';
-	const WM_TEXT = 'wmText';
-	const WM_TEXT_COLOUR = 'wmColor';
-	const WM_TEXT_ALPHA = 'wmOpaque';
+	const WM_POSITION               = 'wmPos';
+	const WM_X_POSITION             = 'wmXpos';
+	const WM_Y_POSITION             = 'wmYpos';
+	const WM_TYPE                   = 'wmType';
+	const WM_IMAGE_PATH             = 'wmPath';
+	const WM_FONT                   = 'wmFont';
+	const WM_FONT_SIZE              = 'wmSize';
+	const WM_TEXT                   = 'wmText';
+	const WM_TEXT_COLOUR            = 'wmColor';
+	const WM_TEXT_ALPHA             = 'wmOpaque';
 
-	const SLIDE_EFFECT = 'slideFx';
-	const SLIDE_WIDTH = 'irWidth';
-	const SLIDE_HEIGHT = 'irHeight';
-	const SLIDE_FIT_SIZE = 'irAutoDim';
-	const SLIDE_TIME = 'irRotatetime';
-	const SLIDE_USE_LOOP = 'irLoop';
-	const SLIDE_USE_DRAG = 'irDrag';
-	const SLIDE_SHOW_NAV = 'irNavigation';
-	const SLIDE_SHOW_NAV_DOTS = 'irNavigationDots';
-	const SLIDE_AUTO_PLAY = 'irAutoplay';
-	const SLIDE_PAUSE_ON_HOVER = 'irAutoplayHover';
-	const SLIDE_NR_OF_IMAGES = 'irNumber';
-	const SLIDE_NEXT_ON_CLICK = 'irClick';
+	const SLIDE_EFFECT              = 'slideFx';
+	const SLIDE_WIDTH               = 'irWidth';
+	const SLIDE_HEIGHT              = 'irHeight';
+	const SLIDE_FIT_SIZE            = 'irAutoDim';
+	const SLIDE_TIME                = 'irRotatetime';
+	const SLIDE_USE_LOOP            = 'irLoop';
+	const SLIDE_USE_DRAG            = 'irDrag';
+	const SLIDE_SHOW_NAV            = 'irNavigation';
+	const SLIDE_SHOW_NAV_DOTS       = 'irNavigationDots';
+	const SLIDE_AUTO_PLAY           = 'irAutoplay';
+	const SLIDE_PAUSE_ON_HOVER      = 'irAutoplayHover';
+	const SLIDE_NR_OF_IMAGES        = 'irNumber';
+	const SLIDE_NEXT_ON_CLICK       = 'irClick';
 
-	const STYLE_USE_CSS = 'activateCSS';
-	const STYLE_CSS_FILE = 'CSSfile';
+	const STYLE_USE_CSS             = 'activateCSS';
+	const STYLE_CSS_FILE            = 'CSSfile';
 
 	const MU_GALLERY_PATH           = 'gallerypath';
 	const MU_CSS_FILE               = 'wpmuCSSfile';
-	const MU_SILENT_DB_UPDATE    = 'silentUpdate';
+	const MU_SILENT_DB_UPDATE       = 'silentUpdate';
 	const MU_QUOTA_CHECK            = 'wpmuQuotaCheck';
 	const MU_ALLOW_UPLOAD_ZIP       = 'wpmuZipUpload';
 	const MU_ALLOW_IMPORT_FOLDER    = 'wpmuImportFolder';
@@ -222,6 +227,9 @@ class Options implements \ArrayAccess {
 			// CSS Style
 			'activateCSS'       => true,                            // activate the CSS file
 			'CSSfile'           => plugins_url('css/nggallery.css', dirname(__FILE__)),            // set default css filename
+			
+			self::LEGACY_SHORTCODES => false,
+			self::OLD_SHORTCODES    => true,
 		);
 
 		$mu_defaults = array(

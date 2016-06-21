@@ -157,7 +157,7 @@ function nggShowSlideshow( $galleryID, $args = null) {
  * @return the content
  */
 function nggShowGallery( $galleryID, $template = '', $images = false ) {
-
+	
     global $nggRewrite,$nggdb;
 
     $ngg_options = nggGallery::get_option('ngg_options');

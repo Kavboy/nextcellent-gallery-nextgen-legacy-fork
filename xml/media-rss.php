@@ -11,5 +11,5 @@ require_once(dirname(__DIR__) . '/ngg-config.php');
 require_once(dirname(__DIR__) . '/nggallery.php');
 require_once(dirname(__DIR__) . '/src/rss/generator.php');
 
-wp_redirect(site_url(NCG::ENDPOINT . '/' . \NextCellent\RSS\Generator::ENDPOINT), 301);
+wp_redirect(\NextCellent\RSS\Generator::imageFeedUrl(), 301);
 exit();

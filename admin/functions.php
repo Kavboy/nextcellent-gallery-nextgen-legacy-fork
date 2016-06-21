@@ -1246,6 +1246,7 @@ class nggAdmin{
 	 * @class nggAdmin
 	 * @param integer $galleryID
 	 * @return string $result
+	 * @deprecated Use the upload-handler instead.
 	 */
 	static function swfupload_image($galleryID = 0) {
 

@@ -115,12 +115,11 @@ class Gallery extends Abstract_Model {
 
 			$this->image_count = $manager->get_int(
 				'SELECT COUNT(*) FROM ' . $manager->get_image_table() . ' WHERE ' . Image::GALLERY_ID . ' = %d',
-				array($this->id)
+				[$this->id]
 			);
 		}
 
 		return $this->image_count;
-
 	}
 
 	/**

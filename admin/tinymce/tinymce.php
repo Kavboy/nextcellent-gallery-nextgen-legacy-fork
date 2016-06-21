@@ -24,7 +24,7 @@ class add_nextgen_button {
 	function add_nextgen_button()  {
 		
 		// Set path to editor_plugin.js
-		$this->path = NGGALLERY_URLPATH . 'admin/tinymce/';		
+		$this->path = plugins_url('', __FILE__);
 		
 		// Modify the version when tinyMCE plugins are changed.
 		add_filter('tiny_mce_version', array (&$this, 'change_tinymce_version') );
@@ -78,7 +78,7 @@ class add_nextgen_button {
 	 */
 	function add_tinymce_plugin($plugin_array) {    
 	
-		$plugin_array[$this->pluginname] =  $this->path . 'editor_plugin.js';
+		$plugin_array[$this->pluginname] =  $this->path . '/editor_plugin.js';
 		
 		return $plugin_array;
 	}
@@ -97,6 +97,6 @@ class add_nextgen_button {
 }
 
 // Call it now
-$tinymce_button = new add_nextgen_button ();
+$tinymce_button = new add_nextgen_button();
 
 ?>
