@@ -56,12 +56,8 @@ class Image extends Abstract_Model {
 	 * @var string $thumb_url The URL to the thumbnail of this image.
 	 * @var string $thumb_path The path to the thumbnail of this image.
 	 */
-	
 	private $url;
 	private $thumb_url;
-	private $ugly_url;
-	private $ugly_thumb_url;
-	
 	private $path;
 	private $thumb_path;
 
@@ -124,6 +120,8 @@ class Image extends Abstract_Model {
 	 * @param int    $start
 	 * @param int    $per_page
 	 * @param bool   $exclude
+	 * 
+	 * @todo: fix this.
 	 *
 	 * @return array
 	 */

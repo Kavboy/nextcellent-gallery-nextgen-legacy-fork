@@ -2,6 +2,8 @@
 
 namespace NextCellent\Rendering;
 
+use NextCellent\Exception;
+
 /**
  * @author  Niko Strijbol
  * @version 16/06/2016
@@ -52,7 +54,7 @@ class Renderer {
 		$location = $this->get_template();
 		
 		if($location == null) {
-			_e('Template not found.', 'nggallery');
+			self::render_error( __('Template not found.', 'nggallery') );
 			return;
 		}
 		
@@ -71,5 +73,28 @@ class Renderer {
 		ob_start();
 		$this->render( $args );
 		return ob_get_clean();
+	}
+
+	/**
+	 * Render an error with Exception.
+	 * 
+	 * @param Exception $exception
+	 *
+	 * @return string
+	 */
+	public static function render_exception(Exception $exception) {
+		return self::render_error( $exception->getMessage() );
+	}
+
+	/**
+	 * Render an error with message.
+	 * 
+	 * @param string $message
+	 *
+	 * @return string
+	 */
+	protected static function render_error($message) {
+		$error = sprintf( __( 'An error occurred: %s', 'nggallery' ), $message );
+		return apply_filters('ncg_render_error', $error);
 	}
 }

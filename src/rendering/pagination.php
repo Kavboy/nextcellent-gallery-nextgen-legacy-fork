@@ -63,12 +63,16 @@ class Pagination {
 				echo "<span class='current'>$page_num</span>";
 				continue;
 			}
+			
+			$data = [
+				'ncg-page'  => $page_num,
+			];
 
 			// The other pages
 			// We print the first two pages, two before/after the current one and the two last pages.
 			if ( $page_num <= 2 || ( $page_num >= $this->page - 2 && $page_num <= $this->page + 2 ) || $page_num >= $total_pages - 2 ) {
 
-				$link = Rewrite::get_pagination_link( $page_num );
+				$link = Rewrite::get_link( $data );
 
 //				$link = $nggRewrite->get_permalink( [
 //					'nggpage'   => 1 == $page_num ? false : $page_num
@@ -100,7 +104,9 @@ class Pagination {
 
 		$previous = $this->page - 1;
 
-		$prev = Rewrite::get_pagination_link( $previous );
+		$prev = Rewrite::get_link( [
+			'ncg-page'  => $previous
+		]);
 
 //		$prev = $nggRewrite->get_permalink ( [
 //			'nggpage'   => 1 == $this->page - 1 ? false : $this->page - 1,
@@ -116,7 +122,9 @@ class Pagination {
 
 		$next_page = $this->page + 1;
 
-		$next = Rewrite::get_pagination_link( $next_page );
+		$next = Rewrite::get_link( [
+			'ncg-page' => $next_page 
+		]);
 
 //		$next = $nggRewrite->get_permalink ([
 //			'nggpage'   => $next_page,

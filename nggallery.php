@@ -56,9 +56,6 @@ if (!class_exists('NCG')) {
 
 	    //The base for our admin pages. A page will be 'admin.php?page=nextcellent-[NAME]
 	    const ADMIN_BASE = 'nextcellent';
-
-	    //The endpoint for NextCellent
-	    const ENDPOINT = 'nextcellent';
 	    
 	    //The name of the folder with custom templates/styles
 	    const NCG_FOLDER = 'ngg_styles';

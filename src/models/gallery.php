@@ -20,7 +20,7 @@ use NextCellent\Database\Not_Found_Exception;
  * @property-read Image[] $images The images in this gallery.
  * @property-read Image $preview_image The preview image.
  */
-class Gallery extends Abstract_Model {
+class Gallery extends Abstract_Model implements Displayable_Images {
 
 	/**
 	 * Define the database tables.
@@ -38,7 +38,7 @@ class Gallery extends Abstract_Model {
 	/**
 	 * @var array $image_map Associative array of the ID -> Image Object.
 	 */
-	private $image_map = array();
+	private $image_map = [];
 
 	/**
 	 * @var null|int The total number of images in this gallery.
@@ -275,7 +275,7 @@ class Gallery extends Abstract_Model {
 		return $image;
 	}
 
-	protected function get_images() {
+	public function get_images() {
 		if(empty($this->image_map)) {
 			$this->load_images();
 		}

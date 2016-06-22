@@ -10,7 +10,7 @@ use NextCellent\Database\Manager;
  */
 abstract class Abstract_Model {
 
-	protected $properties = array();
+	protected $properties = [];
 
 	/**
 	 * Count all rows in a given table.

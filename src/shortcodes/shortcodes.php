@@ -102,8 +102,7 @@ function show_gallery($attr) {
 		'images'   => false
 	], $attr);
 
-	return \NextCellent\Rendering\render_gallery( $attr['id'], $attr['template'], $attr['images'] );
-	//return nggShowGallery($attr['id'], $attr['template'], $attr['images']);
+	return \NextCellent\Rendering\render_gallery_shortcode( $attr['id'], $attr['template'], $attr['images'] );
 }
 
 /**
@@ -133,13 +132,14 @@ function show_image_browser($attr) {
 /**
  * Render a slideshow. Syntax:
  *
- * [slideshow id="10|random|recent" width=""|w="" height=""|h="" dots="" /]
- * [ncg_slideshow id="10" width="" height="" /]
+ * [slideshow id="10|random|recent" width=""|w="" height=""|h="" /]
+ * [ncg_slideshow id="10" width="" height="" images="10"/]
  *
  * where
  * - id is the id of the gallery or "random" for random images or "recent" for recent images.
  * - width is the width of the slideshow
  * - height is the height of the slideshow
+ * - images is the number of images when using random or recent
  *
  * @param array $attr array The shortcode attributes.
  *                    
@@ -159,24 +159,14 @@ function show_slideshow($attr) {
 		unset($attr['h']);
 	}
 
-	$attr = shortcode_atts([
-		'id'   => 'random',
-		'w'    => null,
-		'h'    => null,
-		'dots' => null
+	$attr = shortcode_atts( [
+		'id'     => 'random',
+		'width'  => null,
+		'height' => null,
+		'images' => null,
 	], $attr);
-
-	if (isset($attr['width']) || isset($attr['height'])) {
-		$attr['autodim'] = false;
-	}
 	
-	if ($attr['dots'] == null) {
-		unset($attr['dots']);
-	} else {
-		$data['nav_dots'] = $attr['dots'];
-	}
-
-	return nggShowSlideshow($attr['id'], $attr);
+	return \NextCellent\Rendering\render_slideshow_shortcode($attr['id'], $attr['width'], $attr['height'], $attr['images']);
 }
 
 /**
