@@ -16,7 +16,6 @@
  * @var bool $loop If the slideshow should loop or not.
  * @var bool $drag If the slideshow is draggable or not.
  * @var bool $nav If the navigation should be displayed or not.
- * @var bool $nav_dots If the navigation dots should be displayed.
  * @var bool $auto_play If the slideshow should play automatically.
  * @var bool $hover Pause on hover.
  * @var string $effect The effect.
@@ -59,7 +58,6 @@ if( !$auto_dim ) {
 				nav: true,
 				navText: ['<?php _e('previous', 'nggallery') ?>','<?php _e('next', 'nggallery') ?>'],
 				<?php endif; ?>
-				dots: <?= var_export($nav_dots, true) ?>,
 				autoplay: <?= var_export($auto_play, true) ?>,
 				autoplayTimeout: <?= $time ?>,
 				autoplayHoverPause: <?= var_export($hover, true) ?>,

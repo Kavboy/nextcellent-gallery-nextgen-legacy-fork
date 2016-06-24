@@ -47,7 +47,6 @@ function nggShowSlideshow( $galleryID, $args = null) {
         'loop'      => $ngg_options['irLoop'],
         'drag'      => $ngg_options['irDrag'],
         'nav'       => $ngg_options['irNavigation'],
-        'nav_dots'  => $ngg_options['irNavigationDots'],
         'autoplay'  => $ngg_options['irAutoplay'],
         'hover'     => $ngg_options['irAutoplayHover'],
         'effect'    => $ngg_options['slideFx'],
@@ -125,7 +124,6 @@ function nggShowSlideshow( $galleryID, $args = null) {
 				navText: ['" . __('previous', 'nggallery') ."','" . __('next', 'nggallery') ."'],";
 	}
 	$out .=    "
-	            dots: " .  var_export($param['nav_dots'], true) .",
 	            autoplay: ". var_export($param['autoplay'], true) .",
 				autoplayTimeout: " . $param['time'] . ",
 				autoplayHoverPause: " . var_export($param['hover'], true) . ",

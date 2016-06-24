@@ -94,6 +94,7 @@ class Options implements \ArrayAccess {
 	const WM_TEXT_COLOUR            = 'wmColor';
 	const WM_TEXT_ALPHA             = 'wmOpaque';
 
+	//Slideshow settings
 	const SLIDE_EFFECT              = 'slideFx';
 	const SLIDE_WIDTH               = 'irWidth';
 	const SLIDE_HEIGHT              = 'irHeight';
@@ -102,11 +103,12 @@ class Options implements \ArrayAccess {
 	const SLIDE_USE_LOOP            = 'irLoop';
 	const SLIDE_USE_DRAG            = 'irDrag';
 	const SLIDE_SHOW_NAV            = 'irNavigation';
-	const SLIDE_SHOW_NAV_DOTS       = 'irNavigationDots';
 	const SLIDE_AUTO_PLAY           = 'irAutoplay';
 	const SLIDE_PAUSE_ON_HOVER      = 'irAutoplayHover';
 	const SLIDE_NR_OF_IMAGES        = 'irNumber';
 	const SLIDE_NEXT_ON_CLICK       = 'irClick';
+	const SLIDE_USE_CAPTION         = 'irCaption';
+	const SLIDE_CAPTION_SOURCE      = 'irCaptionSrc';
 
 	const STYLE_USE_CSS             = 'activateCSS';
 	const STYLE_CSS_FILE            = 'CSSfile';
@@ -170,6 +172,7 @@ class Options implements \ArrayAccess {
 			'thumbheight'       => 75,                      //Thumb height
 			'thumbfix'          => true,                    //Fix the dimension
 			'thumbquality'      => 100,                     //Thumb Quality
+			'thumbDifferentSize'=> false,                   //Thumbnails of different sizes
 
 			// Image Settings
 			'imgWidth'          => 800,                     //Image Width
@@ -218,11 +221,12 @@ class Options implements \ArrayAccess {
 			'irLoop'            => true,                    //Loop or not
 			'irDrag'            => true,                    //Enable drag or not
 			'irNavigation'      => false,                   //Show navigation
-			'irNavigationDots'  => false,                   //Show navigation dots
 			'irAutoplay'        => true,                    //Autoplay
 			'irAutoplayHover'   => true,                    //Pause on hover
 			'irNumber'          => 20,                      //Number of images when random or latest
 			'irClick'           => true,                    //Go to next on click.
+			'irCaption'         => false,                   //Display a caption or not.
+			'irCaptionSrc'      => 'title',                 //The source of the caption
 
 			// CSS Style
 			'activateCSS'       => true,                            // activate the CSS file
@@ -331,11 +335,11 @@ class Options implements \ArrayAccess {
 	 * @param string $option The name of the option.
 	 * @param mixed $value   The value of the option. If not scalar, it should be serialized.
 	 *
-	 * @throws InvalidOptionException If the option is not a predefined option.
+	 * @throws Invalid_Option_Exception If the option is not a predefined option.
 	 */
 	public function set_option( $option, $value ) {
 		if ( is_null( $this->get( $option ) ) ) {
-			throw new InvalidOptionException( $option );
+			throw new Invalid_Option_Exception( $option );
 		}
 		$this->options[ $option ] = $value;
 	}
@@ -425,11 +429,11 @@ class Options implements \ArrayAccess {
 	 * @param string $option The name of the option.
 	 * @param mixed $value   The value of the option. If not scalar, it should be serialized.
 	 *
-	 * @throws InvalidOptionException If the option does not exist.
+	 * @throws Invalid_Option_Exception If the option does not exist.
 	 */
 	public function set_mu_option( $option, $value ) {
 		if ( is_null( $this->get_mu_option( $option ) ) ) {
-			throw new InvalidOptionException( $option );
+			throw new Invalid_Option_Exception( $option );
 		}
 		$this->mu_options[ $option ] = $value;
 	}
@@ -563,23 +567,56 @@ class Options implements \ArrayAccess {
 	/**
 	 * Get an option.
 	 *
-	 * @param array $options  The options from where to get the options.
-	 * @param array $defaults The defaults for the given options.
-	 * @param string $option  The option to look for.
+	 * @param array  $options  The options from where to get the options.
+	 * @param array  $defaults The defaults for the given options.
+	 * @param string $option   The option to look for.
 	 *
-	 * @return null|mixed Null if the option does not exists, else the value of the option.
+	 * @return mixed|null Null if the option does not exists, else the value of the option.
+	 *
+	 * @throws Invalid_Option_Exception If it does not exist.
 	 */
 	private function option( $options, $defaults, $option ) {
-		//If the option is not present in the saved options, it's maybe in the defaults.
-		if ( ! array_key_exists( $option, $options ) ) {
-			if ( ! array_key_exists( $option, $defaults ) ) {
-				return null;
+		//The option exists
+		if(array_key_exists( $option, $defaults )) {
+			//If there is a saved option, return that
+			if(array_key_exists( $option, $options )) {
+				return $options[$option];
 			} else {
-				return $defaults[ $option ];
+				return $defaults[$option];
 			}
 		} else {
-			return $options[ $option ];
+			throw new Invalid_Option_Exception($option);
 		}
+	}
+
+	/**
+	 * Check if an option exists or not.
+	 *
+	 * @param string $option The option to check.
+	 * @param array  $defaults Default values.
+	 *
+	 * @return bool
+	 */
+	private function exists_option($option, $defaults) {
+		return array_key_exists( $option, $defaults );
+	}
+
+	/**
+	 * @param string $option
+	 *
+	 * @return bool If the option exists or not.
+	 */
+	public function exists($option) {
+		return $this->exists_option( $option, $this->default_options );
+	}
+
+	/**
+	 * @param string $mu_option
+	 *
+	 * @return bool If the mu option exists or not.
+	 */
+	public function mu_exists($mu_option) {
+		return $this->exists_option( $mu_option, $this->default_mu_options );
 	}
 
 	/**
@@ -591,7 +628,7 @@ class Options implements \ArrayAccess {
 	 * @return boolean True if it exists, otherwise false.
 	 */
 	public function offsetExists( $offset ) {
-		return array_key_exists( $offset, $this->options );
+		return $this->exists( $offset );
 	}
 
 	/**

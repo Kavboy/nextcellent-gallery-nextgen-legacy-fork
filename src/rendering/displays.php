@@ -101,20 +101,21 @@ function render_slideshow($images, $gallery_id = null, $args = [], $template = '
 	$options = $ncg->options;
 
 	$param = wp_parse_args( $args, [
-		'width'     => $options[ Options::SLIDE_WIDTH ],
-		'height'    => $options[ Options::SLIDE_HEIGHT ],
-		'anchor'    => 'ncg-slideshow-' . $counter++,
-		'time'      => $options[ Options::SLIDE_TIME ] * 1000,
-		'loop'      => $options[ Options::SLIDE_USE_LOOP ],
-		'drag'      => $options[ Options::SLIDE_USE_DRAG ],
-		'nav'       => $options[ Options::SLIDE_SHOW_NAV ],
-		'nav_dots'  => $options[ Options::SLIDE_SHOW_NAV_DOTS ],
-		'auto_play' => $options[ Options::SLIDE_AUTO_PLAY ],
-		'hover'     => $options[ Options::SLIDE_PAUSE_ON_HOVER ],
-		'effect'    => $options[ Options::SLIDE_EFFECT ],
-		'click'     => $options[ Options::SLIDE_NEXT_ON_CLICK ],
-		'auto_dim'  => $options[ Options::SLIDE_FIT_SIZE ],
-		'number'    => $options[ Options::SLIDE_NR_OF_IMAGES ]
+		'width'       => $options[ Options::SLIDE_WIDTH ],
+		'height'      => $options[ Options::SLIDE_HEIGHT ],
+		'anchor'      => 'ncg-slideshow-' . $counter ++,
+		'time'        => $options[ Options::SLIDE_TIME ] * 1000,
+		'loop'        => $options[ Options::SLIDE_USE_LOOP ],
+		'drag'        => $options[ Options::SLIDE_USE_DRAG ],
+		'nav'         => $options[ Options::SLIDE_SHOW_NAV ],
+		'auto_play'   => $options[ Options::SLIDE_AUTO_PLAY ],
+		'hover'       => $options[ Options::SLIDE_PAUSE_ON_HOVER ],
+		'effect'      => $options[ Options::SLIDE_EFFECT ],
+		'click'       => $options[ Options::SLIDE_NEXT_ON_CLICK ],
+		'auto_dim'    => $options[ Options::SLIDE_FIT_SIZE ],
+		'number'      => $options[ Options::SLIDE_NR_OF_IMAGES ],
+		'caption'     => $options[ Options::SLIDE_USE_CAPTION ],
+		'caption_src' => $options[ Options::SLIDE_CAPTION_SOURCE ]
 	] );
 
 	if ( $gallery_id !== null ) {
@@ -125,6 +126,10 @@ function render_slideshow($images, $gallery_id = null, $args = [], $template = '
 	} else {
 		$link      = false;
 		$link_text = false;
+	}
+
+	if($param['caption'] == false) {
+		$param['caption_src'] = null;
 	}
 
 	$data = array_merge( $param, [
