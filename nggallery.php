@@ -37,6 +37,9 @@ check_for_nextgen();
 
 /**
  * The main class is only loaded if it or it's alias do not exist yet.
+ *
+ * !NextCellent only supports PHP branches that are actively maintained!
+ * See http://php.net/supported-versions.php
  */
 if (!class_exists('NCG')) {
 
@@ -52,7 +55,7 @@ if (!class_exists('NCG')) {
 	    const VERSION = '1.9.31';
 	    const DB_VERSION = '1.8.3';
 	    const MINIMUM_WP = '4.0';
-	    const MINIMUM_PHP = '5.4';
+	    const MINIMUM_PHP = '5.5';
 
 	    //The base for our admin pages. A page will be 'admin.php?page=nextcellent-[NAME]
 	    const ADMIN_BASE = 'nextcellent';
