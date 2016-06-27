@@ -485,7 +485,7 @@ if (!class_exists('NCG')) {
 			}
 
 			//Files for the slideshow
-	        wp_enqueue_script('owl', plugins_url('js/owl.carousel.min.js', __FILE__), array('jquery'), '2');
+	        wp_enqueue_script('owl', plugins_url('plugins/owl/owl.carousel.min.js', __FILE__), array('jquery'), '2');
 
 			//Load AJAX navigation script, works only with shutter script as we need to add the listener
 	        if ( $options['galAjaxNav'] && ($options['thumbEffect'] == "shutter" || function_exists( 'srel_makeshutter' ) ) ) {
@@ -533,6 +533,8 @@ if (!class_exists('NCG')) {
 				//load the framework
 				wp_enqueue_style('ncg-base', plugins_url('css/framework-min.css', __FILE__), false, '1.0.1', 'screen');
 			}
+			
+			wp_enqueue_style('owl', plugins_url('plugins/owl/assets/owl.carousel.min.css', __FILE__));
 
 			//	activate Thickbox
 			if ($options['thumbEffect'] == 'thickbox') {

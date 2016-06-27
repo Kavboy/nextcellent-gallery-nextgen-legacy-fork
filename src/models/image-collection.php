@@ -8,86 +8,106 @@ use NextCellent\Database\Manager;
  * @author  Niko Strijbol
  * @version 22/06/2016
  */
-class Image_Collection implements Displayable_Images {
+class Image_Collection extends Lazy_Images {
 
 	/**
-	 * @var array $image_map Associative array of the ID -> Image Object.
+	 * Get a collection that provides random images.
+	 *
+	 * @param int        $limit
+	 * @param null|array $galleries When provided, the random images will be taken from the given galleries only.
+	 *
+	 * @return Lazy_Images The images.
 	 */
-	private $image_map = [];
+	public static function random($limit, $galleries = null) {
+		$order = 'rand()';
+		return self::common($limit, $galleries, $order);
+	}
 
 	/**
-	 * Load the images of this gallery from the database, with the given constraints.
+	 * Get a collection that provides random images.
 	 *
-	 * @param array  $where
-	 * @param string $order
-	 * @param int    $start    The start position. If the number of images is 0, this is ignored.
-	 * @param int    $per_page The number of images.
+	 * @param int        $limit
+	 * @param null|array $galleries When provided, the random images will be taken from the given galleries only.
 	 *
-	 * @return Image_Collection
+	 * @return Lazy_Images The images.
 	 */
-	public static function load_images($where = [], $order = '', $start = 0, $per_page = 0 ) {
+	public static function recent($limit, $galleries = null) {
 
-		$images = new Image_Collection();
-		
-		$order_by = " ORDER BY $order";
+		$i = Manager::get()->get_image_table();
+		$order = $i . '.' . Image::ID . ' DESC';
 
-		$start = absint($start);
-
-		if($per_page > 0) {
-			$limit = " LIMIT {$start},{$per_page}";
-		} else {
-			$limit = '';
-		}
-		
-		//Prepare where
-		if(empty( $where )) {
-			$clauses = '';
-			$info = [];
-		} else {
-			$clauses = 'WHERE ' . $where[0];
-			$info = $where[1];
-		}
-
-		$manager = Manager::get();
-		$i = $manager->get_image_table();
-		$g = $manager->get_gallery_table();
-		$p = $g . '.' . Gallery::PATH;
-
-		$i_i = Image::GALLERY_ID;
-		$g_i = Gallery::ID;
-
-		$ids = $manager->get_results(
-			"SELECT $i.*, $p FROM $i INNER JOIN $g ON $i_i = $g_i $clauses $order_by $limit",
-			$info
-		);
-
-		var_dump( $ids );
-
-		foreach ( $ids as $id ) {
-			/** @noinspection PhpInternalEntityUsedInspection */
-			$images->image_map[$id[Image::ID]] = Image::to_image($id);
-		}
-
-		return $images;
+		return self::common($limit, $galleries, $order);
 	}
 	
-	public static function get_random($limit, $gallery_id = null) {
-		
-		if($gallery_id === null) {
-			$where = [];
+	/*
+	 * The common functions of recent and random.
+	 */
+	private static function common($limit, $galleries, $order) {
+		$i = Manager::get()->get_image_table();
+		$g = Manager::get()->get_gallery_table();
+
+		$p = $g . '.' . Gallery::PATH; //Gallery path field.
+		$joiner = $i . '.' . Image::GALLERY_ID . '=' . $g . '.' . Gallery::ID;
+
+		if($galleries === null) {
+			$where = '';
 		} else {
-			$where = [Image::GALLERY_ID . ' = %d', [$gallery_id]];
+			array_walk($galleries, 'intval');
+			$where = 'WHERE ' . $i . '.' . Image::GALLERY_ID . ' IN (' . implode(',', $galleries) . ')';
 		}
-		
-		return self::load_images($where, 'rand()', 0, $limit);
+
+		$query = "SELECT $i.*, $p FROM $i INNER JOIN $g ON $joiner $where ORDER BY $order";
+
+		return new Lazy_Images($query, (int) $limit);
 	}
 
 	/**
-	 * Get the images to display.
+	 * @param Gallery $gallery  The gallery or a gallery ID.
+	 * @param string  $sort     Column to sort on.
+	 * @param string  $sort_dir Sort direction.
+	 * @param bool    $exclude
 	 *
-	 * @return Image[]
+	 * @return Lazy_Images The images.
 	 */
-	public function get_images() {
-		return $this->image_map;
+	public static function gallery($gallery, $sort = Image::SORT_ORDER, $sort_dir = 'ASC', $exclude = false) {
+
+		//Possible sort orders
+		$sort_orders = [
+			Image::SORT_ORDER,
+			Image::ID,
+			Image::FILENAME,
+			Image::ALT_TEXT,
+			Image::DATE
+		];
+
+		if(!in_array($sort, $sort_orders, true)) {
+			$sort = Image::SORT_ORDER;
+		}
+
+		//Sort direction
+		$order_dir = ( $sort_dir === 'DESC') ? 'DESC' : 'ASC';
+
+		//Exclude stuff
+		$exclude_sql = $exclude ? ' AND ' . Image::EXCLUDE . ' == 1' : '';
+
+		$g_id = Image::GALLERY_ID;
+		$i_id = Image::ID;
+		$i = Manager::get()->get_image_table();
+
+		$query  = "SELECT * FROM $i WHERE $g_id = %d $exclude_sql ORDER BY $sort $order_dir";
+		$values = [$gallery->id];
+
+		$counter = "SELECT count($i_id) FROM $i WHERE $g_id = %d";
+		$counterValues = [$gallery->id];
+		
+		return new Lazy_Images($query, $counter, $values, $counterValues, function($results) use($gallery) {
+			$converted = [];
+			foreach ( $results as $id ) {
+				$id[Gallery::PATH] = $gallery->path;
+				/** @noinspection PhpInternalEntityUsedInspection */
+				$converted[$id[Image::ID]] = Image::to_image($id);
+			}
+			return $converted;
+		});
 	}
 }

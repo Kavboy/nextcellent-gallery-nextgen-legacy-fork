@@ -7,7 +7,7 @@
  * and in most cases, fail silently.
  * 
  * Following variables are available for use:
- * @var array $images The images to display. It contains the images for this page.
+ * @var \NextCellent\Models\Image[] $images The images to display. It contains the images for this page.
  * @var int $width The width of the slideshow
  * @var int $height The height of the slideshow.
  * @var string $class The class of the slideshow
@@ -33,6 +33,7 @@ if( !$auto_dim ) {
 	$style   = '';
 	$i_style = '';
 }
+
 ?>
 
 <div class="ncg-slideshow-container">

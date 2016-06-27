@@ -2,6 +2,8 @@
 
 namespace NextCellent\Widgets;
 
+use NextCellent\RSS\Generator;
+
 /**
  * The NextCellent Media RSS widget.
  */
@@ -11,10 +13,10 @@ class Media_RSS_Widget extends \WP_Widget {
 	 * Register the widget.
 	 */
 	public function __construct() {
-		parent::__construct( 'ngg-mrssw', __( 'NextCellent Media RSS', 'nggallery' ), array(
+		parent::__construct( 'ngg-mrssw', __( 'NextCellent Media RSS', 'nggallery' ), [
 			'classname'   => 'ngg_mrssw',
 			'description' => __( 'Widget that displays a Media RSS links for NextCellent Gallery.', 'nggallery' )
-		) );
+		]);
 	}
 
 	/**
@@ -27,21 +29,32 @@ class Media_RSS_Widget extends \WP_Widget {
 	 */
 	public function widget( $args, $instance ) {
 
-		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '&nbsp;' : $instance['title'], $instance, $this->id_base );
+		if (empty($instance['title'])) {
+			$instance['title'] = __('Slideshow', 'nggallery');
+		}
 
-		$out = $args['before_widget'];
-		$out .= $args['before_title'] . $title . $args['after_title'];
-		$out .= "<div class='ngg-media-rss-widget'>";
-		$out .= "<a href='" . \nggMediaRss::get_mrss_url() . "' title='" . $instance['mrss_title'] . "' class='ngg-media-rss-link'>";
+		//Title for the widget.
+		$title = apply_filters('widget_title', $instance['title'], $instance, $this->id_base);
+
+		$link = Generator::imageFeedUrl();
+		$linkTitle = esc_attr($instance['mrss_title']);
+
+		$out = "<a href='$link' title='$linkTitle' class='ngg-media-rss-link'>";
 		if ( $instance['show_icon'] ) {
 			$out .= '<span class="dashicons dashicons-rss" style="padding-right: 1.5em"></span>';
 		}
 		if ( $instance['show_global_mrss'] ) {
 			$out .= $instance['mrss_text'];
 		}
-		$out .= "</a></div>";
-		$out .= $args['after_widget'];
-		echo $out;
+		$out .= '</a>';
+
+		//Do the actual output.
+		echo $args['before_widget'];
+		if ($title) {
+			echo $args['before_title'] . $title . $args['after_title'];
+		}
+		echo '<div class="ngg-media-rss-widget widget">' . $out . '</div>';
+		echo $args['after_widget'];
 	}
 
 	/**
@@ -78,13 +91,13 @@ class Media_RSS_Widget extends \WP_Widget {
 	function form( $instance ) {
 
 		//Defaults
-		$instance = wp_parse_args( (array) $instance, array(
+		$instance = wp_parse_args( $instance, [
 			'title'            => __( 'Media RSS', 'nggallery' ),
 			'show_global_mrss' => true,
 			'mrss_text'        => __( 'Media RSS', 'nggallery' ),
 			'mrss_title'       => __( 'Link to the main image feed', 'nggallery' ),
 			'show_icon'        => true
-		) );
+		]);
 
 		// The widget form
 		?>

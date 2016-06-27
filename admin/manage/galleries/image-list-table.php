@@ -81,15 +81,13 @@ class Image_List_Table extends \WP_List_Table {
 			$currentPage = $this->get_pagenum();
 			$perPage     = $this->get_items_per_page('ngg_images_per_page', 50);
 
-			$options    = $ncg->options;
+			$options     = $ncg->options;
 
 			$start       = ( $currentPage - 1 ) * $perPage;
 
-			$this->gallery->load_images($options['galSort'], $options['galSortDir'], $start, $perPage);
+			$this->items = $this->gallery->retrieveImages($start, $perPage, $options['galSort'], $options['galSortDir']);
 
-			$this->items = $this->gallery->images;
-
-			$totalItems = $this->gallery->count_images();
+			$totalItems = $this->gallery->total();
 
 			$this->set_pagination_args( array(
 				'total_items' => $totalItems,

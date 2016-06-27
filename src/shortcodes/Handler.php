@@ -4,7 +4,7 @@ namespace NextCellent\Shortcodes;
 
 use NextCellent\Options\Options;
 
-require_once("shortcodes.php");
+require_once('shortcodes.php');
 
 /**
  * @author  Niko Strijbol
@@ -61,7 +61,7 @@ class Handler {
 	 * @return string The converted content.
 	 */
 	public function legacy_convert($content) {
-		if ( stristr( $content, '[singlepic' )) {
+		if (stripos( $content, '[singlepic' ) !== false) {
 			$search = "@\[singlepic=(\d+)(|,\d+|,)(|,\d+|,)(|,watermark|,web20|,)(|,right|,center|,left|,)\]@i";
 			if (preg_match_all($search, $content, $matches, PREG_SET_ORDER)) {
 
@@ -77,7 +77,7 @@ class Handler {
 			}
 		}
 
-		if ( stristr( $content, '[album' )) {
+		if ( stripos( $content, '[album' ) !== false) {
 			$search = "@(?:<p>)*\s*\[album\s*=\s*(\w+|^\+)(|,extend|,compact)\]\s*(?:</p>)*@i";
 			if (preg_match_all($search, $content, $matches, PREG_SET_ORDER)) {
 
@@ -90,7 +90,7 @@ class Handler {
 			}
 		}
 
-		if ( stristr( $content, '[gallery' )) {
+		if ( stripos( $content, '[gallery' ) !== false) {
 			$search = "@(?:<p>)*\s*\[gallery\s*=\s*(\w+|^\+)\]\s*(?:</p>)*@i";
 			if (preg_match_all($search, $content, $matches, PREG_SET_ORDER)) {
 
@@ -101,7 +101,7 @@ class Handler {
 			}
 		}
 
-		if ( stristr( $content, '[imagebrowser' )) {
+		if ( stripos( $content, '[imagebrowser' ) !== false) {
 			$search = "@(?:<p>)*\s*\[imagebrowser\s*=\s*(\w+|^\+)\]\s*(?:</p>)*@i";
 			if (preg_match_all($search, $content, $matches, PREG_SET_ORDER)) {
 
@@ -112,7 +112,7 @@ class Handler {
 			}
 		}
 
-		if ( stristr( $content, '[slideshow' )) {
+		if ( stripos( $content, '[slideshow' ) !== false) {
 			$search = "@(?:<p>)*\s*\[slideshow\s*=\s*(\w+|^\+)(|,(\d+)|,)(|,(\d+))\]\s*(?:</p>)*@i";
 			if (preg_match_all($search, $content, $matches, PREG_SET_ORDER)) {
 
@@ -126,7 +126,7 @@ class Handler {
 			}
 		}
 
-		if ( stristr( $content, '[tags' )) {
+		if ( stripos( $content, '[tags' ) !== false) {
 			$search = "@(?:<p>)*\s*\[tags\s*=\s*(.*?)\s*\]\s*(?:</p>)*@i";
 			if (preg_match_all($search, $content, $matches, PREG_SET_ORDER)) {
 
@@ -138,7 +138,7 @@ class Handler {
 			}
 		}
 
-		if ( stristr( $content, '[albumtags' )) {
+		if ( stripos( $content, '[albumtags' ) !== false) {
 			$search = "@(?:<p>)*\s*\[albumtags\s*=\s*(.*?)\s*\]\s*(?:</p>)*@i";
 			if (preg_match_all($search, $content, $matches, PREG_SET_ORDER)) {
 

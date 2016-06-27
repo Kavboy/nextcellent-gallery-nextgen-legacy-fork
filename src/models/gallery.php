@@ -8,6 +8,16 @@ use NextCellent\Database\Manager;
 use NextCellent\Database\Not_Found_Exception;
 
 /**
+ * A gallery. To find images in the gallery, you need to do the following:
+ * 
+ * 1. Call {@link #load_images()} to prepare the gallery.
+ * 2. Call getImages().
+ * 
+ * Once you have loaded the images, you can call get images an unlimited amount of times.
+ * 
+ * If you need the images directly, there is a helper method called retrieveImages(), that does all this in one go.
+ * 
+ * 
  * @property int $id The id.
  * @property string $name The name.
  * @property string $slug The slug of the gallery.
@@ -20,7 +30,9 @@ use NextCellent\Database\Not_Found_Exception;
  * @property-read Image[] $images The images in this gallery.
  * @property-read Image $preview_image The preview image.
  */
-class Gallery extends Abstract_Model implements Displayable_Images {
+class Gallery implements Images {
+
+	use Savable_Model;
 
 	/**
 	 * Define the database tables.
@@ -36,14 +48,20 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 	const AUTHOR = 'author';
 
 	/**
-	 * @var array $image_map Associative array of the ID -> Image Object.
+	 * @var null|Images
 	 */
-	private $image_map = [];
+	private $imageCollection;
 
 	/**
-	 * @var null|int The total number of images in this gallery.
+	 * Load the images of this gallery from the database, with the given constraints.
+	 *
+	 * @param string $sort     The column to sort on.
+	 * @param string $sort_dir The sorting direction.
+	 * @param bool   $exclude  Whether to include the hidden images or not.
 	 */
-	private $image_count = null;
+	public function load_images($sort = Image::SORT_ORDER, $sort_dir = 'ASC', $exclude = false ) {
+		$this->imageCollection = Image_Collection::gallery($this, $sort, $sort_dir, $exclude);
+	}
 
 	/**
 	 * Count all galleries.
@@ -51,7 +69,7 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 	 * @return int The number of galleries.
 	 */
 	public static function count() {
-		return parent::count_table(Manager::get()->get_gallery_table());
+		return self::count_table(Manager::get()->get_gallery_table());
 	}
 
 	/**
@@ -104,22 +122,15 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 	}
 
 	/**
-	 * Count all images in this gallery.
-	 *
-	 * @return int The number of images, inclusive the excluded ones.
+	 * @return int The total number of images.
 	 */
-	public function count_images() {
+	public function total() {
 
-		if($this->image_count === null) {
-			$manager = Manager::get();
-
-			$this->image_count = $manager->get_int(
-				'SELECT COUNT(*) FROM ' . $manager->get_image_table() . ' WHERE ' . Image::GALLERY_ID . ' = %d',
-				[$this->id]
-			);
+		if($this->imageCollection === null ) {
+			return Image_Collection::gallery($this)->total();
 		}
-
-		return $this->image_count;
+		
+		return $this->imageCollection->total();
 	}
 
 	/**
@@ -134,57 +145,39 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 	}
 
 	/**
-	 * Load the images of this gallery from the database, with the given constraints.
+	 * Get some portion of the images. The first image is at index 0.
 	 *
+	 * THe obvious use for this is pagination.
+	 *
+	 * @param int $start  At which image to start. Must be non-negative.
+	 * @param int $number How many images are needed. If not set, all images are returned. Must be non-negative.
+	 *
+	 * @return Image[] The requested images. If there are no images, an empty array is returned.
+	 * @throws \LogicException
+	 */
+	public function getImages($start = 0, $number = PHP_INT_MAX) {
+		
+		if($this->imageCollection === null ) {
+			throw new \LogicException('You must first call load_images().');
+		}
+		
+		return $this->imageCollection->getImages($start, $number);
+	}
+
+	/**
+	 * Get the images of this gallery from the database, with the given constraints.
+	 *
+	 * @param int    $start
+	 * @param int    $perPage
 	 * @param string $sort     The column to sort on.
 	 * @param string $sort_dir The sorting direction.
-	 * @param int $start       The start position. If the number of images is 0, this is ignored.
-	 * @param int $per_page    The number of images.
-	 * @param bool $exclude Whether to include the hidden images or not.
+	 * @param bool   $exclude  Whether to include the hidden images or not.
+	 *
+	 * @return Image[]
 	 */
-	public function load_images($sort = Image::SORT_ORDER, $sort_dir = 'ASC', $start = 0, $per_page = 0, $exclude = false ) {
-
-		$sort_orders = array(
-			Image::SORT_ORDER,
-			Image::ID,
-			Image::FILENAME,
-			Image::ALT_TEXT,
-			Image::DATE
-		);
-
-		if(!in_array($sort, $sort_orders)) {
-			$sort = Image::SORT_ORDER;
-		}
-
-		$order_dir = ( $sort_dir === 'DESC') ? 'DESC' : 'ASC';
-
-		$order_by = " ORDER BY {$sort} {$order_dir}";
-
-		$start = absint($start);
-
-		if($per_page > 0) {
-			$limit = " LIMIT {$start},{$per_page}";
-		} else {
-			$limit = '';
-		}
-
-		if($exclude) {
-			$exclude_sql = ' AND ' . Image::EXCLUDE . ' == 1';
-		} else {
-			$exclude_sql = '';
-		}
-
-		$manager = Manager::get();
-		$ids = $manager->get_results(
-			'SELECT * FROM ' . $manager->get_image_table() . ' WHERE ' . Image::GALLERY_ID . ' = %d' . $exclude_sql . $order_by . $limit,
-			$this->id
-		);
-
-		foreach ( $ids as $id ) {
-			$id[Gallery::PATH] = $this->path;
-			/** @noinspection PhpInternalEntityUsedInspection */
-			$this->image_map[$id[Image::ID]] = Image::to_image($id);
-		}
+	public function retrieveImages($start = 0, $perPage = PHP_INT_MAX, $sort = Image::SORT_ORDER, $sort_dir = 'ASC', $exclude = false ) {
+		$this->imageCollection = Image_Collection::gallery($this, $sort, $sort_dir, $exclude);
+		return $this->getImages($start, $perPage);
 	}
 
 	/**
@@ -196,7 +189,7 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 	 * @param int $per_page
 	 * @param bool $count_images
 	 *
-	 * @return array
+	 * @return Gallery[]
 	 */
 	public static function all($sort = self::ID, $sort_dir = 'ASC', $start = 0, $per_page = 0, $count_images = false ) {
 
@@ -206,7 +199,7 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 			self::AUTHOR,
 		);
 
-		if(!in_array($sort, $sort_orders)) {
+		if(!in_array($sort, $sort_orders, true)) {
 			$sort = self::ID;
 		}
 
@@ -231,11 +224,11 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 
 		foreach ( $ids as $id ) {
 			$galleries[$id[self::ID]] = self::to_gallery($id);
-			array_push($gallery_ids, $id[self::ID]);
+			$gallery_ids[] = $id[self::ID];
 		}
 
 		if($count_images) {
-			$id_string = join(',', $gallery_ids);
+			$id_string = implode(',', $gallery_ids);
 			$results = $manager->get_results(
 				'SELECT COUNT(*) FROM ' . $manager->get_image_table() . ' WHERE '. Image::GALLERY_ID . ' IN (' . $id_string . ') GROUP BY ' . Image::GALLERY_ID
 			);
@@ -243,7 +236,7 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 			$counter = 0;
 
 			foreach($gallery_ids as $gallery_id) {
-				$galleries[$gallery_id]->image_count = (int)$results[$counter]["COUNT(*)"];
+				$galleries[$gallery_id]->image_count = (int)$results[$counter]['COUNT(*)'];
 				$counter++;
 			}
 		}
@@ -259,35 +252,27 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 	 * @return Gallery The image instance.
 	 */
 	private static function to_gallery( $data ) {
-		$image = new Gallery();
-		$image->set_properties( array(
+		$gallery = new Gallery();
+		$gallery->set_properties(array(
 			'id'          => (int) $data[ self::ID ],
 			'name'        => $data[ self::NAME ],
-			'slug'  => $data[ self::SLUG ],
-			'path'    => $data[ self::PATH ],
-			'title' => $data[ self::TITLE ],
-			'description'        => $data[ self::DESCRIPTION ],
+			'slug'        => $data[ self::SLUG ],
+			'path'        => $data[ self::PATH ],
+			'title'       => $data[ self::TITLE ],
+			'description' => $data[ self::DESCRIPTION ],
 			'page_id'     => (int) $data[ self::PAGE_ID ],
-			'preview'  => (bool) $data[ self::PREVIEW ],
-			'author'   => (int) $data[ self::AUTHOR ]
-		) );
+			'preview'     => (bool) $data[ self::PREVIEW ],
+			'author'      => (int) $data[ self::AUTHOR ]
+		));
 
-		return $image;
-	}
-
-	public function get_images() {
-		if(empty($this->image_map)) {
-			$this->load_images();
-		}
-
-		return $this->image_map;
+		return $gallery;
 	}
 
 	protected function get_preview_image() {
-		if(empty($this->image_map)) {
+		if(empty($this->imageMap)) {
 			return Image::find($this->preview);
 		} else {
-			return $this->image_map[$this->preview];
+			return $this->imageMap[$this->preview];
 		}
 	}
 
@@ -324,7 +309,7 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 	}
 
 	public function save() {
-		return parent::save_model( Manager::get()->get_gallery_table(), self::ID, $this->id );
+		return $this->save_model( Manager::get()->get_gallery_table(), self::ID, $this->id );
 	}
 
 	public function can_manage($user = null) {
@@ -333,7 +318,11 @@ class Gallery extends Abstract_Model implements Displayable_Images {
 			$user = get_current_user_id();
 		}
 		
-		return user_can($user, Roles::MANAGE_ALL_GALLERIES) || (user_can($user, Roles::MANAGE_GALLERIES) && $this->author == get_current_user_id());
+		return user_can($user, Roles::MANAGE_ALL_GALLERIES) || (user_can($user, Roles::MANAGE_GALLERIES) && $this->author === get_current_user_id());
+	}
+	
+	public function get_images() {
+		return $this->imageCollection;
 	}
 
 	/**

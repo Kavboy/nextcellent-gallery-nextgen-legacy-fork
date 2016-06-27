@@ -14,6 +14,6 @@ class Wrong_Property_Exception extends Exception {
 	 * @param string $property The property that was tried to access.
 	 */
 	public function __construct( $property ) {
-		parent::__construct( sprintf( __( 'The property %s does not exist.', 'nggallery'), $property ) );
+		parent::__construct( sprintf( 'The property %s does not exist.', $property ) );
 	}
 }

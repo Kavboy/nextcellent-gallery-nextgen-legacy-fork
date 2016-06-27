@@ -2,11 +2,9 @@
 
 namespace NextCellent\Models;
 
-use NextCellent\Api\Image_Viewer;
 use NextCellent\Database\Database_Exception;
 use NextCellent\Database\Manager;
 use NextCellent\Database\Not_Found_Exception;
-use NextCellent\Options\Options;
 
 /**
  * The NextCellent image model.
@@ -31,9 +29,9 @@ use NextCellent\Options\Options;
  * @property-read int $height The height of the image.
  * @property-read int $width The width of the image.
  */
-class Image extends Abstract_Model {
+class Image {
 
-	const BETA_LINKS = false;
+	use Savable_Model;
 
 	/**
 	 * Define the database column names.
@@ -67,7 +65,7 @@ class Image extends Abstract_Model {
 	 * @return int The number of images.
 	 */
 	public static function count() {
-		return parent::count_table(Manager::get()->get_image_table());
+		return self::count_table(Manager::get()->get_image_table());
 	}
 
 	/**
@@ -133,7 +131,7 @@ class Image extends Abstract_Model {
 			self::GALLERY_ID,
 		);
 
-		if(!in_array($sort, $sort_orders)) {
+		if(!in_array($sort, $sort_orders, true)) {
 			$sort = self::ID;
 		}
 
@@ -143,17 +141,9 @@ class Image extends Abstract_Model {
 
 		$start = absint($start);
 
-		if($per_page > 0) {
-			$limit = " LIMIT {$start},{$per_page}";
-		} else {
-			$limit = '';
-		}
-		
-		if($exclude) {
-			$excluding = ' WHERE ' . self::EXCLUDE . ' = 0';
-		} else {
-			$excluding = '';
-		}
+		$limit = $per_page > 0 ? " LIMIT {$start},{$per_page}" : '';
+
+		$excluding = $exclude ? ' WHERE ' . self::EXCLUDE . ' = 0' : '';
 
 		$manager = Manager::get();
 
@@ -193,7 +183,6 @@ class Image extends Abstract_Model {
 		) );
 
 		$gallery_path = $data[Gallery::PATH];
-
 
 		$image->path = WINABSPATH . $gallery_path . '/' . $image->filename;
 		$image->url = site_url() . '/' . $gallery_path . '/' . $image->filename;
@@ -245,7 +234,7 @@ class Image extends Abstract_Model {
 	}
 
 	public function save() {
-		return parent::save_model( Manager::get()->get_image_table(), self::ID, $this->id );
+		return $this->save_model( Manager::get()->get_image_table(), self::ID, $this->id );
 	}
 
 	public function __toString() {

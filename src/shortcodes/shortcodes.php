@@ -9,15 +9,15 @@ namespace NextCellent\Shortcodes;
 /**
  * Function to show a single picture. Syntax:
  *
- * [ncg_single id="10" float="none|left|right" width="" height="" mode="none|watermark|web20" link="url" template="filename" /]
- * [singlepic  id="10" float="none|left|right" width="" height="" mode="none|watermark|web20" link="url" template="filename" /]
+ * [ncg_single id="10" float="none|left|right" width="" height="" mode="none|watermark" link="url" template="filename" /]
+ * [singlepic  id="10" float="none|left|right" width="" height="" mode="none|watermark" link="url" template="filename" /]
  *
  * where
  *  - id is the ID of an image
  *  - float is the CSS float property to apply to the thumbnail
  *  - width is width of the single picture you want to show (original width if this parameter is missing)
  *  - height is height of the single picture you want to show (original height if this parameter is missing)
- *  - mode is one of none, watermark or web20 (transformation applied to the picture)
+ *  - mode is one of none, watermark
  *  - link is optional and could link to a other url instead the full image
  *  - template is a name for a gallery template, which is located in themefolder/nggallery or plugins/nextgen-gallery/view
  *
@@ -132,8 +132,8 @@ function show_image_browser($attr) {
 /**
  * Render a slideshow. Syntax:
  *
- * [slideshow id="10|random|recent" width=""|w="" height=""|h="" /]
- * [ncg_slideshow id="10" width="" height="" images="10"/]
+ * [slideshow id="10|random|recent" width=""|w="" height=""|h="" nav="true|false" /]
+ * [ncg_slideshow id="10" width="" height="" images="10" nav="true|false"/]
  *
  * where
  * - id is the id of the gallery or "random" for random images or "recent" for recent images.
@@ -144,8 +144,6 @@ function show_image_browser($attr) {
  * @param array $attr array The shortcode attributes.
  *                    
  * @return string
- *                
- * @todo clean up this mess
  */
 function show_slideshow($attr) {
 
@@ -164,9 +162,10 @@ function show_slideshow($attr) {
 		'width'  => null,
 		'height' => null,
 		'images' => null,
+		'nav'    => null
 	], $attr);
 	
-	return \NextCellent\Rendering\render_slideshow_shortcode($attr['id'], $attr['width'], $attr['height'], $attr['images']);
+	return \NextCellent\Rendering\render_slideshow_shortcode($attr['id'], $attr['width'], $attr['height'], $attr['images'], $attr['nav']);
 }
 
 /**
@@ -256,12 +255,12 @@ function show_thumbnails($attr) {
  * Function to show a gallery of random or the most recent images with shortcode of type:
  *
  * [random     max="7" template="filename" id="2" /]
- * [ncg_random max="7" template="filename" id="2" /]
+ * [ncg_random max="7" template="filename" id="2,3,..." /]
  *
  * where
  * - max is the maximum number of random or recent images to show
  * - template is a name for a gallery template, which is located in themefolder/nggallery or plugins/nextgen-gallery/view
- * - id is the gallery id, if the recent/random pictures shall be taken from a specific gallery only
+ * - id are the gallery ids, if the recent/random pictures shall be taken from a specific gallery only
  *
  * @param array $attr
  *
@@ -269,43 +268,60 @@ function show_thumbnails($attr) {
  */
 function show_random($attr) {
 
+	if(isset($attr['id'])) {
+		$attr['id'] = explode(',', $attr['id']);
+	}
+
 	$attr = shortcode_atts([
 		'max'      => '',
-		'template' => '',
-		'id'       => 0
+		'template' => 'gallery',
+		'id'       => null
 	], $attr);
 
-	return nggShowRandomRecent('random', $attr['max'], $attr['template'], $attr['id']);;
+	if(empty($attr['id'])) {
+		$attr['id'] = null;
+	}
+
+	return \NextCellent\Rendering\render_random_shortcode($attr['max'], $attr['template'], $attr['id']);
 }
 
 /**
  * Function to show a gallery of random or the most recent images with shortcode of type:
  *
  * [recent max="7" template="filename" id="3" mode="date" /]
- * [ncg_recent max="7" template="filename" id="3" mode="date" /]
+ * [ncg_recent max="7" template="filename" id="2,3,..." mode="date" /]
  * 
  * where
  * - max is the maximum number of random or recent images to show
  * - template is a name for a gallery template, which is located in themefolder/nggallery or plugins/nextgen-gallery/view
- * - id is the gallery id, if the recent/random pictures shall be taken from a specific gallery only
+ * - id is the gallery ids, if the recent/random pictures shall be taken from a specific gallery only
  * - mode is either "id" (which takes the latest additions to the databse, default)
  *               or "date" (which takes the latest pictures by EXIF date)
  *               or "sort" (which takes the pictures by user sort order)
  *
  * @param array $attr
+ * 
+ * @todo Enable id/date/sort things.
  *
  * @return string
  */
 function show_recent($attr) {
 
+	if(isset($attr['id'])) {
+		$attr['id'] = explode(',', $attr['id']);
+	}
+
 	$attr = shortcode_atts([
 		'max'      => '',
-		'template' => '',
-		'id'       => 0,
-		'mode'     => 'id'
+		'template' => 'gallery',
+		'id'       => null
 	], $attr);
+
+	if(empty($attr['id'])) {
+		$attr['id'] = null;
+	}
 	
-	return nggShowRandomRecent($attr['mode'], $attr['max'], $attr['template'], $attr['id']);;
+	return \NextCellent\Rendering\render_recent_shortcode($attr['max'], $attr['template'], $attr['id']);
 }
 
 /**

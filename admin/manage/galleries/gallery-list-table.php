@@ -135,7 +135,7 @@ class Gallery_List_Table extends \WP_List_Table {
 			case 'page_id':
 				return $gallery->page_id;
 			case 'quantity':
-				return $gallery->count_images();
+				return $gallery->total();
 			default:
 				ob_start();
 				do_action( 'ngg_manage_gallery_custom_column', $column_name, $gallery->id );

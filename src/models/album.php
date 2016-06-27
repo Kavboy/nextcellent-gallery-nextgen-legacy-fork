@@ -15,7 +15,9 @@ use NextCellent\Database\Not_Found_Exception;
  * @property array $contents The content of the album.
  * @property int $page_id The page ID of the album.
  */
-class Album extends Abstract_Model {
+class Album {
+	
+	use Savable_Model;
 
 	const ID = 'id';
 	const NAME = 'name';
@@ -31,7 +33,7 @@ class Album extends Abstract_Model {
 	 * @return int The number of images.
 	 */
 	public static function count() {
-		return parent::count_table(Manager::get()->get_image_table());
+		return self::count_table(Manager::get()->get_album_table());
 	}
 
 	/**
@@ -132,7 +134,7 @@ class Album extends Abstract_Model {
 	}
 
 	public function save() {
-		return parent::save_model( Manager::get()->get_album_table(), self::ID, $this->id );
+		return self::save_model( Manager::get()->get_album_table(), self::ID, $this->id );
 	}
 
 	public function __toString() {
@@ -156,7 +158,7 @@ class Album extends Abstract_Model {
 			self::NAME
 		);
 
-		if(!in_array($sort, $sort_orders)) {
+		if(!in_array($sort, $sort_orders, true)) {
 			$sort = self::ID;
 		}
 
@@ -166,17 +168,13 @@ class Album extends Abstract_Model {
 
 		$start = absint($start);
 
-		if($per_page > 0) {
-			$limit = " LIMIT {$start},{$per_page}";
-		} else {
-			$limit = '';
-		}
+		$limit = $per_page > 0 ? " LIMIT {$start},{$per_page}" : '';
 
 		$manager = Manager::get();
 
 		$ids = $manager->get_results( 'SELECT * FROM ' . $manager->get_album_table() . $order_by . $limit);
 
-		$albums = array();
+		$albums = [];
 
 		foreach ( $ids as $id ) {
 			$albums[$id[self::ID]] = self::to_album($id);

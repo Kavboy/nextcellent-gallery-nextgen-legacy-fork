@@ -22,7 +22,7 @@ class Album_List_Table extends \WP_List_Table {
 
 	public function __construct( $base, $screen = null ) {
 
-		parent::__construct( array( 'screen' => $screen, 'plural' => 'ngg-manager' ) );
+		parent::__construct( [ 'screen' => $screen, 'plural' => 'ngg-manager' ] );
 
 		$this->base = $base;
 	}
@@ -38,7 +38,7 @@ class Album_List_Table extends \WP_List_Table {
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
 
-		$this->_column_headers = array( $columns, $hidden, $sortable );
+		$this->_column_headers = [ $columns, $hidden, $sortable ];
 
 		/**
 		 * Do the pagination.
@@ -55,7 +55,7 @@ class Album_List_Table extends \WP_List_Table {
 			$order = 'ASC';
 		}
 
-		if ( ( isset ( $_GET['orderby'] ) && ( in_array( $_GET['orderby'], array( 'id', 'name') ) ) ) ) {
+		if ( ( isset ( $_GET['orderby'] ) && ( in_array( $_GET['orderby'], [ 'id', 'name' ] ) ) ) ) {
 			$order_by = $_GET['orderby'];
 		} else {
 			$order_by = 'id';
@@ -65,11 +65,11 @@ class Album_List_Table extends \WP_List_Table {
 		$this->items = Album::all($order_by, $order, $start, $per_page);
 
 		$total_items = Album::count();
-
-		$this->set_pagination_args( array(
+		
+		$this->set_pagination_args( [
 			'total_items' => $total_items,
 			'per_page'    => $per_page
-		) );
+		] );
 	}
 
 	/**

@@ -6,7 +6,7 @@
  * and in most cases, fail silently.
  * 
  * Following variables are available for use:
- * @var NextCellent\Models\Gallery $gallery The gallery to display. It contains the images for this page.
+ * @var \NextCellent\Models\Image[] $images The images. It contains the images for this page.
  * @var \NextCellent\Rendering\Pagination $pagination The pagination. It implements toString, so you can just echo it.
  * @var string $anchor An id for the gallery.
  * @var string|bool $mode_link The link to the other mode or false if disabled.
@@ -22,7 +22,7 @@
 	<?php } ?>
 
 	<!-- Thumbnails -->
-	<?php foreach ( $gallery->images as $image ) : ?>
+	<?php foreach ( $images as $image ) : ?>
 
 	<div id="ngg-image-<?= $image->id ?>" class="ngg-gallery-thumbnail-box">
 		<div class="ngg-gallery-thumbnail" >
