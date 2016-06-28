@@ -1,6 +1,6 @@
 /*
-CSS Name: Shadow Effect
-Description: NextGEN Default Style with a Shadow effect
+CSS Name: Shadow Effect with Description text
+Description: NextGEN Default Style with a Shadow effect and description text below the thumbnail
 Author: NextCellent
 Version: 1.9.22
    
@@ -13,7 +13,7 @@ it's only a template design
 /* ----------- Album Styles Extend -------------*/
 
 .ngg-albumoverview {
-	margin-top: 10px;
+	margin-top: 15px;
 	width: 100%;
 	clear:both; 
 	display:block !important;
@@ -69,7 +69,7 @@ it's only a template design
 }
 
 .ngg-album-compactbox {
-	background:transparent url(albumset.gif) no-repeat scroll 0%;
+	background:transparent url(../css/albumset.gif) no-repeat scroll 0%;
 	height:86px;
 	margin:0pt 0pt 6px !important;
 	padding:12px 0pt 0pt 7px !important;
@@ -116,6 +116,10 @@ it's only a template design
 	background: url(shadowAlpha.png) no-repeat bottom right !important;
 	background: url(shadow.gif) no-repeat bottom right;
 	margin: 10px 0 0 10px !important;
+	padding:10px 15px 10px 15px;
+	border-color:#EEEEEE;
+	border-style:solid none none solid;
+	border-width:1px medium medium 1px;
 }
 
 .ngg-gallery-thumbnail img {
@@ -132,7 +136,11 @@ it's only a template design
 } 
 
 .ngg-gallery-thumbnail span {
-	display:none;
+	margin: -6px 6px 6px -6px;
+	text-align:center;
+	font-size:90%;
+	color:#808080;
+	display:block;
 }
 
 .ngg-clear {
@@ -156,7 +164,7 @@ it's only a template design
 
 .ngg-navigation a.page-numbers,
 .ngg-navigation a.next,
-.ngg-navigation a.prev,
+.ngg-navigation a.prev, 
 .ngg-navigation span.page-numbers,
 .ngg-navigation span.next,
 .ngg-navigation span.prev {

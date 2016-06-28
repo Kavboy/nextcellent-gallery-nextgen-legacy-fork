@@ -92,16 +92,12 @@ abstract class Abstract_Image_Manager extends Abstract_Manager {
 		//Check the bulk options.
 		check_admin_referer('bulk-' . Image_List_Table::PLURAL);
 
-		global $wpdb, $nggdb;
-
-		//TODO:Error message when update failed
-
-		$description = isset ( $_POST['description'] ) ? $_POST['description'] : [];
-		$alt_text     = isset ( $_POST['alttext'] ) ? $_POST['alttext'] : [];
-		$exclude     = isset ( $_POST['exclude'] ) ? $_POST['exclude'] : [];
-		$tagList     = isset ( $_POST['tags'] ) ? $_POST['tags'] : [];
+		$description = isset($_POST['description']) ? $_POST['description'] : [];
+		$alt_text    = isset($_POST['alttext']) ? $_POST['alttext'] : [];
+		$exclude     = isset($_POST['exclude']) ? $_POST['exclude'] : [];
+		$tagList     = isset($_POST['tags']) ? $_POST['tags'] : [];
 		$pictures    = isset($_POST['pid']) ? $_POST['pid'] : [];
-		$date        = isset ( $_POST['date'] ) ? $_POST['date'] : "NOW()"; //Not sure if NOW() will work or not but in theory it should
+		$date        = isset($_POST['date']) ? $_POST['date'] : 'now()'; //Not sure if NOW() will work or not but in theory it should
 		
 		//To int.
 		$pictures = array_map('intval', $pictures);

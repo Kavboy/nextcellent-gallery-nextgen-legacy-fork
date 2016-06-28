@@ -1,59 +1,67 @@
 /*
-CSS Name: K2 Theme
-Description: NextGEN Style for K2 Theme
-Author: NextCellent
+CSS Name: Hovereffect Styles
+Description: Hover Stylesheet based on the idea of Hoverbox from http://host.sonspring.com/hoverbox/
+Author: NextCellent and Nathan Smith
 Version: 1.9.22
-
-This is a template stylesheet that can be used with NextGEN Gallery. I tested the
-styles with a default theme Kubrick. Modify it when your theme struggle with it,
-it's only a template design
+This is a template stylesheet which doesn't support description below the thumbnails. It's a experimental version.
 
 */
 
 /* ----------- Album Styles Extend -------------*/
 
 .ngg-albumoverview {
-	margin: 10px 0px 0px 0px !important;
+	margin-top: 10px;
 	width: 100%;
 	clear:both; 
 	display:block !important;
 }
 
 .ngg-album {
-	/*height: 130px;*/
-	overflow:hidden;
-	margin: 0px 0px 5px !important;
+	overflow: hidden;
 	padding: 5px;
-	border: 1px solid #cccccc;
+	margin-bottom: 5px;
 }
 
 .ngg-albumtitle {
+	border-bottom:1px dashed #AAAAAA;
 	text-align: left;
  	font-weight: bold;
-	padding:0px;
+	margin:0px;
+	padding-bottom: 3px;
 	font-size: 1.4em;
-	margin: 0px 0px 10px 0px !important;
-}
-
-.ngg-albumcontent {
-	margin: 0px !important;
+	margin-bottom: 10px;
 }
 
 .ngg-thumbnail {
-	margin:0px 12px 0px 0px !important;
 	float: left;
+	margin-right: 12px;
+	background:#EEEEEE none repeat scroll 0% 50%;
+	border-color:#DDDDDD rgb(187, 187, 187) rgb(170, 170, 170) rgb(204, 204, 204);
+	border-style:solid;
+	border-width:1px;
+	color:inherit;
+	margin-right: 5px;
+	padding:5px;
 }
 
 .ngg-thumbnail img {
-	background-color:#FFFFFF;
-	border:1px solid #A9A9A9;
-	margin:4px 0px 4px 5px !important;
-	padding:4px;
-	position:relative;
+	filter: alpha(opacity=100);
+	-moz-opacity: .99;
+	opacity: .99;
+	background:#FFFFFF none repeat scroll 0%;
+	border-color:#AAAAAA rgb(204, 204, 204) rgb(221, 221, 221) rgb(187, 187, 187);
+	border-style:solid;
+	border-width:1px;
+	color:inherit;
+	padding:2px;
+	vertical-align:top;
 }
 
 .ngg-thumbnail img:hover {
-	background-color: #A9A9A9;
+	filter: alpha(opacity=90);
+	-moz-opacity: .9;
+    opacity: .9;
+	border-color:#000000;
 }
 
 .ngg-description {
@@ -72,16 +80,13 @@ it's only a template design
 }
 
 .ngg-album-compactbox {
-	background:transparent url(albumset.gif) no-repeat scroll 0%;
+	background:transparent url(../css/albumset.gif) no-repeat scroll 0%;
 	height:86px;
 	margin:0pt 0pt 6px !important;
 	padding:12px 0pt 0pt 7px !important;
 	width:120px;
 }
 
-.ngg-album-link {
-	margin:0px !important;
-}
 
 .ngg-album-compactbox .Thumb {
 	border:1px solid #000000;
@@ -94,10 +99,9 @@ it's only a template design
 .ngg-album-compact h4 {
 	font-size:15px;
 	font-weight:bold;
-	margin-bottom:0px !important;
-	margin-top:0px !important;
+	margin-bottom:0px;
+	margin-top:0px;
 	width:110px;
-	padding:0px !important;
 }
 
 .ngg-album-compact p {
@@ -108,6 +112,7 @@ it's only a template design
 /* ----------- Gallery style -------------*/
 
 .ngg-galleryoverview {
+	overflow: hidden;
 	margin-top: 10px;
 	width: 100%;
 	clear:both; 
@@ -115,36 +120,48 @@ it's only a template design
 }
 
 .ngg-gallery-thumbnail-box {
-	margin:0px !important;
 	float: left;
-}
-
-.ngg-gallery-thumbnail {
-	float: left; 
-	background: url(shadowAlpha.png) no-repeat bottom right !important;
-	background: url(shadow.gif) no-repeat bottom right;
-	margin: 10px 0 0 10px !important;
-}
-
-.ngg-gallery-thumbnail img {
-	margin: -6px 6px 6px -6px !important;
-	background-color:#FFFFFF;
-	border:1px solid #A9A9A9;
-	display:block; 
-	padding:4px;
+	background:#EEEEEE none repeat scroll 0% 50%;
+	border-color:#DDDDDD rgb(187, 187, 187) rgb(170, 170, 170) rgb(204, 204, 204);
+	border-style:solid;
+	border-width:1px;
+	color:inherit;
+	display:inline;
+	margin:3px;
+	padding:5px;
 	position:relative;
 }
 
-.ngg-gallery-thumbnail img:hover {
-	background-color: #A9A9A9;
+.ngg-gallery-thumbnail {
+	float: left;
 }
+
+.ngg-gallery-thumbnail img {
+	filter: alpha(opacity=100);
+	-moz-opacity: .99;
+	opacity: .99;
+	background:#FFFFFF none repeat scroll 0%;
+	border-color:#AAAAAA rgb(204, 204, 204) rgb(221, 221, 221) rgb(187, 187, 187);
+	border-style:solid;
+	border-width:1px;
+	color:inherit;
+	padding:2px;
+	vertical-align:top;
+}
+
+.ngg-gallery-thumbnail img:hover {
+	filter: alpha(opacity=90);
+	-moz-opacity: .9;
+    opacity: .9;
+	border-color:#000000;
+} 
 
 .ngg-gallery-thumbnail span {
 	/* Images description */
 	font-size:90%;
 	padding-left:5px;
 	display:block;
-} 
+}
 
 .ngg-clear {
 	clear: both;
@@ -158,6 +175,7 @@ it's only a template design
 	display:block !important;
 	padding-top:15px;
 	text-align:center;
+	
 }
 
 .ngg-navigation span {
@@ -183,8 +201,8 @@ it's only a template design
 .ngg-navigation span.next:hover,
 .ngg-navigation span.prev:hover {
 	background-color: #0066CC;
-	color: #FFFFFF;
-	text-decoration: none;
+	color: #FFFFFF !important;
+	text-decoration: none !important;
 }
 
 /* ----------- Image browser style -------------*/
@@ -195,20 +213,35 @@ it's only a template design
 
 .ngg-imagebrowser h3 {
 	text-align:center;
+	padding-bottom:10px;
+}
+
+.ngg-imagebrowser .pic {
+	background:#EEEEEE none repeat scroll 0% 50%;
+	border-color:#DDDDDD rgb(187, 187, 187) rgb(170, 170, 170) rgb(204, 204, 204);
+	border-style:solid;
+	border-width:1px;
+	color:inherit;
+	display:block;
+	padding:10px;
 }
 
 .ngg-imagebrowser img {
-	border:1px solid #A9A9A9;
-	margin-top: 10px; 
-	margin-bottom: 10px; 
 	width: 100%;
-	display:block !important;
-	padding:5px;
+	margin: -3px;
+	background:#FFFFFF none repeat scroll 0%;
+	border-color:#AAAAAA rgb(204, 204, 204) rgb(221, 221, 221) rgb(187, 187, 187);
+	border-style:solid;
+	border-width:1px;
+	color:inherit;
+	padding:2px;
+	vertical-align:top;
 }
 
 .ngg-imagebrowser-nav {
-	padding:5px;
-	margin-left:10px;	
+	padding:10px;
+	margin-left:10px;
+	
 }
 
 .ngg-imagebrowser-nav .back {
@@ -223,6 +256,16 @@ it's only a template design
 	border:1px solid #DDDDDD;
 	margin-right:3px;
 	padding:3px 7px;
+}
+
+.ngg-imagebrowser-nav .back:hover,
+.ngg-imagebrowser-nav .next:hover {
+	border:1px solid #000000;
+}
+
+.ngg-imagebrowser-nav .back a:hover,
+.ngg-imagebrowser-nav .next a:hover {
+	text-decoration: none !important;
 }
 
 .ngg-imagebrowser-nav .counter {
@@ -317,7 +360,6 @@ it's only a template design
 	overflow: hidden;
 	margin:0pt;
 	padding:5px 0px 0px 0pt;
-	text-align:left;
 }
 
 .ngg-widget img {
@@ -338,7 +380,7 @@ it's only a template design
 .ngg-related-gallery img {
 	border: 1px solid #DDDDDD;
 	float: left;
-	margin: 0pt 2px;
+	margin: 0pt 3px;
 	padding: 2px;
 	height: 50px;
 	width:  50px;
@@ -346,4 +388,56 @@ it's only a template design
 
 .ngg-related-gallery img:hover {
 	border: 1px solid #000000;
-} 
+}
+
+/* ----------- Gallery list -------------*/
+
+.ngg-galleryoverview ul li:before {
+	content: '' !important;
+}
+
+.ngg-gallery-list {
+	list-style-type:none;
+	padding: 0px !important;
+	text-indent:0px !important;	
+}
+
+.ngg-galleryoverview div.pic img{
+	width: 100%;	
+}
+
+.ngg-gallery-list li {
+	float:left;
+	margin:0 2px 0px 2px !important;
+	overflow:hidden;
+}
+
+.ngg-gallery-list li a {
+	border:1px solid #CCCCCC;
+	display:block;
+	padding:2px;
+}
+
+.ngg-gallery-list li.selected a{
+	-moz-background-clip:border;
+	-moz-background-inline-policy:continuous;
+	-moz-background-origin:padding;
+	background:#000000 none repeat scroll 0 0;
+}
+
+.ngg-gallery-list li img {
+	height:40px;
+	width:40px;	
+}
+
+li.ngg-next, li.ngg-prev {
+	height:40px;
+	width:40px;	
+	font-size:3.5em;
+}
+
+li.ngg-next a, li.ngg-prev a  {
+	padding-top: 10px;
+	border: none;
+	text-decoration: none;
+}

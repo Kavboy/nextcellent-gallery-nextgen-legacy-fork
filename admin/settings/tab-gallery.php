@@ -78,7 +78,10 @@ class Tab_Gallery extends Settings_Tab {
 					<td>
 						<input type="number" step="1" min="0" class="small-text" name="galColumns" id="galColumns" value="<?php echo $this->options['galColumns']; ?>">
 						<?php _e( 'columns per page', 'nggallery'); ?>
-						<p class="description"><?php _e('0 will display as much columns as possible. This is normally only required for captions below the images.','nggallery') ?></p>
+						<p class="description">
+							<?php _e('0 will display as much columns as possible. This is normally only required for captions below the images.','nggallery') ?><br>
+							<?php _e('This option is ignored in the default templates.', 'nggallery') ?>
+						</p>
 					</td>
 				</tr>
 				<tr>

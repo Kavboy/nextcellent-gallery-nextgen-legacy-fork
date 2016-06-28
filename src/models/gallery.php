@@ -31,8 +31,6 @@ use NextCellent\Database\Not_Found_Exception;
  * @property string       $abs_thumb_path The absolute path to the thumbnail folder.
  * @property-read Image[] $images The images in this gallery.
  * @property-read Image   $preview_image The preview image.
- * @property string       abs_path
- * @property string        abs_thumb_path
  */
 class Gallery implements Images {
 

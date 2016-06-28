@@ -2,6 +2,9 @@
 
 namespace NextCellent\Options;
 
+use BadMethodCallException;
+use const NextCellent\Rendering\Css\FOLDER_BUILTIN;
+
 /**
  * This class manages NextCellent's options. When used inside NextCellent, the instance should be taken from
  * the registry:
@@ -112,6 +115,7 @@ class Options implements \ArrayAccess {
 
 	const STYLE_USE_CSS             = 'activateCSS';
 	const STYLE_CSS_FILE            = 'CSSfile';
+	const STYLE_CSS_FOLDER          = 'CSSfolder';
 
 	const MU_GALLERY_PATH           = 'gallerypath';
 	const MU_CSS_FILE               = 'wpmuCSSfile';
@@ -150,7 +154,7 @@ class Options implements \ArrayAccess {
 	 * @internal See the class description. You should almost never make an instance of this class.
 	 */
 	public function __construct() {
-		$defaults = array(
+		$defaults = [
 			//General stuff
 			'gallerypath'       => 'wp-content/gallery/',   //Set the default path to the gallery.
 			'deleteImg'         => true,                    //Delete images from disk?
@@ -229,16 +233,17 @@ class Options implements \ArrayAccess {
 			'irCaptionSrc'      => 'title',                 //The source of the caption
 
 			// CSS Style
-			'activateCSS'       => true,                            // activate the CSS file
-			'CSSfile'           => plugins_url('css/nggallery.css', dirname(__FILE__)),            // set default css filename
+			'activateCSS'       => true,                     // activate the CSS file
+			'CSSfolder'         => FOLDER_BUILTIN,
+			'CSSfile'           => 'css/nextcellent.css',    // set default css filename
 			
 			self::LEGACY_SHORTCODES => false,
 			self::OLD_SHORTCODES    => true,
-		);
+		];
 
 		$mu_defaults = [
 			'gallerypath'       => 'wp-content/sites/%BLOG_ID%/gallery/',
-			'wpmuCSSfile'       => 'nggallery.css',
+			'wpmuCSSfile'       => 'nextcellent.css',
 			'silentUpdate'      => false,
 			'wpmuQuotaCheck'    => true,
 			'wpmuZipUpload'     => true,
@@ -254,13 +259,7 @@ class Options implements \ArrayAccess {
 		$this->default_options    = $defaults;
 		$this->default_mu_options = $mu_defaults;
 
-		$this->options = get_option( self::FIELD );
-
-		//If the options do not exist.
-		if ( ! $this->options ) {
-			$this->install_options();
-			$this->options = get_option( self::FIELD );
-		}
+		$this->options = get_option( self::FIELD, [] );
 
 		if ( is_multisite() ) {
 			$this->mu_options = get_site_option( self::FIELD );
@@ -283,13 +282,6 @@ class Options implements \ArrayAccess {
 	public static function getInstance() {
 		global $ncg;
 		return $ncg->options;
-	}
-
-	/**
-	 * Save the default options, which is an empty array.
-	 */
-	private function install_options() {
-		update_option( self::FIELD, array() );
 	}
 
 	/**
@@ -348,10 +340,14 @@ class Options implements \ArrayAccess {
 	 * @throws Invalid_Option_Exception If the option is not a predefined option.
 	 */
 	public function set_option( $option, $value ) {
-		if ( is_null( $this->get( $option ) ) ) {
-			throw new Invalid_Option_Exception( $option );
+		$this->check_option( $option, $this->default_options );
+		$this->options[$option] = $value;
+	}
+
+	private function check_option($option, $defaults) {
+		if(!array_key_exists($option, $defaults)) {
+			throw new Invalid_Option_Exception($option);
 		}
-		$this->options[ $option ] = $value;
 	}
 
 	/**
@@ -442,9 +438,8 @@ class Options implements \ArrayAccess {
 	 * @throws Invalid_Option_Exception If the option does not exist.
 	 */
 	public function set_mu_option( $option, $value ) {
-		if ( is_null( $this->get_mu_option( $option ) ) ) {
-			throw new Invalid_Option_Exception( $option );
-		}
+		//Check option
+		$this->check_option( $option, $this->default_mu_options );
 		$this->mu_options[ $option ] = $value;
 	}
 
@@ -668,7 +663,7 @@ class Options implements \ArrayAccess {
 	 * @return void
 	 */
 	public function offsetSet( $offset, $value ) {
-		$this->update_option( $offset, $value );
+		throw new BadMethodCallException("The options are read only as array."); 
 	}
 
 	/**
@@ -683,6 +678,6 @@ class Options implements \ArrayAccess {
 	 * @since 5.0.0
 	 */
 	public function offsetUnset( $offset ) {
-		$this->delete_option( $offset );
+		throw new BadMethodCallException("The options are read only as array.");
 	}
 }

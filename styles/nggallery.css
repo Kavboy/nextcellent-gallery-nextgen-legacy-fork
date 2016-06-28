@@ -1,5 +1,5 @@
 /*
-CSS Name: Default Styles
+CSS Name: Old style
 Description: NextGEN Default Gallery Stylesheet
 Author: NextCellent
 Version: 1.9.22
@@ -84,7 +84,7 @@ html>body .ngg-album {
 }
 
 .ngg-album-compactbox {
-	background:transparent url(albumset.gif) no-repeat scroll 0%;
+	background:transparent url(../css/albumset.gif) no-repeat scroll 0%;
 	height:86px;
 	margin:0pt 0pt 6px !important;
 	padding:12px 0pt 0pt 7px !important;

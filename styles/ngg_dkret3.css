@@ -1,11 +1,11 @@
-/*
-CSS Name: Black Minimalism Theme
-Description: For Black Minimalism Theme 
-Author: NextCellent
+﻿/*
+CSS Name: dkret3 Theme
+Description: NextGEN dkret3 style with a shadow effect
+Author: Jörn Kretzschmar and NextCellent
 Version: 1.9.22
    
 This is a template stylesheet that can be used with NextGEN Gallery. I tested the
-styles with a default theme Kubrick. Modify it when your theme struggle with it,
+styles with the theme dkret3. Modify it when your theme struggle with it,
 it's only a template design
 
 */
@@ -20,11 +20,11 @@ it's only a template design
 }
 
 .ngg-album {
-	/*height: 130px;*/
-	overflow:hidden;
+	height: 100%;
 	padding: 5px;
 	margin-bottom: 5px;
 	border: 1px solid #cccccc;
+	overflow:hidden;
 }
 
 .ngg-albumtitle {
@@ -38,8 +38,7 @@ it's only a template design
 
 .ngg-thumbnail {
 	float: left;
-	margin: 0pt !important;
-	margin-right: 12px !important;
+	margin-right: 12px;
 }
 
 .ngg-thumbnail img {
@@ -70,7 +69,7 @@ it's only a template design
 }
 
 .ngg-album-compactbox {
-	background:transparent url(albumset.gif) no-repeat scroll 0%;
+	background:transparent url(../css/albumset.gif) no-repeat scroll 0%;
 	height:86px;
 	margin:0pt 0pt 6px !important;
 	padding:12px 0pt 0pt 7px !important;
@@ -102,7 +101,6 @@ it's only a template design
 /* ----------- Gallery style -------------*/
 
 .ngg-galleryoverview {
-	overflow: hidden;
 	margin-top: 10px;
 	width: 100%;
 	clear:both; 
@@ -111,7 +109,6 @@ it's only a template design
 
 .ngg-gallery-thumbnail-box {
 	float: left;
-	width: 20%;
 }
 
 .ngg-gallery-thumbnail {
@@ -135,10 +132,7 @@ it's only a template design
 } 
 
 .ngg-gallery-thumbnail span {
-	/* Images description */
-	font-size:90%;
-	padding-left:5px;
-	display:block;
+	display:none;
 }
 
 .ngg-clear {
@@ -166,7 +160,7 @@ it's only a template design
 .ngg-navigation span.page-numbers,
 .ngg-navigation span.next,
 .ngg-navigation span.prev {
-	border:1px solid #660000;
+	border:1px solid #DDDDDD;
 	margin-right:3px;
 	padding:3px 7px;
 }
@@ -177,9 +171,9 @@ it's only a template design
 .ngg-navigation span.page-numbers:hover,
 .ngg-navigation span.next:hover,
 .ngg-navigation span.prev:hover {
-	background-color: #660000;
-	color: #FFFFFF;
-	text-decoration: none;
+	background-color: #0066CC;
+	color: #FFFFFF !important;
+	text-decoration: none !important;
 }
 
 /* ----------- Image browser style -------------*/
@@ -286,31 +280,32 @@ it's only a template design
 
 /* ----------- Single picture -------------*/
 .ngg-singlepic {
+	background-color:#FFFFFF;
 	display:block;  
 	padding:4px;
 }
 
 .ngg-left {
 	float: left;
-	margin-right:10px;
 }
 
 .ngg-right {
 	float: right;
-	margin-left:10px;
 }
 
 .ngg-center {
-  	margin-left: auto !important;
-    margin-right: auto !important;
+  	margin-left: auto;
+    margin-right: auto;
 }
 
 /* ----------- Sidebar widget -------------*/
+
 .ngg-widget,
 .ngg-widget-slideshow {
 	overflow: hidden;
 	margin:0pt;
 	padding:5px 0px 0px 0pt;
+  text-align: center;
 }
 
 .ngg-widget img {
@@ -331,7 +326,7 @@ it's only a template design
 .ngg-related-gallery img {
 	border: 1px solid #DDDDDD;
 	float: left;
-	margin: 0pt 2px;
+	margin: 0pt 3px;
 	padding: 2px;
 	height: 50px;
 	width:  50px;
@@ -340,55 +335,3 @@ it's only a template design
 .ngg-related-gallery img:hover {
 	border: 1px solid #000000;
 } 
-
-/* ----------- Gallery list -------------*/
-
-.ngg-galleryoverview ul li:before {
-	content: '' !important;
-}
-
-.ngg-gallery-list {
-	list-style-type:none;
-	padding: 0px !important;
-	text-indent:0px !important;	
-}
-
-.ngg-galleryoverview div.pic img{
-	width: 100%;	
-}
-
-.ngg-gallery-list li {
-	float:left;
-	margin:0 2px 0px 2px !important;
-	overflow:hidden;
-}
-
-.ngg-gallery-list li a {
-	border:1px solid #CCCCCC;
-	display:block;
-	padding:2px;
-}
-
-.ngg-gallery-list li.selected a{
-	-moz-background-clip:border;
-	-moz-background-inline-policy:continuous;
-	-moz-background-origin:padding;
-	background:#000000 none repeat scroll 0 0;
-}
-
-.ngg-gallery-list li img {
-	height:40px;
-	width:40px;	
-}
-
-li.ngg-next, li.ngg-prev {
-	height:40px;
-	width:40px;	
-	font-size:3.5em;
-}
-
-li.ngg-next a, li.ngg-prev a  {
-	padding-top: 10px;
-	border: none;
-	text-decoration: none;
-}

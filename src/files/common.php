@@ -284,3 +284,28 @@ function moveImages(array $images, Gallery $destination) {
 		$image->save();
 	}
 }
+
+/**
+ * Write to a file. If the file doesn't exist, attempt to make it.
+ *
+ * @param string $path Full path to the file.
+ *
+ * @param string $content
+ *
+ * @throws FileException
+ */
+function writeToFile($path, $content) {
+
+	$dir = dirname($path);
+
+	//If the path doesn't exist, attempt to create it.
+	if (!is_dir($dir)) {
+		if ( !wp_mkdir_p($dir)) {
+			throw new FileException('Could not create folder: ' . $dir);
+		}
+	}
+	
+	if(file_put_contents($path, $content) === false) {
+		throw new FileException("Could not write to file $path");
+	}
+}

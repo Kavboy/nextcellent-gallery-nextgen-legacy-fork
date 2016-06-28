@@ -55,7 +55,7 @@ if (!class_exists('NCG')) {
 	    const VERSION = '1.9.31';
 	    const DB_VERSION = '1.8.3';
 	    const MINIMUM_WP = '4.0';
-	    const MINIMUM_PHP = '5.5';
+	    const MINIMUM_PHP = '5.6';
 
 	    //The base for our admin pages. A page will be 'admin.php?page=nextcellent-[NAME]
 	    const ADMIN_BASE = 'nextcellent';
@@ -337,9 +337,13 @@ if (!class_exists('NCG')) {
 	        //The NextCellent version. This is provided for easy access in other plugins.
 	        define('NCG_VERSION', self::VERSION);
 	        //The path to the NextCellent plugin folder.
-	        define('NCG_PATH', str_replace('\\', '/', plugin_dir_path(__FILE__)));
+	        define('NCG_PATH', wp_normalize_path(plugin_dir_path(__FILE__)));
+	        //The path to the main NextCellent file, for easy access.
+	        define('NCG_FILE_PATH', __FILE__);
 	        //The name of the folder in which NextCellent is installed.
 	        define('NCG_FOLDER', basename(__DIR__));
+	        //The path to the folder.
+	        define('NCG_USER_FOLDER_PATH', wp_normalize_path(WP_CONTENT_DIR . '/' . self::NCG_FOLDER . '/'));
 	        //The URL to the NextCellent folder
 	        define('NCG_URL', plugins_url('', __FILE__));
 	        //The basename for this pluing, e.g. 'nextcellent/nggallery.php'
@@ -394,6 +398,7 @@ if (!class_exists('NCG')) {
 		    //Include file utils
             require_once(__DIR__ . '/src/files/utils.php');
 		    require_once(__DIR__ . '/src/files/common.php');
+		    require_once(__DIR__ . '/src/rendering/css.php');
 
 		    // Load global libraries
 		    require_once( __DIR__ . '/lib/core.php' );
@@ -527,7 +532,8 @@ if (!class_exists('NCG')) {
 			wp_enqueue_style('owl');
 			
 			//Include the general style.
-			if($file = \NextCellent\Rendering\Css::getCssFile() !== null) {
+			$file = \NextCellent\Rendering\Css\getCssFileUrl();
+			if($file !== null) {
 				wp_enqueue_style('ncg-style', $file, [], self::VERSION, 'screen');
 			}
 

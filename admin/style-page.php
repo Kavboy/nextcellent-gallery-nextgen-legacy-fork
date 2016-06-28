@@ -1,6 +1,9 @@
 <?php  
 
 namespace NextCellent\Admin;
+use NextCellent\Files\FileException;
+use NextCellent\Options\Options;use function NextCellent\Rendering\Css\getCssFilesFrom;
+use function NextCellent\Rendering\Css\getThemeCssFile;
 
 /**
 * Class Style_Page
@@ -11,104 +14,59 @@ namespace NextCellent\Admin;
 class Style_Page extends Post_Admin_Page {
 
 	const NAME = 'style';
-	
-	/**
-	 * Find stylesheets.
-	 *
-	 * @since 1.9.22
-	 * 
-	 * @param array $directions Absolute paths to the folders that contain stylesheets.
-	 *
-	 *@return array Absolute paths to the stylesheets.
-	 */
-	static function ngg_get_cssfiles( $directions ) {
+	const SEPARATOR = '|&|';
 
-		$plugin_files = array ();
-
-		foreach ($directions as $direction) {
-			$plugins_dir = dir($direction);
-					if ($plugins_dir) {
-				while (($file = $plugins_dir->read()) !== false) {
-					if (preg_match('|^\.+$|', $file))
-						{continue;}
-					if (is_dir($direction.'/'.$file)) {
-						$plugins_subdir = dir($direction.'/'.$file);
-						if ($plugins_subdir) {
-							while (($subfile = $plugins_subdir->read()) !== false) {
-								if (preg_match('|^\.+$|', $subfile))
-									{continue;}
-								if (preg_match('|\.css$|', $subfile))
-									{$plugin_files[] = "$direction/$file/$subfile";}
-							}
-						}
-					} else {
-						if (preg_match('|\.css$|', $file))
-							{$plugin_files[] = $direction . '/' . $file;}
-					}
-				}
-			}
-		}
-
-		return $plugin_files;
-	}
-	
-	/**
-	 * Parse stylesheet information.
-	 *
-	 * @since 1.9.22
-	 * 
-	 * @param string $plugin_file Absolute path to the stylesheet.
-	 *
-	 *@return array The information about the stylesheet.
-	 */
-	static function ngg_get_cssfiles_data($plugin_file) {
-	
-		$css_data = implode('', file($plugin_file));
-		$folder = basename(dirname($plugin_file));
-
-		preg_match("|CSS Name:(.*)|i", $css_data, $plugin_name);
-		preg_match("|Description:(.*)|i", $css_data, $description);
-		preg_match("|Author:(.*)|i", $css_data, $author_name);
-		
-		if (preg_match("|Version:(.*)|i", $css_data, $version))
-			{$version = trim($version[1]);}
-		else
-			{$version = '';}
-
-		$description = wptexturize(trim($description[1]));
-
-		$name = trim($plugin_name[1]);
-		$author = trim($author_name[1]);
-
-		return array ('Name' => $name, 'Description' => $description, 'Author' => $author, 'Version' => $version, 'Folder' => $folder );
-	}
-
-	/**
-	 * Output a set of options for a select element.
-	 *
-	 * @since 1.9.26
-	 *
-	 * @param array $css_list The paths to the stylesheets.
-	 * @param string $act_css_file The path to the current active stylesheet.
-	 */
-	static function output_css_files_dropdown( $css_list, $act_css_file ) {
-		foreach ( $css_list as $file) {
-			$a_cssfile = Style_Page::ngg_get_cssfiles_data($file);
-			$css_name = esc_attr( $a_cssfile['Name'] );
-			$css_folder = esc_attr( $a_cssfile['Folder'] );
-			if ( $css_name != '' ) {
-				echo '<option value="' . $file . '" ' . selected( $file, $act_css_file ) . '>' . $css_name . ' (' . $css_folder . ')</option>';
-			}
-		}
-	}
-	
-	/**
-	 * Save, change and move the css files and options.
-	 *
-	 * @since 1.9.22
-	 *
-	 */
 	protected function processor() {
+
+		check_admin_referer('ngg_style');
+
+		var_dump($_POST);
+
+		if(!isset($_POST['mode'])) {
+			return;
+		}
+
+		if($_POST['mode'] === 'update-css') {
+
+			//Check for permission
+			if ( !current_user_can('edit_themes') ) {
+				\NextCellent\show_error(__('You do not have sufficient permissions to edit templates for this blog.', 'nggallery'));
+				return;
+			}
+
+			$activeFile = $_POST['file'];
+			$activeFolder = $_POST['folder'];
+
+			$moved = false;
+			$options = Options::getInstance();
+
+			//If it is a built in, update the options.
+			if($activeFolder === \NextCellent\Rendering\Css\FOLDER_BUILTIN) {
+				$options->update_option(Options::STYLE_CSS_FOLDER, \NextCellent\Rendering\Css\FOLDER_STYLES);
+				$moved = true;
+			}
+
+			//Otherwise we have a built in file, and we copy it.
+
+			//Save the file in the correct location.
+			$fullPath = NCG_USER_FOLDER_PATH . $activeFile;
+
+			try {
+				\NextCellent\Files\Common\writeToFile($fullPath, $_POST['content']);
+			} catch (FileException $e) {
+				\NextCellent\show_error(sprintf(__("Could not save file: %s", 'nggallery'), $e->getMessage()));
+				if($moved) {
+					$options->update_option(Options::STYLE_CSS_FOLDER, \NextCellent\Rendering\Css\FOLDER_BUILTIN);
+				}
+				return;
+			}
+
+			\NextCellent\show_success(__('CSS file successfully updated.','nggallery'));
+			return;
+		}
+
+		return;
+
 		global $ngg;
 		$options = get_option('ngg-options');
 		$i = 0;
@@ -208,127 +166,153 @@ class Style_Page extends Post_Admin_Page {
 
 		parent::display();
 
-		global $ngg;
-		
-		//the directions containing the css files
-		if ( file_exists(NGG_CONTENT_DIR . "/ngg_styles") ) {
-			$dir = array(NGGALLERY_ABSPATH . "css", NGG_CONTENT_DIR . "/ngg_styles");
-		} else {
-			$dir = array(NGGALLERY_ABSPATH . "css");
-		}
-		
-		//support for legacy location (in theme folder)
-		if ( $theme_css_exists = file_exists (get_stylesheet_directory() . "/nggallery.css") ) {
-			$act_cssfile = get_stylesheet_directory() . "/nggallery.css";
-		}
-		
-		//if someone uses the filter, don't display this page.
-		if ( !$theme_css_exists && $set_css_file = \nggGallery::get_theme_css_file() ) {
-			\nggGallery::show_error( __('Your CSS file is set by a theme or another plugin.','nggallery') . "<br><br>" . __('This CSS file will be applied:','nggallery') . "<br>" . $set_css_file);
+		//Find active CSS file.
+		if(getThemeCssFile() !== false) {
+			$this->displayShortCss(__('Your CSS file is set by a theme or another plugin.','nggallery'));
 			return;
 		}
-		
-		//load all files
-		if ( !isset($act_cssfile) ) {
-			$csslist = Style_Page::ngg_get_cssfiles($dir);
-			$act_cssfile = $ngg->options['CSSfile'];
-		}
-		
-		//get the data from the file
-		$act_css_data = Style_Page::ngg_get_cssfiles_data($act_cssfile);
-		$act_css_name = $act_css_data['Name'];
-		$act_css_description = $act_css_data['Description'];
-		$act_css_author = $act_css_data['Author'];
-		$act_css_version = $act_css_data['Version'];
-		$act_css_folder = $act_css_data['Folder'];
-		
-		
-		// get the content of the file
-		$error = ( !is_file($act_cssfile) );
 
-		if (!$error && filesize($act_cssfile) > 0) {
-			$f = fopen($act_cssfile, 'r');
-			$content = fread($f, filesize($act_cssfile));
-			$content = htmlspecialchars($content); 
-		} 
+		//Find CSS files
+		$files = getCssFilesFrom(NCG_PATH . 'styles');
+
+		if (file_exists(NCG_USER_FOLDER_PATH)) {
+			$files = array_merge(getCssFilesFrom(NCG_USER_FOLDER_PATH), $files);
+		}
+
+		//Get data for each file.
+
+		$options = Options::getInstance();
+
+		if (!$options[Options::STYLE_USE_CSS]) {
+			$this->displayNoCss($files);
+			return;
+		}
+
+		$activeFile = $options[Options::STYLE_CSS_FILE];
+		$activeFolder = $options[Options::STYLE_CSS_FOLDER];
+
+		if($activeFolder === \NextCellent\Rendering\Css\FOLDER_BUILTIN) {
+			$fullPath = NCG_PATH . 'styles/' . $activeFile;
+		} else {
+			$fullPath = NCG_USER_FOLDER_PATH . $activeFile;
+		}
+
+		if(!array_key_exists($fullPath, $files)) {
+			$this->displayNoCss($files);
+			return;
+		}
+
+		//Read the data.
+		/** @var \SplFileInfo $active */
+		$active = $files[$fullPath];
+		$data = \NextCellent\Rendering\Css\readData($active);
+		
+		$readFile = $active->openFile();
+
+		if($readFile->isWritable()) {
+			$title = sprintf(__('Editing %s', 'nggallery'), $activeFile);
+		} else {
+			$title = sprintf(__('Viewing %s', 'nggallery'), $activeFile);
+		}
+
 		?>
 		<div class="wrap">
-			<div class="bordertitle">
-				<h2><?php _e('Style Editor','nggallery') ?></h2>
-				<div class="fileedit-sub">
-				<?php if(!$theme_css_exists): //no need if there is a theme css?>
-					<div class="alignright">
-						<form id="themeselector" name="cssfiles" method="post">
-							<?php wp_nonce_field('ngg_style') ?>
-							<strong><?php _e('Activate and use style sheet:','nggallery') ?></strong>
-							<input type="checkbox" name="activateCSS" value="1" <?php checked('1', $ngg->options['activateCSS']); ?> />							
-							<select name="css" id="theme" style="margin: 0pt; padding: 0pt;">
-								<?php self::output_css_files_dropdown($csslist, $act_cssfile); ?>
-							</select>
-							<input class="button" type="submit" name="activate" value="<?php _e('Activate','nggallery') ?> &raquo;" class="button" />
-						</form>
-					</div>
-				<?php endif; ?>
-				<?php if (!is_multisite() || is_super_admin() ) { ?>
-					<div class="alignleft">
-						<?php
-						$title = '<h3>';
-						if ( is_writeable($act_cssfile) ) {
-							$title .= sprintf(__('Editing %s','nggallery'), $act_css_name);
-						} else {
-							$title .= sprintf(__('Browsing %s','nggallery'), $act_css_name);
-						}
-						if ( $theme_css_exists )
-							{$title .= ' ' . __('(from the theme folder)','nggallery');}
-						$title .= '</h3>';
-						echo $title
-						?>
-					</div>
-					<br class="clear" />
-				</div> <!-- fileedit-sub -->
-				<div id="templateside">
-				<?php if ( $theme_css_exists ) : ?>
-					<form id="filemover" name="filemover" method="post" style="background:white; padding: 1px 10px 10px;">
-						<p><?php _e('To ensure your css file stays safe during upgrades, please move it to the right folder.','nggallery') ?></p>
-						<input type="hidden" name="movecss" value="movecss" />
-						<input type="hidden" name="oldpath" value="<?php echo $act_cssfile ?>" />
-						<input class="button-primary action" type="submit" name="submit" value="<?php _e('Move file','nggallery') ?>" />
+			<h2><?php _e('Style Editor','nggallery') ?></h2>
+			<div class="fileedit-sub">
+				<div class="alignright">
+					<form id="theme-selector" name="css-files" method="post">
+						<?php wp_nonce_field('ngg_style') ?>
+						<label for="activateCSS"><strong><?php _e('Activate and use style sheet:','nggallery') ?></strong></label>
+						<input type="checkbox" id="activateCSS" name="activateCSS" value="true" <?php $options->checked(Options::STYLE_USE_CSS); ?>>
+						<select name="css" id="theme">
+							<?php $this->doDropdown($files, $active) ?>
+						</select>
+						<input type="hidden" name="mode" value="set-css" />
+						<?php submit_button(__('Activate','nggallery'), 'primary', 'submit', false) ?>
 					</form>
-					<br class="clear" />
-				<?php endif; ?>
-					<ul>
-						<li><strong><?php _e('Author','nggallery') ?>:</strong> <?php echo $act_css_author ?></li>
-						<li><strong><?php _e('Version','nggallery') ?>:</strong> <?php echo $act_css_version ?></li>
-					</ul>
-					<p><strong><?php _e('Description','nggallery') ?>:</strong></p>
-					<p class="description"><?php echo $act_css_description ?></p>
-					<p><strong><?php _e('File location','nggallery') ?>:</strong></p>
-					<p class="description"><?php echo $act_cssfile; ?></p>
 				</div>
-				<?php if ( !$error ) { ?>
-				<form name="template" id="template" method="post">
-					<?php wp_nonce_field('ngg_style') ?>
-					<div>
-						<textarea cols="70" rows="25" name="newcontent" id="newcontent" tabindex="1"  class="codepress css"><?php echo $content ?></textarea>
-						<input type="hidden" name="updatecss" value="updatecss" />
-						<input type="hidden" name="folder" value="<?php echo $act_css_folder ?>" />
-						<input type="hidden" name="file" value="<?php echo $act_cssfile ?>" />
-					</div>
-					<?php if ( is_writeable($act_cssfile) ) : ?>
-					<p class="submit"><input class="button-primary action" type="submit" name="submit" value="<?php _e('Update File','nggallery') ?>" tabindex="2" /></p>
-					<?php else : ?>
-					<p><em><?php _e('If this file were writable you could edit it.','nggallery'); ?></em></p>
-					<?php endif; ?>
-				</form>
-				<?php 
-					} else {
-						echo '<div class="error"><p>' . __('This file does not exist. Double check the name and try again.','nggallery') . '</p></div>';
-					} 
-				?>
-				<div class="clear"> &nbsp; </div>
-			</div> <!-- wrap-->
-			<?php
-				} //end if ( !is_multisite() || is_super_admin() )
+				<div class="alignleft">
+					<h3><?= $title ?></h3>
+				</div>
+				<br class="clear" />
+			</div> <!-- fileedit-sub -->
+			<div id="templateside">
+				<ul>
+					<li><strong><?php _e('Author','nggallery') ?>:</strong> <?= $data['author'] ?></li>
+					<li><strong><?php _e('Version','nggallery') ?>:</strong> <?= $data['version'] ?></li>
+				</ul>
+				<p><strong><?php _e('Description','nggallery') ?>:</strong></p>
+				<p class="description"><?= $data['desc'] ?></p>
+				<p><strong><?php _e('File location','nggallery') ?>:</strong></p>
+				<p class="description"><?= $active->getPathname(); ?></p>
+			</div>
+			<form name="template" id="template" method="post">
+				<?php wp_nonce_field('ngg_style') ?>
+				<div>
+					<textarea cols="70" rows="25" name="content" id="content" tabindex="1"  class="codepress css"><?php foreach($readFile as $line) echo $line ?></textarea>
+					<input type="hidden" name="mode" value="update-css" >
+					<input type="hidden" name="file" value="<?= $activeFile ?>">
+					<input type="hidden" name="folder" value="<?= $activeFolder ?>">
+				</div>
+				<?php if($readFile->isWritable()): ?>
+				<p class="submit"><input class="button-primary action" type="submit" name="submit" value="<?php _e('Update File','nggallery') ?>" tabindex="2" /></p>
+				<?php else: ?>
+				<p><em><?php _e('If this file were writable you could edit it.','nggallery'); ?></em></p>
+				<?php endif; ?>
+			</form>
+			<div class="clear"></div>
+		</div> <!-- wrap-->
+		<?php
+	}
+
+	private function displayShortCss($message) {
+		?>
+		<div class="wrap">
+		<h2><?php _e('Style Editor', 'nggallery') ?></h2>
+		<p><?= $message ?></p>
+		</div>
+		<?php
+	}
+
+	private function displayNoCss($files) {
+		?>
+		<div class="wrap">
+		<h2><?php _e('Style Editor', 'nggallery') ?></h2>
+		<p><?php _e('You do not use a CSS file at present. Choose a style below and update to use one.','nggallery') ?></p>
+		<form id="themes-selector" name="activate-files" method="post">
+			<?php wp_nonce_field('ngg_style') ?>
+			<label for="file-selector"><?php _e('Select a file:', 'nggallery') ?></label>
+			<select name="file" id="file-selector">
+				<?php $this->doDropdown($files); ?>
+			</select>
+			<input type="hidden" name="mode" value="set-css" />
+			<?php submit_button(__('Activate','nggallery')) ?>
+		</form>
+		</div>
+		<?php
+	}
+
+	/**
+	 * @param \SplFileInfo[]    $files
+	 * @param null|\SplFileInfo $active
+	 */
+	private function doDropdown($files, $active = null) {
+		foreach ($files as $file) {
+			if(basename($file->getPath()) === 'styles') {
+				$value = \NextCellent\Rendering\Css\FOLDER_BUILTIN . self::SEPARATOR . $file->getFilename();
+				$display = $file->getFilename() . ' ' . __('(built in)', 'nggallery');
+			} else {
+				$value = \NextCellent\Rendering\Css\FOLDER_STYLES . self::SEPARATOR . $file->getFilename();
+				$display = $file->getFilename() . ' ' .__('(user style)', 'nggallery');
+			}
+			$value = esc_attr($value);
+
+			if($active === null || $active->getPathname() != $file->getPathname()) {
+				echo "<option value='$value'>$display</option>";
+			} else {
+				echo "<option value='$value' selected>$display</option>";
+			}
+		}
 	}
 
 	public function register_styles() {
@@ -355,7 +339,8 @@ class Style_Page extends Post_Admin_Page {
 			'content' => $help
 		) );
 	}
-/**
+
+	/**
 	 * Get the name of this page. This is the second part of the full name:
 	 *
 	 * admin.php?page=[SLUG]-[PAGE_NAME].

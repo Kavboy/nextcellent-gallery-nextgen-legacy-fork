@@ -1,11 +1,11 @@
-﻿/*
-CSS Name: dkret3 Theme
-Description: NextGEN dkret3 style with a shadow effect
-Author: Jörn Kretzschmar and NextCellent
+/*
+CSS Name: K2 Theme
+Description: NextGEN Style for K2 Theme
+Author: NextCellent
 Version: 1.9.22
-   
+
 This is a template stylesheet that can be used with NextGEN Gallery. I tested the
-styles with the theme dkret3. Modify it when your theme struggle with it,
+styles with a default theme Kubrick. Modify it when your theme struggle with it,
 it's only a template design
 
 */
@@ -13,38 +13,41 @@ it's only a template design
 /* ----------- Album Styles Extend -------------*/
 
 .ngg-albumoverview {
-	margin-top: 10px;
+	margin: 10px 0px 0px 0px !important;
 	width: 100%;
 	clear:both; 
 	display:block !important;
 }
 
 .ngg-album {
-	height: 100%;
-	padding: 5px;
-	margin-bottom: 5px;
-	border: 1px solid #cccccc;
+	/*height: 130px;*/
 	overflow:hidden;
+	margin: 0px 0px 5px !important;
+	padding: 5px;
+	border: 1px solid #cccccc;
 }
 
 .ngg-albumtitle {
 	text-align: left;
  	font-weight: bold;
-	margin:0px;
 	padding:0px;
 	font-size: 1.4em;
-	margin-bottom: 10px;
+	margin: 0px 0px 10px 0px !important;
+}
+
+.ngg-albumcontent {
+	margin: 0px !important;
 }
 
 .ngg-thumbnail {
+	margin:0px 12px 0px 0px !important;
 	float: left;
-	margin-right: 12px;
 }
 
 .ngg-thumbnail img {
 	background-color:#FFFFFF;
 	border:1px solid #A9A9A9;
-	margin:4px 0px 4px 5px;
+	margin:4px 0px 4px 5px !important;
 	padding:4px;
 	position:relative;
 }
@@ -69,13 +72,16 @@ it's only a template design
 }
 
 .ngg-album-compactbox {
-	background:transparent url(albumset.gif) no-repeat scroll 0%;
+	background:transparent url(../css/albumset.gif) no-repeat scroll 0%;
 	height:86px;
 	margin:0pt 0pt 6px !important;
 	padding:12px 0pt 0pt 7px !important;
 	width:120px;
 }
 
+.ngg-album-link {
+	margin:0px !important;
+}
 
 .ngg-album-compactbox .Thumb {
 	border:1px solid #000000;
@@ -88,9 +94,10 @@ it's only a template design
 .ngg-album-compact h4 {
 	font-size:15px;
 	font-weight:bold;
-	margin-bottom:0px;
-	margin-top:0px;
+	margin-bottom:0px !important;
+	margin-top:0px !important;
 	width:110px;
+	padding:0px !important;
 }
 
 .ngg-album-compact p {
@@ -108,6 +115,7 @@ it's only a template design
 }
 
 .ngg-gallery-thumbnail-box {
+	margin:0px !important;
 	float: left;
 }
 
@@ -119,7 +127,7 @@ it's only a template design
 }
 
 .ngg-gallery-thumbnail img {
-	margin: -6px 6px 6px -6px;
+	margin: -6px 6px 6px -6px !important;
 	background-color:#FFFFFF;
 	border:1px solid #A9A9A9;
 	display:block; 
@@ -129,11 +137,14 @@ it's only a template design
 
 .ngg-gallery-thumbnail img:hover {
 	background-color: #A9A9A9;
-} 
+}
 
 .ngg-gallery-thumbnail span {
-	display:none;
-}
+	/* Images description */
+	font-size:90%;
+	padding-left:5px;
+	display:block;
+} 
 
 .ngg-clear {
 	clear: both;
@@ -172,8 +183,8 @@ it's only a template design
 .ngg-navigation span.next:hover,
 .ngg-navigation span.prev:hover {
 	background-color: #0066CC;
-	color: #FFFFFF !important;
-	text-decoration: none !important;
+	color: #FFFFFF;
+	text-decoration: none;
 }
 
 /* ----------- Image browser style -------------*/
@@ -287,25 +298,26 @@ it's only a template design
 
 .ngg-left {
 	float: left;
+	margin-right:10px;
 }
 
 .ngg-right {
 	float: right;
+	margin-left:10px;
 }
 
 .ngg-center {
-  	margin-left: auto;
-    margin-right: auto;
+  	margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 /* ----------- Sidebar widget -------------*/
-
 .ngg-widget,
 .ngg-widget-slideshow {
 	overflow: hidden;
 	margin:0pt;
 	padding:5px 0px 0px 0pt;
-  text-align: center;
+	text-align:left;
 }
 
 .ngg-widget img {
@@ -326,7 +338,7 @@ it's only a template design
 .ngg-related-gallery img {
 	border: 1px solid #DDDDDD;
 	float: left;
-	margin: 0pt 3px;
+	margin: 0pt 2px;
 	padding: 2px;
 	height: 50px;
 	width:  50px;
