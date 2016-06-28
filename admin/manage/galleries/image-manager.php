@@ -11,6 +11,8 @@ use NextCellent\Models\Image;
  * Display the gallery managing page.
  */
 class Image_Manager extends Abstract_Image_Manager {
+	
+	const NONCE = 'ngg-update-gallery';
 
 	/**
 	 * @var Gallery $gallery The gallery.
@@ -61,13 +63,13 @@ class Image_Manager extends Abstract_Image_Manager {
 		?>
 		<div class="wrap">
 			<form id="update_gallery" class="nggform" method="post" action="<?php echo $this->get_full_url() . '&mode=image&gid=' . $this->id . '&paged=' . $page; ?>" accept-charset="utf-8">
-				<?php wp_nonce_field( 'ngg-update-gallery', '_ngg_nonce_gallery' ); ?>
+				<?php wp_nonce_field( self::NONCE ); ?>
 				<input type="hidden" name="form" value="gallery">
 				<?php $this->print_gallery_overview( $table->items ) ?>
 			</form>
 			<!-- TODO Add a search inside a gallery form -->
 			<form id="update_images" class="nggform" method="post" action="<?php echo $this->get_full_url() . '&mode=image&gid=' . $this->id . '&paged=' . $page; ?>" accept-charset="utf-8">
-				<?php wp_nonce_field( 'ngg-update-images', '_ngg_nonce_images' ); ?>
+				<?php wp_nonce_field( 'lol', 'lol' ); ?>
 				<input type="hidden" id="page_type" name="page_type" value="image">
 				<?php $table->display(); ?>
 			</form>

@@ -18,6 +18,8 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  * If this doesn't work anymore in the future, it's because that class has changed.
  */
 class Image_List_Table extends \WP_List_Table {
+	
+	const PLURAL = 'ngg-manager-image';
 
 	/**
 	 * @var Gallery $gallery The gallery.
@@ -36,7 +38,7 @@ class Image_List_Table extends \WP_List_Table {
 	 */
 	public function __construct( $base, $gallery, $screen = null ) {
 
-		parent::__construct( array( 'screen' => $screen, 'plural' => 'ngg-manager' ) );
+		parent::__construct( array( 'screen' => $screen, 'plural' => self::PLURAL ) );
 
 		$this->base = $base;
 		$this->gallery = $gallery;

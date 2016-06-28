@@ -1,38 +1,36 @@
 <?php
+
 /**
-* Main PHP class for the WordPress plugin NextGEN Gallery
-*
-* @author Alex Rabe
-*
-* @deprecated
+ * Main PHP class for the WordPress plugin NextGEN Gallery
+ *
+ * @author Alex Rabe
+ *
+ * @deprecated This class only exists to provide compatibility with existing plugins and will be removed in a future
+ *             version. Please use one of the appropriate methods from the new library.
  */
 class nggGallery {
 
 	/**
-	* Show a error messages
-	 *
-	 * @deprecated Use the NCG utils.
-	*/
-	static function show_error($message) {
-		echo '<div class="error" id="error"><p>' . $message . '</p></div>';
-	}
-
-	/**
-	* Show a system messages
-	 *
-	 * @deprecated Use the NCG utils.
-	*/
-	static function show_message($message) {
-		echo '<div class="updated fade" id="message"><p>' . $message . '</p></div>';
-	}
-
-	/**
-	* get the thumbnail url to the image
-	 *
 	 * @deprecated
 	*/
-	static function get_thumbnail_url($imageID, $picturepath = '', $fileName = ''){
+	static function show_error($message) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
+		\NextCellent\show_error($message);
+	}
 
+	/**
+	 * @deprecated
+	 */
+	static function show_message($message) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
+		\NextCellent\show_success($message);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	static function get_thumbnail_url($imageID, $picturepath = '', $fileName = ''){
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		// get the complete url to the thumbnail
 		global $wpdb;
 
@@ -56,9 +54,10 @@ class nggGallery {
 	}
 
 	/**
-	* get the complete url to the image
-	*/
+	 * @deprecated
+	 */
 	static function get_image_url($imageID, $picturepath = '', $fileName = '') {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		global $wpdb;
 
 		// safety first
@@ -80,13 +79,10 @@ class nggGallery {
 	}
 
 	/**
-	* nggGallery::get_thumbnail_folder()
-	*
-	* @param mixed $gallerypath
-	* @param bool $include_Abspath
-	* @return string $foldername
-	*/
+	 * @deprecated
+	 */
 	static function create_thumbnail_folder($gallerypath, $include_Abspath = TRUE) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		if (!$include_Abspath) {
 			$gallerypath = WINABSPATH . $gallerypath;
 		}
@@ -126,6 +122,7 @@ class nggGallery {
 	* @return string $foldername
 	*/
 	static function get_thumbnail_folder($gallerypath, $include_Abspath = TRUE) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		return nggGallery::create_thumbnail_folder($gallerypath, $include_Abspath);
 	}
 
@@ -138,6 +135,7 @@ class nggGallery {
 	* @return string  "thumbs_";
 	*/
 	static function get_thumbnail_prefix($gallerypath, $include_Abspath = TRUE) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		return 'thumbs_';
 	}
 
@@ -150,6 +148,7 @@ class nggGallery {
 	 * @deprecated Use the options from the global $ncg->options instance.
 	*/
 	static function get_option($key) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
         global $post;
 
 		// get first the options from the database
@@ -226,14 +225,10 @@ class nggGallery {
 	}
 
 	/**
-	* nggGallery::scale_image() - Scale down a image
-	*
-	* @param mixed $location (filename)
-	* @param int $maxw - max width
-	* @param int $maxh -  max height
-	* @return array (width, heigth)
-	*/
+	 * @deprecated
+	 */
 	static function scale_image($location, $maxw = 0, $maxh = 0){
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		$img = @getimagesize($location);
 		if ($img){
 			$w = $img[0];
@@ -269,6 +264,7 @@ class nggGallery {
 	 * @deprecated Use the Renderer class instead.
 	**/
 	static function render($template_name, $vars = array (), $callback = false) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		foreach ($vars AS $key => $val) {
 			$$key = $val;
 		}
@@ -309,6 +305,7 @@ class nggGallery {
 	 * @deprecated Use the Renderer class instead.
 	**/
 	static function capture ($template_name, $vars = array ()) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		ob_start ();
 		nggGallery::render ($template_name, $vars);
 		$output = ob_get_contents ();
@@ -321,8 +318,10 @@ class nggGallery {
 	 * nggGallery::graphic_library() - switch between GD and ImageMagick
 	 *
 	 * @return path to the selected library
+	 * @deprecated
 	 */
 	static function graphic_library() {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 
 		$ngg_options = get_option('ngg_options');
 
@@ -355,6 +354,7 @@ class nggGallery {
      */
 
 	static function get_theme_css_file() {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
   		//Allow to include a custom stylesheet, return stylesheet uri
 		$stylesheet = apply_filters( 'ngg_load_stylesheet', false );
         //Is there a stylsheet customization?
@@ -375,8 +375,10 @@ class nggGallery {
 	 * @param string $in
 	 * @param string $name (optional) required for wpml to determine the type of translation
 	 * @return string $in localized
+	 * @deprecated
 	 */
 	static function i18n($in, $name = null) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 
 		if ( function_exists( 'langswitch_filter_langs_with_message' ) )
 			$in = langswitch_filter_langs_with_message($in);
@@ -400,8 +402,10 @@ class nggGallery {
      *
      * @param object $image
      * @return void
+     * @deprecated
      */
     static function RegisterString($image) {
+	    trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
         if (function_exists('icl_register_string')) {
             global $wpdb;
             icl_register_string('plugin_ngg', 'pic_' . $image->pid . '_description', $image->description, TRUE);
@@ -418,6 +422,7 @@ class nggGallery {
 	 * @deprecated This is not true anymore. Just delete this message.
 	 */
 	static function check_memory_limit() {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 
 		if ( (function_exists('memory_get_usage')) && (ini_get('memory_limit')) ) {
 
@@ -456,8 +461,11 @@ class nggGallery {
 	 *
 	 * @param string $name The name being checked.
 	 * @return array containing information about file
+	 * @deprecated
 	 */
 	static function fileinfo( $name ) {
+
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 
 		//Sanitizes a filename replacing whitespace with dashes
 		$name = sanitize_file_name($name);
@@ -493,6 +501,7 @@ class nggGallery {
 	 * @deprecated Extended capabilities are no longer supported.
 	 */
 	static function current_user_can( $capability ) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		return true;
 	}
 
@@ -506,6 +515,7 @@ class nggGallery {
 	 * @deprecated Extended capabilities are no longer supported.
 	 */
 	static function current_user_can_form( $capability ) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 
 		if ( !nggGallery::current_user_can( $capability ))
 			echo 'disabled="disabled"';
@@ -522,6 +532,7 @@ class nggGallery {
 	 * @deprecated Extended capabilities are no longer supported.
 	 */
 	static function add_capabilites( $capability , $register = true ) {
+		trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 		global $_ngg_capabilites;
 
 		if ( !is_array($_ngg_capabilites) )
@@ -547,6 +558,7 @@ class nggGallery {
      * @deprecated This function is out of scope for an image manager.
      */
     static function detect_mobile_phone() {
+	    trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
 
         $useragents = array();
 
@@ -589,35 +601,6 @@ class nggGallery {
     }
 
     /**
-     * get_memory_usage
-     *
-     * @access only for debug purpose
-     * @since 1.8.3
-     * @param string $text
-     * @return void
-     */
-    static function get_memory( $text = '' ) {
-        global $memory;
-
-        $memory_peak = memory_get_usage();
-        $diff = 0;
-
-		if ( isset($memory) )
-            $diff = $memory_peak - $memory;
-
-        $exp = ($diff < 0) ? '-' : '';
-        $diff = ($exp == '-') ? 0 - $diff : $diff;
-
-        $memory = $memory_peak;
-
-        $unit = array('b','kb','mb','gb','tb','pb');
-        $rounded = @round($diff/pow(1024,($i=floor(log($diff,1024)))),2).' '.$unit[$i];
-
-        echo $text . ': ' . $exp . $rounded .'<br />';
-
-    }
-
-    /**
      * Show NextGEN Version in header
      * @since 1.9.0
      *
@@ -626,6 +609,7 @@ class nggGallery {
      * @deprecated This function doesn't do anything anymore: we do not want to print the NextCellent version.
      */
     static function nextgen_version() {
+	    trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
         //global $ngg;
         //echo apply_filters('show_nextgen_version', '<!-- <meta name="NextGEN" version="'. $ngg->version . '" /> -->' . "\n");
     }
@@ -635,10 +619,9 @@ class nggGallery {
      * 20140604: Improved based on suggestions of jayque9
      * http://wordpress.org/support/topic/prevent-removal-of-html-code-from-image-descriptions
      */
-    static function suppress_injection
-    ($html_text) {
+    static function suppress_injection($html_text) {
+	    trigger_error('nggGallery is deprecated and will be removed in the future.', E_USER_DEPRECATED);
         global $allowedposttags;
         return wp_kses(stripslashes($html_text),$allowedposttags);
     }
 }
-?>

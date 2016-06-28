@@ -79,8 +79,12 @@ class Manager {
 	 *
 	 * @return int The result.
 	 */
-	public function get_int($query, $args = array()) {
-		$prepared = $this->connection->prepare($query, $args);
+	public function get_int($query, $args = []) {
+		if(empty($args)) {
+			$prepared = $query;
+		} else {
+			$prepared = $this->connection->prepare($query, $args);
+		}
 		return (int) $this->connection->get_var($prepared);
 	}
 

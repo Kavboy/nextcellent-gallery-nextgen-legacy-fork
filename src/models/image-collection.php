@@ -62,6 +62,26 @@ class Image_Collection extends Lazy_Images {
 	}
 
 	/**
+	 * Get a list of images for a given list of ids.
+	 * 
+	 * @param array $ids Ids of the images you want. Assumes existing images, or the count will be wrong.
+	 *                   
+	 * @return Lazy_Images The images.
+	 */
+	public static function inList(array $ids) {
+		$i = Manager::get()->get_image_table();
+		$g = Manager::get()->get_gallery_table();
+
+		$p = $g . '.' . Gallery::PATH; //Gallery path field.
+		$joiner = $i . '.' . Image::GALLERY_ID . '=' . $g . '.' . Gallery::ID;
+		$where = 'WHERE ' . $i . '.' . Image::ID . ' IN (' . implode(',', $ids) . ')';
+
+		$query = "SELECT $i.*, $p FROM $i INNER JOIN $g ON $joiner $where";
+
+		return new Lazy_Images($query, count($ids));
+	}
+
+	/**
 	 * @param Gallery $gallery  The gallery or a gallery ID.
 	 * @param string  $sort     Column to sort on.
 	 * @param string  $sort_dir Sort direction.

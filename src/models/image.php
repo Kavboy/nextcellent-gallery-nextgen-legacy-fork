@@ -23,9 +23,10 @@ use NextCellent\Database\Not_Found_Exception;
  * These properties are read-only, but some are marked as normal due to a bug in phpStorm.
  * @property-read string $tags The image tags.
  * @property string $url The URL.
- * @property string $path The path.
+ * @property string $path The full path.
  * @property string $thumb_url URL to the thumbnail
- * @property string $thumb_path Path to the thumbnail
+ * @property string $thumb_path Full path to the thumbnail
+ * @property string $backup_path Full path to the thumbnail
  * @property-read int $height The height of the image.
  * @property-read int $width The width of the image.
  */
@@ -47,9 +48,11 @@ class Image {
 	const EXCLUDE = 'exclude';
 	const SORT_ORDER = 'sortorder';
 	const META_DATA = 'meta_data';
+	
+	const BACKUP_SUFFIX = '_backup';
 
 	/**
-	 * @var string $path The folder in which this image is present.
+	 * @var string $path The full path to the image.
 	 * @var string $url The URL to this image.
 	 * @var string $thumb_url The URL to the thumbnail of this image.
 	 * @var string $thumb_path The path to the thumbnail of this image.
@@ -261,6 +264,10 @@ class Image {
 		return $this->thumb_path;
 	}
 
+	protected function get_backup_path() {
+		return $this->path . self::BACKUP_SUFFIX;
+	}
+
 	protected function get_height() {
 
 		if(!isset( $this->meta_data['height'] )) {
@@ -284,5 +291,13 @@ class Image {
 		
 		$this->properties['meta_data']['width'] = $data[0];
 		$this->properties['meta_data']['height'] = $data[1];
+	}
+
+	/**
+	 * Read and update the metadata from file.
+	 */
+	public function readMetaData() {
+		$metaData = wp_read_image_metadata($this->path);
+		$this->properties['meta_data'] = array_merge($metaData, $this->properties['meta_data']);
 	}
 }

@@ -236,7 +236,7 @@ class Options implements \ArrayAccess {
 			self::OLD_SHORTCODES    => true,
 		);
 
-		$mu_defaults = array(
+		$mu_defaults = [
 			'gallerypath'       => 'wp-content/sites/%BLOG_ID%/gallery/',
 			'wpmuCSSfile'       => 'nggallery.css',
 			'silentUpdate'      => false,
@@ -244,7 +244,7 @@ class Options implements \ArrayAccess {
 			'wpmuZipUpload'     => true,
 			'wpmuImportFolder'  => true,
 			'wpmuStyle'         => false,
-		);
+		];
 
 		if ( is_multisite() ) {
 			$defaults['gallerypath'] = str_replace( "%BLOG_ID%", get_current_blog_id(), $mu_defaults['gallerypath'] );
@@ -273,6 +273,16 @@ class Options implements \ArrayAccess {
 		} else {
 			$this->mu_options = null;
 		}
+	}
+
+	/**
+	 * Shortcut for getting the options.
+	 * 
+	 * @return Options
+	 */
+	public static function getInstance() {
+		global $ncg;
+		return $ncg->options;
 	}
 
 	/**

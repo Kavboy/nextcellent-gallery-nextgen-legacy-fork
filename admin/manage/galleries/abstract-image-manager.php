@@ -2,6 +2,8 @@
 
 namespace NextCellent\Admin\Manage\Galleries;
 
+use NextCellent\Models\Image_Collection;
+
 /**
  * Class Abstract_Image_Manager
  *
@@ -13,7 +15,7 @@ abstract class Abstract_Image_Manager extends Abstract_Manager {
 
 		parent::display();
 
-		if ( isset ( $_POST['update_images'] ) ) {
+		if (isset($_POST['update_images'])) {
 			$this->handle_update_images();
 		}
 	}
@@ -84,76 +86,68 @@ abstract class Abstract_Image_Manager extends Abstract_Manager {
 
 		<?php
 	}
-
-	/**
-	 * @todo Make a real DAO system for NextCellent.
-	 * @todo Make this a lot faster by merging all these database commands
-	 */
+	
 	private function handle_update_images() {
 
-		if ( wp_verify_nonce( $_POST['_ngg_nonce_images'], 'ngg-update-images' ) === false ) {
-			\nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
-
-			return;
-		}
+		//Check the bulk options.
+		check_admin_referer('bulk-' . Image_List_Table::PLURAL);
 
 		global $wpdb, $nggdb;
 
 		//TODO:Error message when update failed
 
-		$description = isset ( $_POST['description'] ) ? $_POST['description'] : array();
-		$alttext     = isset ( $_POST['alttext'] ) ? $_POST['alttext'] : array();
-		$exclude     = isset ( $_POST['exclude'] ) ? $_POST['exclude'] : false;
-		$taglist     = isset ( $_POST['tags'] ) ? $_POST['tags'] : false;
-		$pictures    = isset ( $_POST['pid'] ) ? $_POST['pid'] : false;
+		$description = isset ( $_POST['description'] ) ? $_POST['description'] : [];
+		$alt_text     = isset ( $_POST['alttext'] ) ? $_POST['alttext'] : [];
+		$exclude     = isset ( $_POST['exclude'] ) ? $_POST['exclude'] : [];
+		$tagList     = isset ( $_POST['tags'] ) ? $_POST['tags'] : [];
+		$pictures    = isset($_POST['pid']) ? $_POST['pid'] : [];
 		$date        = isset ( $_POST['date'] ) ? $_POST['date'] : "NOW()"; //Not sure if NOW() will work or not but in theory it should
-
-		if ( is_array( $pictures ) ) {
-			foreach ( $pictures as $pid ) {
-				$image = $nggdb->find_image( $pid );
-				if ( $image ) {
-					// description field
-					$image->description = $description[ $image->pid ];
-					$image->date        = $date[ $image->pid ];
-					// only uptade this field if someone change the alttext
-					if ( $image->alttext != $alttext[ $image->pid ] ) {
-						$image->alttext    = $alttext[ $image->pid ];
-						$image->image_slug = \nggdb::get_unique_slug( sanitize_title( $image->alttext ), 'image',
-							$image->pid );
-					}
-
-					// set exclude flag
-					if ( is_array( $exclude ) ) {
-						$image->exclude = ( array_key_exists( $image->pid, $exclude ) ) ? 1 : 0;
-					} else {
-						$image->exclude = 0;
-					}
-
-					// update the database
-					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->nggpictures SET image_slug = '%s', alttext = '%s', description = '%s', exclude = %d, imagedate = %s WHERE pid = %d",
-						$image->image_slug, $image->alttext, $image->description, $image->exclude, $image->date,
-						$image->pid ) );
-					// remove from cache
-					wp_cache_delete( $image->pid, 'ngg_image' );
-
-					// hook for other plugins after image is updated
-					do_action( 'ngg_image_updated', $image );
-				}
-
-			}
-
-			//This is for backwards compatibility.
-			do_action( 'ngg_update_gallery', (int) $_GET['gid'], $_POST);
+		
+		//To int.
+		$pictures = array_map('intval', $pictures);
+		
+		if(!is_array($pictures)) {
+			\NextCellent\show_info(__('There was nothing to update.', 'nggallery'));
 		}
 
-		//TODO: This produce 300-400 queries !
-		if ( is_array( $taglist ) ) {
-			foreach ( $taglist as $key => $value ) {
-				$tags = explode( ',', $value );
-				wp_set_object_terms( $key, $tags, 'ngg_tag' );
+		//Get the images in one go.
+		$images = Image_Collection::inList($pictures)->getImages();
+
+		foreach ($images as $image) {
+			$image->description = $description[$image->id];
+			$image->date        = $date[ $image->id ];
+
+			//Only update this if needed.
+			if ($image->alt_text !== $alt_text[$image->id]) {
+				$image->alt_text    = $alt_text[ $image->id ];
+				//Fast unique slug
+				$image->slug = $image->id . '.' . sanitize_title( $image->alt_text );
 			}
+
+			$image->exclude = array_key_exists($image->id, $exclude);
+
+			//Update image.
+			$image->save();
+
+			//Remove from cache
+			wp_cache_delete($image->id, 'ngg_image');
+
+			// hook for other plugins after image is updated
+			//TODO: compat?
+			do_action( 'ngg_image_updated', $image );
+		}
+		
+		/**
+		 * This is for backwards compatibility.
+		 * @deprecated
+		 */
+		do_action( 'ngg_update_gallery', (int) $_GET['gid'], $_POST);
+
+		foreach ($tagList as $id => $tagsString ) {
+			$tags = explode(',', $tagsString);
+			wp_set_object_terms($id, $tags, 'ngg_tag');
 		}
 
-		\nggGallery::show_message( __( 'Update successful', "nggallery" ) );
+		\NextCellent\show_success( __( 'Update successful', "nggallery" ) );
 	}
 }

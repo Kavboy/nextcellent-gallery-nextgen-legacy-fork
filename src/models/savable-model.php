@@ -19,7 +19,7 @@ trait Savable_Model {
 	protected static function count_table($table) {
 		$manager = Manager::get();
 
-		return $manager->get_int('SELECT COUNT(*) FROM ' . $table);
+		return $manager->get_int("SELECT COUNT(*) FROM $table");
 	}
 	
 	protected $properties = [];

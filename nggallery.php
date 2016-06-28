@@ -392,7 +392,8 @@ if (!class_exists('NCG')) {
 		    require_once( __DIR__ . '/src/ncg-utils.php' );
 		    
 		    //Include file utils
-            require_once(__DIR__ . '/src/file-utils.php');
+            require_once(__DIR__ . '/src/files/utils.php');
+		    require_once(__DIR__ . '/src/files/common.php');
 
 		    // Load global libraries
 		    require_once( __DIR__ . '/lib/core.php' );
@@ -518,23 +519,17 @@ if (!class_exists('NCG')) {
 
 			$options = $this->options;
 
-            //Notice stylesheet selection has this priority:
-            //1-sytlesheet loaded from filter ngg_load_stylesheet
-            //2-nggalery.css on folder's current theme
-            //3-active stylesheet defined on styles.
-			if ( $css_file = nggGallery::get_theme_css_file() ) {
-				wp_enqueue_style('NextGEN', $css_file , false, '1.0.0', 'screen');
-				//load the framework
-				wp_enqueue_style('ncg-base', plugins_url('css/framework-min.css', __FILE__), false, '1.0.1', 'screen');
-			} elseif ($options['activateCSS']) {
-				//convert the path to an URL
-				$css = str_replace(NCG_PATH, '', $options['CSSfile']);
-				wp_enqueue_style('NextGEN', plugins_url($css, __FILE__), false, '1.0.0', 'screen');
-				//load the framework
-				wp_enqueue_style('ncg-base', plugins_url('css/framework-min.css', __FILE__), false, '1.0.1', 'screen');
-			}
+			//Register some styles.
+			wp_register_style('animate', plugins_url('css/animate.css', __FILE__), [], '3.5.2', 'screen');
+			wp_register_style('owl', plugins_url('plugins/owl/assets/owl.carousel.min.css', __FILE__), ['animate'], '2', 'screen');
 			
-			wp_enqueue_style('owl', plugins_url('plugins/owl/assets/owl.carousel.min.css', __FILE__));
+			//Include the slideshow style.
+			wp_enqueue_style('owl');
+			
+			//Include the general style.
+			if($file = \NextCellent\Rendering\Css::getCssFile() !== null) {
+				wp_enqueue_style('ncg-style', $file, [], self::VERSION, 'screen');
+			}
 
 			//	activate Thickbox
 			if ($options['thumbEffect'] == 'thickbox') {
@@ -544,13 +539,6 @@ if (!class_exists('NCG')) {
 			// activate modified Shutter reloaded if not use the Shutter plugin
 			if ( $this->options['thumbEffect'] == 'shutter' && !function_exists('srel_makeshutter') ) {
 				wp_enqueue_style( 'shutter', plugins_url( 'shutter/shutter-reloaded.css', __FILE__ ), false, '1.3.4', 'screen' );
-			}
-
-			// add qunit style if activated. I put 1.0.0 as formula, but it would mean nothing.
-
-			$nxc = isset( $_GET['nextcellent'] ) ? $_GET['nextcellent'] : "";
-			if ( $nxc ) {
-				wp_enqueue_style( "qunit", plugins_url('css/qunit-1.16.0.css', __FILE__), false, '1.0.0', 'screen' );
 			}
 		}
 

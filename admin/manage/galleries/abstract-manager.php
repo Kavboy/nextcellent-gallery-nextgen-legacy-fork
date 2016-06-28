@@ -20,15 +20,21 @@ abstract class Abstract_Manager extends Admin_Page {
 		/**
 		 * Do a bulk action.
 		 */
-		if ( ( isset( $_POST['action'] ) || isset( $_POST['action2'] ) ) && isset ( $_POST['doaction'] ) ) {
-			$this->handle_bulk_actions();
+		if ((isset($_POST['action']) || isset($_POST['action2'])) && isset($_POST['doaction'])) {
+			//$this->handle_bulk_actions();
+			var_dump("bulk actions");
+			var_dump($_POST);
+			die();
 		}
 
 		/**
 		 * Do the operations with a dialog.
 		 */
-		if ( isset( $_POST['TB_bulkaction'] ) && isset( $_POST['TB_action'] ) ) {
-			$this->handle_dialog_actions();
+		if (isset($_POST['TB_bulkaction']) && isset($_POST['TB_action'])) {
+			//$this->handle_dialog_actions();
+			var_dump("dialog actions");
+			var_dump($_POST);
+			die();
 		}
 	}
 
@@ -458,17 +464,13 @@ abstract class Abstract_Manager extends Admin_Page {
 				return;
 		}
 	}
-
+	
 	/**
 	 * Handle the bulk actions.
 	 */
 	protected function handle_bulk_actions() {
 		//Check the nonce.
-		if ( wp_verify_nonce( $_POST['_wpnonce'], 'bulk-ngg-manager' ) === false ) {
-			\nggGallery::show_error( __( 'You waited too long, or you cheated.', 'nggallery' ) );
-
-			return;
-		}
+		check_admin_referer();
 
 		global $wpdb, $ngg;
 
@@ -480,6 +482,15 @@ abstract class Abstract_Manager extends Admin_Page {
 		$a2 = $_POST['action2'];
 
 		if ( $a1 === "delete_gallery" || $a2 === "delete_gallery" ) {
+			
+			//If there are no gallery ids, stop.
+			if(!is_array($_POST['doaction'])) {
+				return;
+			}
+			
+			$ids = $_POST['doaction'];
+			
+			
 			// Delete gallery
 			if ( is_array( $_POST['doaction'] ) ) {
 				$deleted = false;

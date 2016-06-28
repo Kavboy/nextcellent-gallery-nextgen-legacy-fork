@@ -22,13 +22,17 @@ use NextCellent\Database\Not_Found_Exception;
  * @property string $name The name.
  * @property string $slug The slug of the gallery.
  * @property string $path The path of the gallery.
- * @property string $title The title of the gallery.
- * @property string $description The description.
- * @property int $page_id The page associated with this gallery.
- * @property int $preview The preview image of the gallery.
- * @property int $author The ID of the gallery author.
+ * @property string       $title The title of the gallery.
+ * @property string       $description The description.
+ * @property int          $page_id The page associated with this gallery.
+ * @property int          $preview The preview image of the gallery.
+ * @property int          $author The ID of the gallery author.
+ * @property string       $abs_path The absolute path to this gallery.
+ * @property string       $abs_thumb_path The absolute path to the thumbnail folder.
  * @property-read Image[] $images The images in this gallery.
- * @property-read Image $preview_image The preview image.
+ * @property-read Image   $preview_image The preview image.
+ * @property string       abs_path
+ * @property string        abs_thumb_path
  */
 class Gallery implements Images {
 
@@ -46,11 +50,15 @@ class Gallery implements Images {
 	const PAGE_ID = 'pageid';
 	const PREVIEW = 'previewpic';
 	const AUTHOR = 'author';
+	
+	const THUMBNAIL_FOLDER = 'thumb';
 
 	/**
 	 * @var null|Images
 	 */
 	private $imageCollection;
+
+	private $absolutePath;
 
 	/**
 	 * Load the images of this gallery from the database, with the given constraints.
@@ -257,13 +265,15 @@ class Gallery implements Images {
 			'id'          => (int) $data[ self::ID ],
 			'name'        => $data[ self::NAME ],
 			'slug'        => $data[ self::SLUG ],
-			'path'        => $data[ self::PATH ],
+			'path'        => trailingslashit($data[ self::PATH ]),
 			'title'       => $data[ self::TITLE ],
 			'description' => $data[ self::DESCRIPTION ],
 			'page_id'     => (int) $data[ self::PAGE_ID ],
 			'preview'     => (bool) $data[ self::PREVIEW ],
 			'author'      => (int) $data[ self::AUTHOR ]
 		));
+
+		$gallery->absolutePath = trailingslashit(NCG_ABSPATH . $gallery->path);
 
 		return $gallery;
 	}
@@ -295,7 +305,12 @@ class Gallery implements Images {
 		);
 	}
 
+	/**
+	 * @throws Database_Exception
+	 * @throws Not_Found_Exception
+	 */
 	public function delete() {
+
 		$manager = Manager::get();
 		$result = $manager->delete($manager->get_gallery_table(), self::ID, $this->id);
 
@@ -325,6 +340,14 @@ class Gallery implements Images {
 		return $this->imageCollection;
 	}
 
+	public function get_abs_path() {
+		return $this->absolutePath;
+	}
+
+	public function get_abs_thumb_path() {
+		return trailingslashit($this->absolutePath . self::THUMBNAIL_FOLDER);
+	}
+
 	/**
 	 * Get the absolute path to an image. This is useful when you have the filename, but the image is not yet
 	 * in the gallery. If it is in the gallery, it is recommended to use the {@link Image#path} property.
@@ -334,6 +357,6 @@ class Gallery implements Images {
 	 * @return string The absolute path.
 	 */
 	public function path_to_image($image_name) {
-		return NCG_ABSPATH . $this->path . '/' . $image_name;
+		return $this->absolutePath . $image_name;
 	}
 }
