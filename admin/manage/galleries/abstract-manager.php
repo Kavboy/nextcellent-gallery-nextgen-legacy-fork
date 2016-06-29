@@ -3,6 +3,7 @@
 namespace NextCellent\Admin\Manage\Galleries;
 
 use NextCellent\Admin\Admin_Page;
+use NextCellent\Options\Options;
 
 /**
  * Class Abstract_Manager
@@ -21,20 +22,14 @@ abstract class Abstract_Manager extends Admin_Page {
 		 * Do a bulk action.
 		 */
 		if ((isset($_POST['action']) || isset($_POST['action2'])) && isset($_POST['doaction'])) {
-			//$this->handle_bulk_actions();
-			var_dump("bulk actions");
-			var_dump($_POST);
-			die();
+			$this->handle_bulk_actions();
 		}
 
 		/**
 		 * Do the operations with a dialog.
 		 */
 		if (isset($_POST['TB_bulkaction']) && isset($_POST['TB_action'])) {
-			//$this->handle_dialog_actions();
-			var_dump("dialog actions");
-			var_dump($_POST);
-			die();
+			$this->handle_dialog_actions();
 		}
 	}
 
@@ -43,7 +38,7 @@ abstract class Abstract_Manager extends Admin_Page {
 	 */
 	protected function print_dialogs() {
 
-		$options = get_option( 'ngg_options' );
+		$options = Options::getInstance();
 
 		?>
 		<style>
@@ -66,9 +61,9 @@ abstract class Abstract_Manager extends Admin_Page {
 						</td>
 						<td>
 							<label for="imgWidth"><?php _e( 'Width', 'nggallery' ) ?></label>
-							<input type="number" min="0" class="small-text" id="imgWidth" name="imgWidth" value="<?php echo $options['imgWidth']; ?>">
+							<input type="number" min="0" class="small-text" id="imgWidth" name="imgWidth" value="<?= $options['imgWidth']; ?>">
 							<label for="imgHeight"><?php _e( 'Height', 'nggallery' ) ?></label>
-							<input type="number" min="0" size="5" name="imgHeight" id="imgHeight" class="small-text" value="<?php echo $options['imgHeight']; ?>">
+							<input type="number" min="0" size="5" name="imgHeight" id="imgHeight" class="small-text" value="<?= $options['imgHeight']; ?>">
 
 							<p class="description"><?php _e( 'Width and height (in pixels). NextCellent Gallery will keep the ratio size.',
 									'nggallery' ) ?></p>
@@ -89,9 +84,9 @@ abstract class Abstract_Manager extends Admin_Page {
 						<th align="left"><?php _e( 'Size', 'nggallery' ) ?></th>
 						<td>
 							<label for="thumbwidth"><?php _e( 'Width', 'nggallery' ) ?></label>
-							<input id="thumbwidth" class="small-text" type="number" min="0" name="thumbwidth" value="<?php echo $options['thumbwidth']; ?>">
+							<input id="thumbwidth" class="small-text" type="number" min="0" name="thumbwidth" value="<?= $options['thumbwidth']; ?>">
 							<label for="thumbheight"><?php _e( 'Height', 'nggallery' ) ?></label>
-							<input id="thumbheight" class="small-text" type="number" step="1" min="0" name="thumbheight" value="<?php echo $options['thumbheight']; ?>">
+							<input id="thumbheight" class="small-text" type="number" step="1" min="0" name="thumbheight" value="<?= $options['thumbheight']; ?>">
 
 							<p class="description"><?php _e( 'These values are maximum values ', 'nggallery' ) ?></p>
 						</td>
@@ -193,12 +188,15 @@ abstract class Abstract_Manager extends Admin_Page {
 			};
 
 			function handleBulkActions(event) {
+
+				"use strict";
+
 				var caller = event.target;
 				var $selector = jQuery(doActionToSelector[caller.id]);
 				var $selected = jQuery("input[name^=doaction]:checkbox:checked");
 
+				//Check for images.
 				if ($selected.length < 1) {
-					alert('<?php echo esc_js(__('No images selected', 'nggallery')); ?>');
 					return false;
 				}
 
@@ -356,109 +354,106 @@ abstract class Abstract_Manager extends Admin_Page {
 	 */
 	protected function handle_dialog_actions() {
 
-		$ngg_options = get_option( 'ngg_options' );
+		//Check the referrer
+		check_admin_referer('ngg_thickbox_form');
 
-		/**
-		 * If the post type is
-		 */
-		if ( $_POST['TB_type'] === 'gallery' ) {
+		//Get the type of data.
+		if ($_POST['TB_type'] === 'gallery') {
 			$mode = 'gallery';
 		} else {
 			$mode = 'image';
 		}
 
-		check_admin_referer( 'ngg_thickbox_form' );
+		$list = explode(',', $_POST['TB_imagelist']);
 
-		$list = explode( ',', $_POST['TB_imagelist'] );
-
-		switch ( $_POST['TB_action'] ) {
+		switch ($_POST['TB_action']) {
 			case 'resize_images':
-				$data = array(
-					'width'     => (int) $_POST['imgWidth'],
-					'height'    => (int) $_POST['imgHeight']
-				);
+				$data    = [
+					'width'  => (int) $_POST['imgWidth'],
+					'height' => (int) $_POST['imgHeight'],
+				];
 				$command = 'resize_image';
-				$title   = __( 'Resize images', 'nggallery' );
-				\nggAdmin::do_ajax_operation( $command, $list, $title, $mode, $data );
+				$title   = __('Resize images', 'nggallery');
+				\nggAdmin::do_ajax_operation($command, $list, $title, $mode, $data);
 				return;
+
 			case 'new_thumbnails':
-				$data = array(
-					'width'     => (int) $_POST['thumbwidth'],
-					'height'    => (int) $_POST['thumbheight'],
-					'fix'       => isset( $_POST['thumb_fix'] ) ? true : false
-				);
+				$data    = [
+					'width'  => (int) $_POST['thumbwidth'],
+					'height' => (int) $_POST['thumbheight'],
+					'fix'    => isset($_POST['thumb_fix']),
+				];
 				$command = 'create_thumbnail';
-				$title   = __( 'Create new thumbnails', 'nggallery' );
-				\nggAdmin::do_ajax_operation( $command, $list, $title, $mode, $data );
+				$title   = __('Create new thumbnails', 'nggallery');
+				\nggAdmin::do_ajax_operation($command, $list, $title, $mode, $data);
 				return;
+
 			case 'copy_to':
 				$dest_gid = (int) $_POST['dest_gid'];
-				\nggAdmin::copy_images( $list, $dest_gid );
-
+				\nggAdmin::copy_images($list, $dest_gid);
 				return;
+
 			case 'move_to':
 				$dest_gid = (int) $_POST['dest_gid'];
-				\nggAdmin::move_images( $list, $dest_gid );
-
+				\nggAdmin::move_images($list, $dest_gid);
 				return;
+
 			case 'add_tags':
-				$tag_list = explode( ',', $_POST['taglist'] );
-				$tag_list = array_map( 'trim', $tag_list );
-				if ( is_array( $list ) ) {
-					foreach ( $list as $pic_id ) {
-						wp_set_object_terms( $pic_id, $tag_list, 'ngg_tag', true );
+				$tag_list = explode(',', $_POST['taglist']);
+				$tag_list = array_map('trim', $tag_list);
+				if (is_array($list)) {
+					foreach ($list as $pic_id) {
+						wp_set_object_terms($pic_id, $tag_list, 'ngg_tag', true);
 					}
 				}
-				\nggGallery::show_message( __( 'Tags changed', 'nggallery' ) );
-
+				\NextCellent\show_success(__('Tags changed', 'nggallery'));
 				return;
+
 			case 'delete_tags':
-				$tag_list = explode( ',', $_POST['taglist'] );
-				$tag_list = array_map( 'trim', $tag_list );
-				if ( is_array( $list ) ) {
-					foreach ( $list as $pic_id ) {
-						$old_tags = wp_get_object_terms( $pic_id, 'ngg_tag', 'fields=names' );
+				$tag_list = explode(',', $_POST['taglist']);
+				$tag_list = array_map('trim', $tag_list);
+				if (is_array($list)) {
+					foreach ($list as $pic_id) {
+						$old_tags = wp_get_object_terms($pic_id, 'ngg_tag', 'fields=names');
 						// get the slugs, to vaoid  case sensitive problems
-						$slug_array = array_map( 'sanitize_title', $tag_list );
-						$old_tags   = array_map( 'sanitize_title', $old_tags );
+						$slug_array = array_map('sanitize_title', $tag_list);
+						$old_tags   = array_map('sanitize_title', $old_tags);
 						// compare them and return the diff
-						$new_tags = array_diff( $old_tags, $slug_array );
-						wp_set_object_terms( $pic_id, $new_tags, 'ngg_tag' );
+						$new_tags = array_diff($old_tags, $slug_array);
+						wp_set_object_terms($pic_id, $new_tags, 'ngg_tag');
 					}
 				}
-				\nggGallery::show_message( __( 'Tags changed', 'nggallery' ) );
-
+				\NextCellent\show_success(__('Tags changed', 'nggallery'));
 				return;
+
 			case 'overwrite_tags':
-				$tag_list = explode( ',', $_POST['taglist'] );
-				$tag_list = array_map( 'trim', $tag_list );
-				if ( is_array( $list ) ) {
-					foreach ( $list as $pic_id ) {
-						wp_set_object_terms( $pic_id, $tag_list, 'ngg_tag' );
+				$tag_list = explode(',', $_POST['taglist']);
+				$tag_list = array_map('trim', $tag_list);
+				if (is_array($list)) {
+					foreach ($list as $pic_id) {
+						wp_set_object_terms($pic_id, $tag_list, 'ngg_tag');
 					}
 				}
-				\nggGallery::show_message( __( 'Tags changed', 'nggallery' ) );
+				\NextCellent\show_success(__('Tags changed', 'nggallery'));
 
 				return;
 			case 'set_title':
 				$new_title = $_POST['text'];
-				if ( is_array( $list ) ) {
-					foreach ( $list as $pic_id ) {
+				if (is_array($list)) {
+					foreach ($list as $pic_id) {
 						\nggdb::update_image($pic_id, false, false, false, $new_title);
 					}
 				}
-				\nggGallery::show_message( __('Image title updated', 'nggallery') );
-
+				\NextCellent\show_success(__('Image title updated', 'nggallery'));
 				return;
 			case 'set_descr':
 				$new_descr = $_POST['text'];
-				if ( is_array( $list ) ) {
-					foreach ( $list as $pic_id ) {
+				if (is_array($list)) {
+					foreach ($list as $pic_id) {
 						\nggdb::update_image($pic_id, false, false, $new_descr);
 					}
 				}
-				\nggGallery::show_message( __('Image description updated', 'nggallery') );
-
+				\NextCellent\show_success(__('Image description updated', 'nggallery'));
 				return;
 			default:
 				return;
@@ -469,8 +464,9 @@ abstract class Abstract_Manager extends Admin_Page {
 	 * Handle the bulk actions.
 	 */
 	protected function handle_bulk_actions() {
+
 		//Check the nonce.
-		check_admin_referer();
+		$this->checkReferrer();
 
 		global $wpdb, $ngg;
 
@@ -481,7 +477,7 @@ abstract class Abstract_Manager extends Admin_Page {
 		$a1 = $_POST['action'];
 		$a2 = $_POST['action2'];
 
-		if ( $a1 === "delete_gallery" || $a2 === "delete_gallery" ) {
+		if ($a1 === "delete_gallery" || $a2 === "delete_gallery") {
 			
 			//If there are no gallery ids, stop.
 			if(!is_array($_POST['doaction'])) {
@@ -569,4 +565,6 @@ abstract class Abstract_Manager extends Admin_Page {
 	public function get_name() {
 		return self::NAME;
 	}
+
+	protected abstract function checkReferrer();
 }

@@ -31,6 +31,6 @@ class Ajax_Handler {
 	}
 	
 	public function handle_upload() {
-		Upload_Handler::handle_upload();
+		(new Upload_Handler($_POST))->handleUpload();
 	}
 }

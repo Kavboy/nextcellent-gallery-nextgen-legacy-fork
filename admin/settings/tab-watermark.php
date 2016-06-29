@@ -178,11 +178,6 @@ class Tab_Watermark extends Settings_Tab {
 	 */
 	public function processor() {
 
-		$this->save_booleans(array(
-			'irAutoDim', 'imgAutoResize', 'thumbfix', 'thumbDifferentSize', 'irLoop', 'irDrag', 'irNavigation',
-			'irNavigationDots', 'irAutoplay', 'irAutoplayHover', 'irClick'
-		));
-
 		//Set positive integers.
 		$this->save_number( array( 'wmXpos', 'wmYpos', 'wmSize', 'wmOpaque' ) );
 

@@ -87,10 +87,15 @@ abstract class Abstract_Image_Manager extends Abstract_Manager {
 		<?php
 	}
 	
+	protected function checkReferrer() {
+		//Check the bulk options.
+		check_admin_referer('bulk-' . Image_List_Table::PLURAL);
+	}
+
 	private function handle_update_images() {
 
 		//Check the bulk options.
-		check_admin_referer('bulk-' . Image_List_Table::PLURAL);
+		$this->checkReferrer();
 
 		$description = isset($_POST['description']) ? $_POST['description'] : [];
 		$alt_text    = isset($_POST['alttext']) ? $_POST['alttext'] : [];

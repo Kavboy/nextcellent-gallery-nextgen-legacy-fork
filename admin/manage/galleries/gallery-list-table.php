@@ -4,17 +4,14 @@ namespace NextCellent\Admin\Manage\Galleries;
 
 use NextCellent\Models\Gallery;
 
-if ( ! class_exists( 'WP_List_Table' ) ) {
-	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+if ( !class_exists('WP_List_Table')) {
+	require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
 /**
  * Class NGG_List_Table
  *
  * This class represents the listing of the galleries in the admin menu.
- *
- * This class was written with WP_List_Table from WordPress 4.3.
- * If this doesn't work anymore in the future, it's because that class has changed.
  */
 class Gallery_List_Table extends \WP_List_Table {
 	
@@ -23,9 +20,7 @@ class Gallery_List_Table extends \WP_List_Table {
 	private $base;
 
 	public function __construct( $base, $screen = null ) {
-
-		parent::__construct( array( 'screen' => $screen, 'plural' => self::PLURAL ) );
-
+		parent::__construct( ['screen' => $screen, 'plural' => self::PLURAL]);
 		$this->base = $base;
 	}
 
@@ -40,38 +35,34 @@ class Gallery_List_Table extends \WP_List_Table {
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
 
-		$this->_column_headers = array( $columns, $hidden, $sortable );
+		$this->_column_headers = [$columns, $hidden, $sortable];
 
-		/**
-		 * Do the pagination.
-		 */
+		//Pagination
 		$currentPage = $this->get_pagenum();
 		$perPage     = $this->get_items_per_page('ngg_galleries_per_page', 25);
 
-		/**
-		 * Sorting
-		 */
-		if ( ( isset ( $_GET['order'] ) && $_GET['order'] == 'desc' ) ) {
+		//Sorting.
+		if ((isset ($_GET['order']) && $_GET['order'] == 'desc')) {
 			$order = 'DESC';
 		} else {
 			$order = 'ASC';
 		}
 
-		if ( ( isset ( $_GET['orderby'] ) && ( in_array( $_GET['orderby'], array( 'gid', 'title', 'author' ) ) ) ) ) {
+		if ((isset ($_GET['orderby']) && (in_array($_GET['orderby'], ['gid', 'title', 'author'])))) {
 			$order_by = $_GET['orderby'];
 		} else {
 			$order_by = 'gid';
 		}
 
-		$start       = ( $currentPage - 1 ) * $perPage;
+		$start       = ($currentPage - 1) * $perPage;
 		$this->items = Gallery::all($order_by, $order, $start, $perPage, true);
 
 		$totalItems = Gallery::count();
 
-		$this->set_pagination_args( array(
+		$this->set_pagination_args([
 			'total_items' => $totalItems,
-			'per_page'    => $perPage
-		) );
+			'per_page'    => $perPage,
+		]);
 	}
 
 	/**
@@ -151,7 +142,7 @@ class Gallery_List_Table extends \WP_List_Table {
 	 */
 	public static function get_columns_static() {
 
-		$columns = array(
+		$columns = [
 			'cb'          => '<input type="checkbox" />',
 			'id'          => __( 'ID', 'nggallery' ),
 			'title'       => __( 'Title', 'nggallery' ),
@@ -159,7 +150,7 @@ class Gallery_List_Table extends \WP_List_Table {
 			'author'      => __( 'Author', 'nggallery' ),
 			'page_id'     => __( 'Page ID', 'nggallery' ),
 			'quantity'    => __( 'Images', 'nggallery' )
-		);
+		];
 
 		/**
 		 * Apply a filter to the columns.
@@ -174,7 +165,6 @@ class Gallery_List_Table extends \WP_List_Table {
 	 * Get the columns.
 	 */
 	public function get_columns() {
-
 		return self::get_columns_static();
 	}
 
@@ -182,21 +172,21 @@ class Gallery_List_Table extends \WP_List_Table {
 	 * Get the sortable columns.
 	 */
 	protected function get_sortable_columns() {
-		return array(
-			'id'     => array( 'gid', true ),
-			'title'  => array( 'title', false ),
-			'author' => array( 'author', false )
-		);
+		return [
+			'id'     => ['gid', true],
+			'title'  => ['title', false],
+			'author' => ['author', false]
+		];
 	}
 
 	protected function get_bulk_actions() {
-		return array(
+		return [
 			'delete_gallery' => __( 'Delete', 'nggallery' ),
 			'set_watermark'  => __( 'Set watermark', 'nggallery' ),
 			'new_thumbnail'  => __( 'Create new thumbnails', 'nggallery' ),
 			'resize_images'  => __( 'Resize images', 'nggallery' ),
 			'import_meta'    => __( 'Import metadata', 'nggallery' ),
 			'recover_images' => __( 'Recover from backup', 'nggallery' ),
-		);
+		];
 	}
 }

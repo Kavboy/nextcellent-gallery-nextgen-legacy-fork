@@ -3,9 +3,7 @@
 namespace NextCellent\Admin\Manage\Galleries;
 
 /**
- * Class Gallery_Manager
- *
- * Display the gallery managing page.
+ * Manage the galleries.
  */
 class Gallery_Manager extends Abstract_Manager {
 
@@ -136,5 +134,10 @@ class Gallery_Manager extends Abstract_Manager {
 		);
 
 		$screen->add_option( 'per_page', $args );
+	}
+
+	protected function checkReferrer() {
+		//Check the bulk options.
+		check_admin_referer('bulk-' . Gallery_List_Table::PLURAL);
 	}
 }
