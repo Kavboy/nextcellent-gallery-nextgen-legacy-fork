@@ -260,7 +260,7 @@ html>body .ngg-album {
 }
 
 .slideshowlink {
-
+	display: block;
 }
 
 /* ----------- JS Slideshow -------------*/

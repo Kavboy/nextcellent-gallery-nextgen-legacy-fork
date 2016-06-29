@@ -47,7 +47,7 @@ class Pagination {
 
 		ob_start();
 
-		echo '<div class="ngg-navigation">';
+		echo '<div class="ngg-navigation ncg-navigation">';
 
 		//If we are not one page 1, we need a link for the previous page.
 		if($this->page > 1) {
@@ -73,11 +73,9 @@ class Pagination {
 			if ( $page_num <= 2 || ( $page_num >= $this->page - 2 && $page_num <= $this->page + 2 ) || $page_num >= $total_pages - 2 ) {
 
 				$link = Rewrite::get_link( $data );
+				$title = sprintf(__('Go to page %d', 'nggallery'), $page_num);
 
-//				$link = $nggRewrite->get_permalink( [
-//					'nggpage'   => 1 == $page_num ? false : $page_num
-//				] );
-				echo "<a class='page-numbers' href='$link'>$page_num</a>";
+				echo "<a class='page-numbers' href='$link' title='$title'>$page_num</a>";
 				$dots = true;
 			}
 			//Do the dots.
@@ -108,15 +106,12 @@ class Pagination {
 			'ncg-page'  => $previous
 		]);
 
-//		$prev = $nggRewrite->get_permalink ( [
-//			'nggpage'   => 1 == $this->page - 1 ? false : $this->page - 1,
-//		] );
+		$t = __('Go to the previous page', 'nggallery');
 
 		echo "<a class='prev' id='ngg-prev-$previous' href='$prev'>$prev_symbol</a>";
 	}
 
 	private function print_next_link() {
-		global $nggRewrite;
 
 		$next_symbol = apply_filters('ngg_prev_symbol', '&#9658;');
 
@@ -126,11 +121,9 @@ class Pagination {
 			'ncg-page' => $next_page 
 		]);
 
-//		$next = $nggRewrite->get_permalink ([
-//			'nggpage'   => $next_page,
-//		]);
+		$t = __('Go to the next page', 'nggallery');
 
-		echo "<a class='next' id='ngg-next-$next_page' href='$next'>$next_symbol</a>";
+		echo "<a class='next' id='ngg-next-$next_page' href='$next' title='$t'>$next_symbol</a>";
 	}
 
 	public function __toString() {

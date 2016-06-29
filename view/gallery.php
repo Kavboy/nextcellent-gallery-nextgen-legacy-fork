@@ -14,18 +14,20 @@
  */
 ?>
 
-<div class="ngg-galleryoverview" id="<?= $anchor ?>">
+<div class="ngg-galleryoverview ncg-gallery-overview" id="<?= $anchor ?>">
 
 	<?php if ($mode_link !== false) { ?>
 		<!-- Slideshow link -->
-		<a class="mode-link" href="<?= $mode_link ?>"><?= $mode_link_text ?></a>
+		<div class="slideshowlink ncg-mode-link-wrapper">
+			<a class="slideshowlink ncg-mode-link" href="<?= $mode_link ?>"><?= $mode_link_text ?></a>
+		</div>
 	<?php } ?>
 
 	<!-- Thumbnails -->
 	<?php foreach ( $images as $image ) : ?>
 
-	<div id="ngg-image-<?= $image->id ?>" class="ngg-gallery-thumbnail-box">
-		<div class="ngg-gallery-thumbnail" >
+	<div id="ngg-image-<?= $image->id ?>" class="ngg-gallery-thumbnail-box ncg-thumbnail-wrapper">
+		<div class="ngg-gallery-thumbnail ncg-thumbnail" >
 			<a href="<?= $image->url ?>" title="<?= $image->description ?>">
 				<img title="<?= $image->alt_text ?>" alt="<?= $image->alt_text ?>" src="<?= $image->thumb_url ?>" />
 			</a>

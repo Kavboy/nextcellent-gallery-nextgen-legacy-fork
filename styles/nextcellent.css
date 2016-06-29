@@ -6,3 +6,54 @@
  * This is a template stylesheet that can be used with NextCellent. Is is very minimalistic, and shouldn't clash with
  * any existing theme.
  */
+
+/**
+ * Gallery images
+ */
+.ncg-gallery-overview {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	overflow: hidden;
+	clear: both;
+}
+
+.ncg-thumbnail-wrapper {
+	float: left;
+	padding: 5px;
+	border: solid 1px lightgray;
+	margin: 5px;
+	transition: background-color 100ms linear;
+}
+
+.ncg-thumbnail-wrapper:hover {
+	background-color: lightgray;
+}
+
+/**
+ * Navigation
+ **/
+.ncg-navigation {
+	clear: both;
+	text-align: center;
+}
+
+.ncg-navigation .current {
+	padding: 3px 7px;
+	margin-right: 3px;
+	font-weight: bold;
+}
+
+.ncg-navigation a.page-numbers {
+	margin-right: 3px;
+	padding: 3px 7px;
+	text-decoration: none;
+	box-shadow: none;
+}
+
+.ncg-navigation a.next, .ncg-navigation a.prev {
+	margin-right: 3px;
+	padding: 3px 7px;
+	text-decoration: none;
+	box-shadow: none;
+	transition: background-color 100ms linear;
+}

@@ -276,7 +276,7 @@ function moveImages(array $images, Gallery $destination) {
 
 		//Move a thumbnail file.
 		if (file_exists($image->thumb_path)) {
-			renameFile($image->thumb_path, $newName, $destination->abs_thumb_path );
+			renameFile($image->thumb_path, 'thumbs_' . $newName, $destination->abs_thumb_path );
 		}
 
 		$image->gallery_id = $destination->id;

@@ -48,7 +48,7 @@ function render_gallery_shortcode($gallery_id, $template = 'gallery', $nr_of_ima
  *
  * @param Images $images       The images to display.
  * @param string $template     The name of the template to use.
- * @param bool   $nr_of_images The number of images to display.
+ * @param bool|int   $nr_of_images The number of images to display.
  *
  * @param bool   $modeLink
  *
@@ -64,7 +64,11 @@ function render_gallery(Images $images, $template = 'gallery', $nr_of_images = f
 
 	$images_per_page = ($nr_of_images === false) ? $options->get( Options::GAL_IMAGES_PER_PAGE ) : $nr_of_images;
 	$page = (int) get_query_var('ncg-page', 1);
-	$start = ($page - 1) * $images_per_page;
+	if($nr_of_images === MAX_IMAGES) {
+		$start = 0;
+	} else {
+		$start = ($page - 1) * $images_per_page;
+	}
 
 	//Decide mode
 	if($modeLink && $options->get( Options::GAL_SHOW_SLIDESHOW )) {

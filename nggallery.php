@@ -349,7 +349,7 @@ if (!class_exists('NCG')) {
 	        //The basename for this pluing, e.g. 'nextcellent/nggallery.php'
 	        define('NCG_BASENAME', plugin_basename(__FILE__));
             //The absolute path to the wordpress install.
-            define('NCG_ABSPATH', str_replace("\\", "/", ABSPATH));
+            define('NCG_ABSPATH', trailingslashit(wp_normalize_path(ABSPATH)));
 	        
 	        /**
 	         * The other constants are kept for compatibility reasons.
@@ -532,7 +532,7 @@ if (!class_exists('NCG')) {
 			wp_enqueue_style('owl');
 			
 			//Include the general style.
-			$file = \NextCellent\Rendering\Css\getCssFileUrl();
+			$file = \NextCellent\Rendering\Css\getCssFile();
 			if($file !== null) {
 				wp_enqueue_style('ncg-style', $file, [], self::VERSION, 'screen');
 			}

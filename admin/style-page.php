@@ -1,15 +1,14 @@
-<?php  
+<?php
 
 namespace NextCellent\Admin;
+
 use NextCellent\Files\FileException;
-use NextCellent\Options\Options;use function NextCellent\Rendering\Css\getCssFilesFrom;
+use NextCellent\Options\Options;
+use function NextCellent\Rendering\Css\getCssFilesFrom;
 use function NextCellent\Rendering\Css\getThemeCssFile;
 
 /**
-* Class Style_Page
- * @package NextCellent\Admin
- *          
- * @todo Rewrite this to a proper page.
+ * Class Style_Page
  */
 class Style_Page extends Post_Admin_Page {
 
@@ -20,28 +19,29 @@ class Style_Page extends Post_Admin_Page {
 
 		check_admin_referer('ngg_style');
 
-		var_dump($_POST);
-
-		if(!isset($_POST['mode'])) {
+		if ( !isset($_POST['mode'])) {
 			return;
 		}
 
-		if($_POST['mode'] === 'update-css') {
+		$options = Options::getInstance();
+
+		if ($_POST['mode'] === 'update-css') {
 
 			//Check for permission
-			if ( !current_user_can('edit_themes') ) {
-				\NextCellent\show_error(__('You do not have sufficient permissions to edit templates for this blog.', 'nggallery'));
+			if ( !current_user_can('edit_themes')) {
+				\NextCellent\show_error(__('You do not have sufficient permissions to edit templates for this blog.',
+					'nggallery'));
+
 				return;
 			}
 
-			$activeFile = $_POST['file'];
+			$activeFile   = $_POST['file'];
 			$activeFolder = $_POST['folder'];
 
 			$moved = false;
-			$options = Options::getInstance();
 
 			//If it is a built in, update the options.
-			if($activeFolder === \NextCellent\Rendering\Css\FOLDER_BUILTIN) {
+			if ($activeFolder === \NextCellent\Rendering\Css\FOLDER_BUILTIN) {
 				$options->update_option(Options::STYLE_CSS_FOLDER, \NextCellent\Rendering\Css\FOLDER_STYLES);
 				$moved = true;
 			}
@@ -55,120 +55,69 @@ class Style_Page extends Post_Admin_Page {
 				\NextCellent\Files\Common\writeToFile($fullPath, $_POST['content']);
 			} catch (FileException $e) {
 				\NextCellent\show_error(sprintf(__("Could not save file: %s", 'nggallery'), $e->getMessage()));
-				if($moved) {
+				if ($moved) {
 					$options->update_option(Options::STYLE_CSS_FOLDER, \NextCellent\Rendering\Css\FOLDER_BUILTIN);
 				}
+
 				return;
 			}
 
-			\NextCellent\show_success(__('CSS file successfully updated.','nggallery'));
+			\NextCellent\show_success(__('CSS file successfully updated.', 'nggallery'), true);
+
 			return;
-		}
-
-		return;
-
-		global $ngg;
-		$options = get_option('ngg-options');
-		$i = 0;
-
-		if ( isset( $_POST['activate'] ) ) {
-			check_admin_referer('ngg_style');
-			$file = $_POST['css'];
-			$activate = $_POST['activateCSS']; 
-			
-			// save option now
-			$options['activateCSS'] = $activate;
-			$options['CSSfile'] = $file;
-			update_option('ngg_options', $ngg->options);
-			
-			if ( isset($activate) ) {
-				\nggGallery::show_message(__('Successfully selected CSS file.','nggallery') );
+		} elseif ($_POST['mode'] === 'set-css') {
+			if ( !isset($_POST['activateCSS'])) {
+				$options->set_option(Options::STYLE_USE_CSS, false);
 			} else {
-				\nggGallery::show_message(__('No CSS file will be used.','nggallery') );
-			}
-		}
-
-		if (isset($_POST['updatecss'])) {
-			
-			check_admin_referer('ngg_style');
-
-			if ( !current_user_can('edit_themes') )
-				{wp_die('<p>'.__('You do not have sufficient permissions to edit templates for this blog.').'</p>');}
-
-			$newcontent = stripslashes($_POST['newcontent']);
-			$old_path = $_POST['file'];
-			$folder = $_POST['folder'];
-			
-			//if the file is in the css folder, copy it.
-			if ($folder === 'css') {
-				$filename = basename ($old_path, '.css');
-				$new_path = NGG_CONTENT_DIR . "/ngg_styles/" . $filename . ".css";
-				//check for duplicate files
-				while ( file_exists( $new_path ) ) {
-					$i++;
-					$new_path = NGG_CONTENT_DIR . "/ngg_styles/"  . $filename . "-" . $i . ".css";
-				}
-				//check if ngg_styles exist or not
-				if ( !file_exists(NGG_CONTENT_DIR . "/ngg_styles") ) {
-					wp_mkdir_p( NGG_CONTENT_DIR . "/ngg_styles" );
-				}
-				//copy the file
-				if ( copy($old_path, $new_path) ) {
-					//set option to new file
-					$options['CSSfile'] = $new_path;
-					update_option('ngg_options', $ngg->options);
-				} else {
-					\nggGallery::show_error(__('Could not move file.','nggallery'));
+				if ( !isset($_POST['css'])) {
 					return;
 				}
-			}
-	
-			if ( file_put_contents($old_path, $newcontent) ) {
-				\nggGallery::show_message(__('CSS file successfully updated.','nggallery'));
-			} else {
-				\nggGallery::show_error(__('Could not save file.','nggallery'));
-			}
-		}
-		
-		if (isset($_POST['movecss'])) {
 
-			if ( !current_user_can('edit_themes') )
-				{wp_die('<p>'.__('You do not have sufficient permissions to edit templates for this blog.').'</p>');}
-			
-			$old_path = $_POST['oldpath'];
-			$new_path = NGG_CONTENT_DIR . "/ngg_styles/nggallery.css";
-			
-			//check for duplicate files
-			while ( file_exists( $new_path ) ) {
-				$i++;
-				$new_path = NGG_CONTENT_DIR . "/ngg_styles/nggallery-" . $i . ".css";
+				$options->update_option(Options::STYLE_USE_CSS, true);
+				$data = explode(self::SEPARATOR, $_POST['css']);
+				if ($data[0] === \NextCellent\Rendering\Css\FOLDER_BUILTIN) {
+					$options->set_option(Options::STYLE_CSS_FOLDER, \NextCellent\Rendering\Css\FOLDER_BUILTIN);
+				} else {
+					$options->set_option(Options::STYLE_CSS_FOLDER, \NextCellent\Rendering\Css\FOLDER_STYLES);
+				}
+
+				$options->set_option(Options::STYLE_CSS_FILE, $data[1]);
 			}
-			
-			//move file
-			if ( rename( $old_path, $new_path) ) {
-				\nggGallery::show_message(__('CSS file successfully moved.','nggallery'));
-				//set option to new file
-				$options['CSSfile'] = $new_path;
-				update_option('ngg_options', $ngg->options);
+			$options->save_options();
+			\NextCellent\show_success(__('Successfully set CSS file.', 'nggallery'), true);
+		} elseif ($_POST['mode'] === 'activate-css') {
+			if ( !isset($_POST['css'])) {
+				return;
+			}
+
+			$options->update_option(Options::STYLE_USE_CSS, true);
+			$data = explode(self::SEPARATOR, $_POST['css']);
+			if ($data[0] === \NextCellent\Rendering\Css\FOLDER_BUILTIN) {
+				$options->set_option(Options::STYLE_CSS_FOLDER, \NextCellent\Rendering\Css\FOLDER_BUILTIN);
 			} else {
-				\nggGallery::show_error(__('Could not move the CSS file.','nggallery'));
+				$options->set_option(Options::STYLE_CSS_FOLDER, \NextCellent\Rendering\Css\FOLDER_STYLES);
 			}
+
+			$options->set_option(Options::STYLE_CSS_FILE, $data[1]);
+			$options->save_options();
+			\NextCellent\show_success(__('Successfully set CSS file.', 'nggallery'), true);
 		}
 	}
 
 	/**
-     * Render the page content.
+	 * Render the page content.
 	 *
 	 * @since 1.9.22
-     *
-     */
+	 *
+	 */
 	public function display() {
 
 		parent::display();
 
 		//Find active CSS file.
-		if(getThemeCssFile() !== false) {
-			$this->displayShortCss(__('Your CSS file is set by a theme or another plugin.','nggallery'));
+		if (getThemeCssFile() !== false) {
+			$this->displayShortCss(__('Your CSS file is set by a theme or another plugin.', 'nggallery'));
+
 			return;
 		}
 
@@ -183,22 +132,24 @@ class Style_Page extends Post_Admin_Page {
 
 		$options = Options::getInstance();
 
-		if (!$options[Options::STYLE_USE_CSS]) {
+		if ( !$options[ Options::STYLE_USE_CSS ]) {
 			$this->displayNoCss($files);
+
 			return;
 		}
 
-		$activeFile = $options[Options::STYLE_CSS_FILE];
-		$activeFolder = $options[Options::STYLE_CSS_FOLDER];
+		$activeFile   = $options[ Options::STYLE_CSS_FILE ];
+		$activeFolder = $options[ Options::STYLE_CSS_FOLDER ];
 
-		if($activeFolder === \NextCellent\Rendering\Css\FOLDER_BUILTIN) {
+		if ($activeFolder === \NextCellent\Rendering\Css\FOLDER_BUILTIN) {
 			$fullPath = NCG_PATH . 'styles/' . $activeFile;
 		} else {
 			$fullPath = NCG_USER_FOLDER_PATH . $activeFile;
 		}
 
-		if(!array_key_exists($fullPath, $files)) {
+		if ( !array_key_exists($fullPath, $files)) {
 			$this->displayNoCss($files);
+
 			return;
 		}
 
@@ -268,8 +219,8 @@ class Style_Page extends Post_Admin_Page {
 	private function displayShortCss($message) {
 		?>
 		<div class="wrap">
-		<h2><?php _e('Style Editor', 'nggallery') ?></h2>
-		<p><?= $message ?></p>
+			<h2><?php _e('Style Editor', 'nggallery') ?></h2>
+			<p><?= $message ?></p>
 		</div>
 		<?php
 	}
@@ -277,17 +228,17 @@ class Style_Page extends Post_Admin_Page {
 	private function displayNoCss($files) {
 		?>
 		<div class="wrap">
-		<h2><?php _e('Style Editor', 'nggallery') ?></h2>
-		<p><?php _e('You do not use a CSS file at present. Choose a style below and update to use one.','nggallery') ?></p>
-		<form id="themes-selector" name="activate-files" method="post">
-			<?php wp_nonce_field('ngg_style') ?>
-			<label for="file-selector"><?php _e('Select a file:', 'nggallery') ?></label>
-			<select name="file" id="file-selector">
-				<?php $this->doDropdown($files); ?>
-			</select>
-			<input type="hidden" name="mode" value="set-css" />
-			<?php submit_button(__('Activate','nggallery')) ?>
-		</form>
+			<h2><?php _e('Style Editor', 'nggallery') ?></h2>
+			<p><?php _e('You do not use a CSS file at present. Choose a style below and update to use one.', 'nggallery') ?></p>
+			<form id="themes-selector" name="activate-files" method="post">
+				<?php wp_nonce_field('ngg_style') ?>
+				<label for="file-selector"><?php _e('Select a file:', 'nggallery') ?></label>
+				<select name="css" id="file-selector">
+					<?php $this->doDropdown($files); ?>
+				</select>
+				<input type="hidden" name="mode" value="activate-css"/>
+				<?php submit_button(__('Activate', 'nggallery')) ?>
+			</form>
 		</div>
 		<?php
 	}
@@ -298,16 +249,16 @@ class Style_Page extends Post_Admin_Page {
 	 */
 	private function doDropdown($files, $active = null) {
 		foreach ($files as $file) {
-			if(basename($file->getPath()) === 'styles') {
-				$value = \NextCellent\Rendering\Css\FOLDER_BUILTIN . self::SEPARATOR . $file->getFilename();
+			if (basename($file->getPath()) === 'styles') {
+				$value   = \NextCellent\Rendering\Css\FOLDER_BUILTIN . self::SEPARATOR . $file->getFilename();
 				$display = $file->getFilename() . ' ' . __('(built in)', 'nggallery');
 			} else {
-				$value = \NextCellent\Rendering\Css\FOLDER_STYLES . self::SEPARATOR . $file->getFilename();
-				$display = $file->getFilename() . ' ' .__('(user style)', 'nggallery');
+				$value   = \NextCellent\Rendering\Css\FOLDER_STYLES . self::SEPARATOR . $file->getFilename();
+				$display = $file->getFilename() . ' ' . __('(user style)', 'nggallery');
 			}
 			$value = esc_attr($value);
 
-			if($active === null || $active->getPathname() != $file->getPathname()) {
+			if ($active === null || $active->getPathname() != $file->getPathname()) {
 				echo "<option value='$value'>$display</option>";
 			} else {
 				echo "<option value='$value' selected>$display</option>";
@@ -320,24 +271,24 @@ class Style_Page extends Post_Admin_Page {
 	}
 
 	public function register_scripts() {
-		wp_enqueue_script( 'codepress' );
+		wp_enqueue_script('codepress');
 	}
+
 	/**
 	 * A possibility to add help to the screen.
 	 *
 	 * @param \WP_Screen $screen The current screen.
 	 */
-	 public function add_help($screen) {
-        $help = '<p>' . __( 'You can edit the css file to adjust how your gallery looks.',
-						'nggallery' ) . '</p>';
-		$help .= '<p>' . __( 'When you save an edited file, NextCellent automatically saves it as a copy in the folder ngg_styles. This protects your changes from upgrades.',
-				'nggallery' ) . '</p>';
+	public function add_help($screen) {
+		$help = '<p>' . __('You can edit the css file to adjust how your gallery looks.', 'nggallery') . '</p>';
+		$help .= '<p>' . __('When you save an edited file, NextCellent automatically saves it as a copy in the folder ngg_styles. This protects your changes from upgrades.',
+				'nggallery') . '</p>';
 
-		$screen->add_help_tab( array(
+		$screen->add_help_tab([
 			'id'      => $screen->id . '-general',
 			'title'   => 'Style your gallery',
-			'content' => $help
-		) );
+			'content' => $help,
+		]);
 	}
 
 	/**
@@ -350,7 +301,8 @@ class Style_Page extends Post_Admin_Page {
 	 * The 'nextcellent' is the slug, the 'manage-images' is the page name.
 	 *
 	 * @return string The name.
-	 */public function get_name() {
-		 return self::NAME;
-	 }
+	 */
+	public function get_name() {
+		return self::NAME;
+	}
 }

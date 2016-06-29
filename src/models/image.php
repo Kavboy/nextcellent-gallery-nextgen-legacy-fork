@@ -185,12 +185,12 @@ class Image {
 			'meta_data'   => unserialize( $data[ self::META_DATA ] )
 		) );
 
-		$gallery_path = $data[Gallery::PATH];
+		$gallery_path = trailingslashit(wp_normalize_path($data[Gallery::PATH]));
 
-		$image->path = WINABSPATH . $gallery_path . '/' . $image->filename;
-		$image->url = site_url() . '/' . $gallery_path . '/' . $image->filename;
-		$image->thumb_url = site_url() . '/' . $gallery_path . '/thumbs/thumbs_' . $image->filename;
-		$image->thumb_path = WINABSPATH . $gallery_path . '/thumbs/thumbs_' . $image->filename;
+		$image->path = NCG_ABSPATH . $gallery_path . $image->filename;
+		$image->url = site_url($gallery_path . $image->filename);
+		$image->thumb_url = site_url($gallery_path . '/thumbs/thumbs_' . $image->filename);
+		$image->thumb_path = NCG_ABSPATH . $gallery_path . 'thumbs/thumbs_' . $image->filename;
 
 		return $image;
 	}
