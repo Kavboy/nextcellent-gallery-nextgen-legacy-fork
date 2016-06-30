@@ -2,7 +2,7 @@
 Contributors: wpready
 Tags:gallery,image,images,photo,photos,picture,pictures,slideshow,flash,media,thumbnails,photo-albums,NextGEN-gallery,NextGEN,nextcellent-gallery,nextcellent
 Requires at least: 4.0
-Tested up to: 4.4.2
+Tested up to: 4.5
 Stable tag: trunk
 License: GPLv2
 
