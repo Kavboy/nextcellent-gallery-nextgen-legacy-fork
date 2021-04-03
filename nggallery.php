@@ -496,7 +496,7 @@ if (!class_exists('nggLoader')) {
 			if ( NGGALLERY_IREXIST == true && $this->options['enableIR'] == '1' && nggGallery::detect_mobile_phone() === false )
 				wp_enqueue_script('swfobject');
 			else if ($this->options['galShowSlide']) {
-				wp_enqueue_script('owl', NGGALLERY_URLPATH .'js/owl.carousel.min.js', array('jquery'), '2.3.4');
+				wp_enqueue_script('owl', NGGALLERY_URLPATH .'public/js/owl.carousel.min.js', array('jquery'), '2.3.4');
 			}
 
 			// Load AJAX navigation script, works only with shutter script as we need to add the listener
@@ -560,9 +560,9 @@ if (!class_exists('nggLoader')) {
 
 			// Load Owl carousel stylesheets if slideshow enabled
 			if ($this->options['galShowSlide']) {
-				wp_enqueue_style('owl', NGGALLERY_URLPATH . 'css/owl.carousel.min.css', false, '2.3.4', 'screen');
-				wp_enqueue_style('owl-theme', NGGALLERY_URLPATH . 'css/owl.theme.default.min.css', false, '2.3.4', 'screen');
-				wp_enqueue_style('animate', NGGALLERY_URLPATH . 'css/animate.min.css', false, '3.7.2', 'screen');
+				wp_enqueue_style('owl', NGGALLERY_URLPATH . 'public/css/owl.carousel.min.css', false, '2.3.4', 'screen');
+				wp_enqueue_style('owl-theme', NGGALLERY_URLPATH . 'public/css/owl.theme.default.min.css', false, '2.3.4', 'screen');
+				wp_enqueue_style('animate', NGGALLERY_URLPATH . 'public/css/animate.min.css', false, '3.7.2', 'screen');
 			}
 
 			// add qunit style if activated. I put 1.0.0 as formula, but it would mean nothing.

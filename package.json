@@ -1,0 +1,65 @@
+{
+  "name": "nextcellent-gallery-nextgen-legacy-fork",
+  "version": "1.9.35",
+  "description": "Fork of the Nextcellent Gallery wordpress plugin",
+  "scripts": {
+    "lint": "eslint --fix public/js",
+    "clean": "fsbin remove public",
+    "copy-files": "fsbin mkdir public && fsbin mkdirs public/js && fsbin mkdirs public/css && fsbin copy js public/js && fsbin copy css public/css",
+    "copy-corousel": "copycopy node_modules/owl.carousel/dist/owl.carousel.min.js public/js && copycopy  node_modules/owl.carousel/dist/assets/owl.carousel.min.css public/css && copycopy node_modules/owl.carousel/dist/assets/owl.theme.default.min.css public/css",
+    "copy-animate": "copycopy node_modules/animate.css/animate.min.css public/css",
+    "copy-cropper": "copycopy node_modules/cropper/dist/cropper.min.js public/js && copycopy node_modules/cropper/dist/cropper.min.css public/css",
+    "prebuild": "npm run clean && npm run copy-files && npm run copy-corousel && npm run copy-animate && npm run copy-cropper",
+    "build": "babel js/ngg.js -d public/js js/shutter-reloaded.js -d public/js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kavboy/nextcellent-gallery-nextgen-legacy-fork.git"
+  },
+  "keywords": [
+    "gallery",
+    "image",
+    "images",
+    "photo",
+    "photos",
+    "picture",
+    "pictures",
+    "slideshow",
+    "flash",
+    "media",
+    "thumbnails",
+    "photo-albums",
+    "NextGEN-gallery",
+    "NextGEN",
+    "nextcellent-gallery",
+    "nextcellent"
+  ],
+  "author": "Fernando Zorrilla",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/Kavboy/nextcellent-gallery-nextgen-legacy-fork/issues"
+  },
+  "private": true,
+  "devDependencies": {
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "@babel/eslint-parser": "^7.13.10",
+    "@babel/preset-env": "^7.13.12",
+    "@wordpress/eslint-plugin": "^7.3.0",
+    "copycopy": "^0.0.2",
+    "copyfiles": "^2.4.1",
+    "eslint": "^7.22.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "fsbin": "^1.0.10",
+    "prettier": "^2.2.1"
+  },
+  "dependencies": {
+    "animate.css": "^3.7.2",
+    "cropper": "^2.2.5",
+    "owl.carousel": "^2.3.4"
+  }
+}
