@@ -212,7 +212,7 @@ class NGG_Installer {
 
 		// CSS Style
 		$ngg_options['activateCSS'] = true;                            // activate the CSS file
-		$ngg_options['CSSfile']     = NGGALLERY_ABSPATH . 'css/nggallery.css';            // set default css filename
+		$ngg_options['CSSfile']     = NGGALLERY_ABSPATH . 'public/css/nggallery.css';            // set default css filename
 
 		// special overrides for WPMU
 		if ( is_multisite() ) {

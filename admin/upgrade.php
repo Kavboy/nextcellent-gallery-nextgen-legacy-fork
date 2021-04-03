@@ -87,6 +87,16 @@ function ngg_upgrade() {
 
 		}
 
+		// v1.8.3 -> v1.8.4
+		if ( version_compare( $installed_ver, '1.8.4', '<' ) ) {
+
+			//update them
+			$ngg_options['CSSfile'] = NGGALLERY_ABSPATH . 'public/css/nggallery.css';
+
+			//save them
+			update_option( 'ngg_options', $ngg_options );
+		}
+
 		// update the database version
 		update_option( "ngg_db_version", NGG_DBVERSION );
 

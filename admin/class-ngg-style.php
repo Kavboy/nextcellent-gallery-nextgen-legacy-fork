@@ -203,9 +203,9 @@ class NGG_Style extends NGG_Post_Admin_Page {
 		
 		//the directions containing the css files
 		if ( file_exists(NGG_CONTENT_DIR . "/ngg_styles") ) {
-			$dir = array(NGGALLERY_ABSPATH . "css", NGG_CONTENT_DIR . "/ngg_styles");
+			$dir = array(NGGALLERY_ABSPATH . "public/css", NGG_CONTENT_DIR . "/ngg_styles");
 		} else {
-			$dir = array(NGGALLERY_ABSPATH . "css");
+			$dir = array(NGGALLERY_ABSPATH . "public/css");
 		}
 		
 		//support for legacy location (in theme folder)
