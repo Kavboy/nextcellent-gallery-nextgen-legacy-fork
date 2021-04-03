@@ -483,7 +483,7 @@ if (!class_exists('nggLoader')) {
 
 			// activate modified Shutter reloaded if not use the Shutter plugin
 			if ( ($this->options['thumbEffect'] == "shutter") && !function_exists('srel_makeshutter') ) {
-				wp_register_script('shutter', NGGALLERY_URLPATH .'shutter/shutter-reloaded.js', false ,'1.3.3');
+				wp_register_script('shutter', NGGALLERY_URLPATH .'public/js/shutter-reloaded.js', false ,'1.3.3');
 				wp_localize_script('shutter', 'shutterSettings', array(
 							'msgLoading' => __('L O A D I N G', 'nggallery'),
 							'msgClose' => __('Click to Close', 'nggallery'),
@@ -556,7 +556,7 @@ if (!class_exists('nggLoader')) {
 
 			// activate modified Shutter reloaded if not use the Shutter plugin
 			if ( ($this->options['thumbEffect'] == 'shutter') && !function_exists('srel_makeshutter') )
-				wp_enqueue_style('shutter', NGGALLERY_URLPATH .'shutter/shutter-reloaded.css', false, '1.3.4', 'screen');
+				wp_enqueue_style('shutter', NGGALLERY_URLPATH .'public/js/shutter-reloaded.css', false, '1.3.4', 'screen');
 
 			// Load Owl carousel stylesheets if slideshow enabled
 			if ($this->options['galShowSlide']) {
