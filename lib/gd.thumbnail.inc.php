@@ -259,9 +259,9 @@ class ngg_Thumbnail {
      *
      */
     function destruct() {
-        if(is_resource($this->newImage)) @ImageDestroy($this->newImage);
-        if(is_resource($this->oldImage)) @ImageDestroy($this->oldImage);
-        if(is_resource($this->workingImage)) @ImageDestroy($this->workingImage);
+        if(is_resource($this->newImage) || $this->newImage instanceof \GdImage) @ImageDestroy($this->newImage);
+        if(is_resource($this->oldImage) || $this->oldImage instanceof \GdImage) @ImageDestroy($this->oldImage);
+        if(is_resource($this->workingImage) || $this->workingImage instanceof \GdImage) @ImageDestroy($this->workingImage);
     }
 
     /**
@@ -870,7 +870,7 @@ class ngg_Thumbnail {
     function watermarkImage( $relPOS = 'botRight', $xPOS = 0, $yPOS = 0) {
     	
 		// if it's a resource ID take it as watermark text image
-    	if(is_resource($this->watermarkImgPath)) {
+    	if(is_resource($this->watermarkImgPath) || $this->watermarkImgPath instanceof \GdImage) {
     		$this->workingImage = $this->watermarkImgPath;
     	} else {
 		// Would you really want to use anything other than a png? 
