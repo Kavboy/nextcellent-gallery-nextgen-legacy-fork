@@ -1,85 +1,151 @@
 /* Shutter */
-#shDisplay div#shTitle {
-	font: normal 12px/17px 'Lucida Grande', Verdana, sans-serif; /* caption font */
-	color: #ffffff; /* caption colour */
-	text-align: center;
-	margin: 0 auto;
-}
-
-#shDisplay div#shCount {
-	color: #999999;
-	font: normal 10px/12px 'Lucida Grande', Verdana, sans-serif;
-}
-
-#shDisplay div#shTitle a {
-	text-decoration: none;
-	font: bold 16pt 'Courier New', Courier, fixed;
-	letter-spacing: -2px;
-	margin: 0 10px;
-	width: 26px;
-	color: #999999;
-}
-
-#shDisplay div#shTitle a:hover {
-	color: #ffffff;
-	border: none;
-}
-
-#shDisplay div#shNext{
-	float:right;
-}
-
-#shDisplay div#shPrev {
-	float:left;
-}
-
 body {
 	height: 100%;
 }
 
-#shShutter *, #shDisplay * {
+
+#shShutter *, #shDisplay *, #shDescription * {
 	padding: 0;
 	margin: 0;
 }
 
-div#shShutter, div#shDisplay {
+#shShutter, #shDisplay {
 	top: 0;
 	left: 0;
 	width: 100%;
 	position: absolute;
 }
 
-div#shShutter {
+#shShutter {
 	height: 100%;
 	z-index: 10000;
-	background-color: #000000;
-	opacity: 0.8;
-	filter:alpha(opacity=80);
+	background-color: rgba(0, 0, 0, 0.8);
+	cursor: pointer;
 }
 
-div#shDisplay {
+#shSpinner {
+	position: relative;
+	margin: 0 auto;
+	width: 64px;
+	height: 64px;
+	border: 8px solid;
+	border-color: #999999 transparent #999999 transparent;
+	border-radius: 50%;
+	animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+#shLoadError {
+	display: none;
+	position: relative;
+	margin: 0 auto;
+	background-color: rgba(0, 0, 0, 0.4);
+	border-radius: 0 0 5px 5px;
+	color: #999999;
+	text-align: center;
+	padding: 20px;
+	cursor: initial;
+}
+
+#shDisplay {
 	display: block;
 	background-color: transparent;
 	z-index: 10002;
 }
 
-div#shDisplay img#shTopImg {
+#shDisplay #shCrossClose {
+	transition: transform 500ms;
+	box-sizing: content-box;
+	position: relative;
+	color: #000000;
+	background-color: rgba(255, 255, 255, 0.9);
+	border: 3px solid rgba(0, 0, 0, 0.8);
+	width: 30px;
+	height: 30px;
+	top: 15px;
+	font-size: 20px;
+	border-radius: 20px;
+	text-align: center;
+	line-height: 29px;
+	font-weight: bold;
+}
+
+#shDisplay #shCrossClose:hover, #shCrossClose:focus, #shCrossClose:active {
+	background-color: #FFFFFF!important;
+	border: 3px solid #000000!important;
+	transform: scale(1.2);
+	outline-offset: 0;
+}
+
+#shDisplay #shutterImg {
 	margin: 0 auto;
 	border: 1px solid #555;
 	background: transparent;
 	display: block;
-	max-width: none;
+	max-width: 100%;
 	max-height: none;
 	float: none;
 	padding:2px;
-	cursor: pointer;
+	cursor: initial;
 }
 
-div#shDisplay div#shWrap {
-	visibility: hidden;
+#shDescription {
+	background-color: rgba(0, 0, 0, 0.4);
+	border-radius: 0 0 5px 5px;
+	color: #999999;
+	margin: 0 auto;
+	text-align: center;
+	padding-bottom: 10px;
+	cursor: initial;
 }
 
-div#shWaitBar {
+#shDisplay #shNavBar {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	font: normal 12px/17px 'Lucida Grande', Verdana, sans-serif; /* caption font */
+	color: #ffffff; /* caption colour */
+	text-align: center;
+	margin: 0 auto;
+	padding: 5px 0 5px 0;
+	line-height: 30px;
+	background-color: rgba(0, 0, 0, 0.4);
+	color: #999999;
+	cursor: initial;
+}
+
+#shDisplay #shNavBar button {
+	text-decoration: none;
+	font: bold 16pt 'Courier New', Courier, fixed;
+	letter-spacing: -2px;
+	padding: 2px;
+	color: #999999;
+	background-color: transparent;
+}
+
+#shDisplay #shNavBar a:hover {
+	color: #ffffff;
+	border: none;
+}
+
+#shDisplay #shNext{
+	min-width: 50px;
+}
+
+#shDisplay #shPrev {
+	min-width: 50px;
+}
+
+#shWaitBar {
 	font: bold 32px 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
 	height: 36px;
 	width: 100%;
@@ -89,6 +155,22 @@ div#shWaitBar {
 	filter: alpha(opacity=100);
 	z-index: 10001;
 	margin-top: 160px;
-	color: #ae0a0a;
-    text-align: center;
+	color: #FFFFFF;
+	text-align: center;
+}
+
+@media screen and (max-width: 500px) {
+	#shCrossClose {
+		display: none;
+	}
+
+	#shDisplay #shNavBar {
+		height: 50px;
+		line-height: 50px;
+	}
+
+	#shDisplay #shNavBar button {
+		height: 50px;
+		width: 50px;
+	}
 }

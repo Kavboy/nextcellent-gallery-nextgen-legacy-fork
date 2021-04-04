@@ -556,7 +556,7 @@ if (!class_exists('nggLoader')) {
 
 			// activate modified Shutter reloaded if not use the Shutter plugin
 			if ( ($this->options['thumbEffect'] == 'shutter') && !function_exists('srel_makeshutter') )
-				wp_enqueue_style('shutter', NGGALLERY_URLPATH .'public/js/shutter-reloaded.css', false, '1.3.4', 'screen');
+				wp_enqueue_style('shutter', NGGALLERY_URLPATH .'public/css/shutter-reloaded.css', false, '1.3.4', 'screen');
 
 			// Load Owl carousel stylesheets if slideshow enabled
 			if ($this->options['galShowSlide']) {
