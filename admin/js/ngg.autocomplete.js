@@ -1,136 +1,153 @@
 /**
  * NextCellent implementation of jQuery UI Autocomplete.
  *
+ * @param {Object} args
  * @see http://jqueryui.com/demos/autocomplete/
  * @see /xml/json.php for the API.
- *
- * @version 1.1
- * 
+ * @version 2.0
  */
 jQuery.fn.nggAutocomplete = function (args) {
+	console.log('autocomplete', args);
+	const defaults = {
+		type: 'image',
+		domain: '',
+		limit: 50,
+	};
 
-    var defaults = {
-        type: 'image',
-        domain: '',
-        limit: 50
-    };
+	// overwrite the default values and add others
+	const settings = {
+		...defaults,
+		...args,
+	};
 
-    var s = jQuery.extend({}, defaults, args);
+	const obj = this[0];
+	const id = jQuery(this).attr('id');
+	const cache = {};
+	let lastXhr;
 
-    var settings = {
-        method: 'autocomplete',
-        type: s.type,
-        format: 'json',
-        callback: 'json',
-        limit: s.limit,
-        term: s.term
-    };
+	/**
+	 * The element.
+	 */
+	const objSelector = jQuery(obj);
 
-    var obj = this.selector;
-    var id = jQuery(this).attr('id');
-    var cache = {}, lastXhr;
+	/**
+	 * The current value of the dropdown field.
+	 */
+	let dropdownText = jQuery('#' + id + ' option:selected').text();
 
-    /**
-     * The element.
-     */
-    var obj_selector = jQuery(obj);
+	/**
+	 * Hide the drop down field and add the search field.
+	 */
+	objSelector
+		.hide()
+		.after(
+			'<input name="' + id + '_ac" type="search" id="' + id + '_ac"/>'
+		);
 
-    /**
-     * The current value of the dropdown field.
-     */
-    var c_text  = jQuery(obj + ' option:selected').text();
-    var c_width = s.width;
+	/**
+	 * The search field.
+	 */
+	const searchField = jQuery('#' + id + '_ac');
 
-    /**
-     * Hide the drop down field and add the search field.
-     */
-    obj_selector.hide().after('<input name="' + id + '_ac" type="search" id="' + id + '_ac"/>');
+	/**
+	 * Add the current value and set the style.
+	 */
+	searchField
+		.val(dropdownText)
+		.css('width', '60%')
+		.addClass('ui-autocomplete-start');
 
-    /**
-     * The search field.
-     */
-    var obj_ac_selector = jQuery(obj + "_ac");
+	/**
+	 * Initiate the autocomplete
+	 * 20150305: only add term to request if term is not empty
+	 */
+	searchField.autocomplete({
+		source(request, response) {
+			console.log('request', request);
+			console.log('response', response);
+			const term = request.term;
+			if (term in cache) {
+				console.log('term cache', term);
+				response(cache[term]);
+				return;
+			}
+			// adding more $_GET parameter
+			lastXhr = jQuery.getJSON(
+				settings.domain,
+				{
+					type: settings.type,
+					limit: settings.limit,
+					method: 'autocomplete',
+					format: 'json',
+					callback: 'json',
+				},
+				function (data, status, xhr) {
+					console.log('status', status);
+					console.log('data', data);
+					// add term to cache
+					cache[term] = data;
+					if (xhr === lastXhr) response(data);
+				}
+			);
+		},
+		minLength: 0,
+		select(event, ui) {
+			/**
+			 * We we will add this to the selector.
+			 *
+			 * @type {Option} The option to be added.
+			 */
+			const option = new Option(ui.item.label, ui.item.id);
 
-    /**
-     * Add the current value and set the style.
-     */
-    obj_ac_selector.val(c_text).css('width', c_width).addClass('ui-autocomplete-start');
+			/**
+			 * Add the select attribute to the option and remove it from the others.
+			 */
+			jQuery(option).attr('selected', true);
+			jQuery('#' + id + ' option:selected').attr('selected', false);
 
-    /**
-     * Initiate the autocomplete
-     * 20150305: only add term to request if term is not empty
-     */
-    obj_ac_selector.autocomplete({
-        source: function (request, response) {
-            var term = request.term;
-            console.log(response);
-            if (term in cache) {
-                    response(cache[term]);
-                return;
-            }
-            // adding more $_GET parameter
-            //20150303: invert stetting and request to make term priority
-            request = jQuery.extend({}, request, settings);
-            lastXhr = jQuery.getJSON(s.domain, request, function (data, status, xhr) {
-                // add term to cache
-                cache[term] = data;
-                if (xhr === lastXhr)
-                    response(data);
-            });
-        },
-        minLength: 0,
-        select: function (event, ui) {
-            /**
-             * We we will add this to the selector.
-             *
-             * @type {Option} The option to be added.
-             */
-            var option = new Option(ui.item.label, ui.item.id);
+			/**
+			 * Add the option.
+			 */
+			objSelector.append(option);
 
-            /**
-             * Add the select attribute to the option and remove it from the others.
-             */
-            jQuery(option).attr('selected', true);
-            jQuery(obj + " option:selected").attr('selected', false);
+			/**
+			 * Remove autocomplete class.
+			 */
+			searchField.removeClass('ui-autocomplete-start');
 
+			/**
+			 * Update the text selector
+			 */
+			dropdownText = ui.item.label;
 
-            /**
-             * Add the option.
-             */
-            obj_selector.append(option);
+			/**
+			 * Trigger a custom event.
+			 *
+			 * @since 1.1
+			 */
+			objSelector.trigger('nggAutocompleteDone');
+		},
+	});
 
-            /**
-             * Remove autocomplete class.
-             */
-            obj_ac_selector.removeClass('ui-autocomplete-start');
+	/**
+	 * If the search field is empty and the focus is lost set default text
+	 */
+	searchField.on('focusout', () => {
+		if (searchField.val() === '') {
+			searchField[0].value = dropdownText;
+		}
+	});
 
-            /**
-             * Update the text selector
-             */
-            c_text  = ui.item.label;
+	searchField.on('click', function () {
+		let search = searchField.val();
 
-            /**
-             * Trigger a custom event.
-             *
-             * @since 1.1
-             */
-            obj_selector.trigger('nggAutocompleteDone');
-        }
-    });
-
-    obj_ac_selector.click(function () {
-        //FZSM 20050307: There is an issue with drop downn list which it can stay behind form editor.
-        //this workaround makes drop-down z-index to follow dialo z-index.
-        jQuery ('.ui-autocomplete').css('z-index', jQuery('.ui-dialog').zIndex()+1);
-
-        var search = obj_ac_selector.val();
-
-        /**
-         * If the selected value is already present, we need to show all images.
-         */
-        if (search == c_text) {
-            search = '';
-        }
-        obj_ac_selector.autocomplete('search', search);
-    });
-}
+		/**
+		 * If the selected value is already present, we need to show all images.
+		 */
+		if (search === dropdownText) {
+			searchField[0].value = '';
+			search = '';
+		}
+		searchField.autocomplete('search', search);
+	});
+};
