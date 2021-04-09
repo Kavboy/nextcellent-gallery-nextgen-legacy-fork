@@ -329,10 +329,6 @@ shutterReloaded = {
 				ev.stopPropagation();
 				this.hideShutter();
 			});
-			shadowBox.addEventListener('wheel', (ev) => {
-				ev.stopPropagation();
-				ev.preventDefault();
-			});
 		}
 		return shadowBox;
 	},

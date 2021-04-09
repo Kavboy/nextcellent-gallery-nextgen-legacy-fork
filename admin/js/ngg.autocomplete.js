@@ -7,7 +7,6 @@
  * @version 2.0
  */
 jQuery.fn.nggAutocomplete = function (args) {
-	console.log('autocomplete', args);
 	const defaults = {
 		type: 'image',
 		domain: '',

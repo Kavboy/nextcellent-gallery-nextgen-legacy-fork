@@ -9,8 +9,11 @@
     "copy-corousel": "copycopy node_modules/owl.carousel/dist/owl.carousel.min.js public/js && copycopy  node_modules/owl.carousel/dist/assets/owl.carousel.min.css public/css && copycopy node_modules/owl.carousel/dist/assets/owl.theme.default.min.css public/css",
     "copy-animate": "copycopy node_modules/animate.css/animate.min.css public/css",
     "copy-cropper": "copycopy node_modules/cropper/dist/cropper.min.js public/js && copycopy node_modules/cropper/dist/cropper.min.css public/css",
-    "prebuild": "npm run clean && npm run copy-files && npm run copy-corousel && npm run copy-animate && npm run copy-cropper",
-    "build": "babel js/ngg.js -d public/js js/shutter-reloaded.js -d public/js",
+    "create-tmp-folder": "fsbin mkdir tmp",
+    "remove-tmp-folder": "fsbin remove tmp",
+    "prebuild": "npm run clean && npm run copy-files && npm run copy-corousel && npm run copy-animate && npm run copy-cropper && npm run create-tmp-folder",
+    "build": "babel js/ngg.js -d public/js js/shutter-reloaded.js -d tmp",
+    "postbuild": "uglifyjs tmp/shutter-reloaded.js -c -m -o public/js/shutter-reloaded.min.js  && npm run remove-tmp-folder && fsbin remove public/js/shutter-reloaded.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -55,7 +58,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
     "fsbin": "^1.0.10",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "uglify-js": "^3.13.3"
   },
   "dependencies": {
     "animate.css": "^3.7.2",
