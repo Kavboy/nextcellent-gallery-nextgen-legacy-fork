@@ -1,31 +1,26 @@
 <?php
-/*
-Plugin Name: NextCellent Gallery
-Plugin URI: http://www.wpgetready.com/nextcellent-gallery
-Description: A Photo Gallery for WordPress providing NextGEN legacy compatibility from version 1.9.13
-Author: WPGReady, Niknetniko based on Alex Rabe & PhotoCrati work.
-Author URI: http://www.wpgetready.com
-Version: 1.9.35
-
-Copyright (c) 2007-2011 by Alex Rabe & NextGEN DEV-Team
-Copyright (c) 2012 Photocrati Media
-Copyright (c) 2013-2014 WPGetReady
-Copyright (c) 2014-2016 WPGetReady, Niknetniko
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+/**
+ * Plugin Name: NextCellent Gallery
+ * Plugin URI: http://www.wpgetready.com/nextcellent-gallery
+ * Description: A Photo Gallery for WordPress providing NextGEN legacy compatibility from version 1.9.13
+ * Author: WPGReady, Niknetniko based on Alex Rabe & PhotoCrati work.
+ * Author URI: http://www.wpgetready.com
+ * Version: 1.9.35
+ * Requires at least: 4.0.0
+ * Requires PHP: 5.4
+ * License: GPL v2
+ * License URI: https://github.com/Kavboy/nextcellent-gallery-nextgen-legacy-fork/blob/master/LICENCE.md
+ *
+ * Text Domain: nggallery
+ * Domain Path: /lang
+ *
+ * @package WordPress
+ *
+ * Copyright (c) 2007-2011 by Alex Rabe & NextGEN DEV-Team
+ * Copyright (c) 2012 Photocrati Media
+ * Copyright (c) 2013-2014 WPGetReady
+ * Copyright (c) 2014-2016 WPGetReady, Niknetniko
+ */
 
 // Stop direct call
 if ( preg_match( '#' . basename( __FILE__ ) . '#', $_SERVER['PHP_SELF'] ) ) {
@@ -500,7 +495,6 @@ if ( ! class_exists( 'nggLoader' ) ) {
 
 		/**
 		 * Load scripts depending options defined
-		 * 20150106: Added js for Qunit
 		 * 20150107: jquery is almost mandatory... Should it be enqueued only when lightbox is activated?
 		 */
 		function load_scripts() {
@@ -512,10 +506,7 @@ if ( ! class_exists( 'nggLoader' ) ) {
 
 			// activate Thickbox
 			if ( $this->options['thumbEffect'] == 'thickbox' ) {
-				wp_enqueue_script( 'thickbox' );
-				// Load the thickbox images after all other scripts
-				add_action( 'wp_footer', array( &$this, 'load_thickbox_images' ), 11 );
-
+				add_thickbox();
 			}
 
 			// activate jquery.lightbox
@@ -566,19 +557,6 @@ if ( ! class_exists( 'nggLoader' ) ) {
 				nggMediaRss::add_piclens_javascript();
 			}
 
-			// Added Qunit for javascript unit testing
-			$nxc = isset( $_GET['nextcellent'] ) ? $_GET['nextcellent'] : '';
-			if ( $nxc ) {
-				wp_enqueue_script( 'qunit-init', NGGALLERY_URLPATH . 'js/nxc.main.js', array( 'jquery' ) ); // main q-unit call
-				wp_enqueue_script( 'qunit', NGGALLERY_URLPATH . 'js/qunit-1.16.0.js', array( 'jquery' ) ); // qunit core
-				wp_enqueue_script( 'nextcellent-test', NGGALLERY_URLPATH . 'js/nxc.test.js', array( 'jquery' ) ); // unit testing specific for nextcellent
-			}
-
-		}
-
-		function load_thickbox_images() {
-			// WP core reference relative to the images. Bad idea
-			echo "\n" . '<script type="text/javascript">tb_pathToImage = "' . site_url() . '/wp-includes/js/thickbox/loadingAnimation.gif";tb_closeImage = "' . site_url() . '/wp-includes/js/thickbox/tb-close.png";</script>' . "\n";
 		}
 
 		/**

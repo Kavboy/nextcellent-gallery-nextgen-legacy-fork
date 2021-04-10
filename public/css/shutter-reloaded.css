@@ -4,12 +4,15 @@ body {
 }
 
 
-#shShutter *, #shDisplay *, #shDescription * {
+#shShutter *,
+#shDisplay *,
+#shDescription * {
 	padding: 0;
 	margin: 0;
 }
 
-#shShutter, #shDisplay {
+#shShutter,
+#shDisplay {
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -29,15 +32,17 @@ body {
 	width: 64px;
 	height: 64px;
 	border: 8px solid;
-	border-color: #999999 transparent #999999 transparent;
+	border-color: #999 transparent #999 transparent;
 	border-radius: 50%;
 	animation: spin 1.2s linear infinite;
 }
 
 @keyframes spin {
+
 	0% {
 		transform: rotate(0deg);
 	}
+
 	100% {
 		transform: rotate(360deg);
 	}
@@ -49,7 +54,7 @@ body {
 	margin: 0 auto;
 	background-color: rgba(0, 0, 0, 0.4);
 	border-radius: 0 0 5px 5px;
-	color: #999999;
+	color: #999;
 	text-align: center;
 	padding: 20px;
 	cursor: initial;
@@ -65,7 +70,7 @@ body {
 	transition: transform 500ms;
 	box-sizing: content-box;
 	position: relative;
-	color: #000000;
+	color: #000;
 	background-color: rgba(255, 255, 255, 0.9);
 	border: 3px solid rgba(0, 0, 0, 0.8);
 	width: 30px;
@@ -78,9 +83,11 @@ body {
 	font-weight: bold;
 }
 
-#shDisplay #shCrossClose:hover, #shCrossClose:focus, #shCrossClose:active {
-	background-color: #FFFFFF!important;
-	border: 3px solid #000000!important;
+#shDisplay #shCrossClose:hover,
+#shCrossClose:focus,
+#shCrossClose:active {
+	background-color: #fff !important;
+	border: 3px solid #000 !important;
 	transform: scale(1.2);
 	outline-offset: 0;
 }
@@ -93,14 +100,14 @@ body {
 	max-width: 100%;
 	max-height: none;
 	float: none;
-	padding:2px;
+	padding: 2px;
 	cursor: initial;
 }
 
 #shDescription {
 	background-color: rgba(0, 0, 0, 0.4);
 	border-radius: 0 0 5px 5px;
-	color: #999999;
+	color: #999;
 	margin: 0 auto;
 	text-align: center;
 	padding-bottom: 10px;
@@ -112,32 +119,32 @@ body {
 	flex-direction: row;
 	flex-wrap: nowrap;
 	justify-content: space-between;
-	font: normal 12px/17px 'Lucida Grande', Verdana, sans-serif; /* caption font */
-	color: #ffffff; /* caption colour */
+	font: normal 12px/17px "Lucida Grande", Verdana, sans-serif; /* caption font */
+	color: #fff; /* caption colour */
 	text-align: center;
 	margin: 0 auto;
 	padding: 5px 0 5px 0;
 	line-height: 30px;
 	background-color: rgba(0, 0, 0, 0.4);
-	color: #999999;
+	color: #999;
 	cursor: initial;
 }
 
 #shDisplay #shNavBar button {
 	text-decoration: none;
-	font: bold 16pt 'Courier New', Courier, fixed;
+	font: bold 16pt "Courier New", Courier, fixed;
 	letter-spacing: -2px;
 	padding: 2px;
-	color: #999999;
+	color: #999;
 	background-color: transparent;
 }
 
 #shDisplay #shNavBar a:hover {
-	color: #ffffff;
+	color: #fff;
 	border: none;
 }
 
-#shDisplay #shNext{
+#shDisplay #shNext {
 	min-width: 50px;
 }
 
@@ -146,7 +153,7 @@ body {
 }
 
 #shWaitBar {
-	font: bold 32px 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
+	font: bold 32px "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
 	height: 36px;
 	width: 100%;
 	left: 0;
@@ -155,11 +162,12 @@ body {
 	filter: alpha(opacity=100);
 	z-index: 10001;
 	margin-top: 160px;
-	color: #FFFFFF;
+	color: #fff;
 	text-align: center;
 }
 
 @media screen and (max-width: 500px) {
+
 	#shCrossClose {
 		display: none;
 	}
